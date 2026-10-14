@@ -33,7 +33,3 @@ run
 gradlew
 
 /logs/
-
-# Terra++ / Terra-- data state directories
-/terraplusplus/
-/terraminusminus/
