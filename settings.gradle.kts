@@ -1,3 +1,4 @@
 rootProject.name = "terracore"
-include("bukkit")
+include("http")
 include("terraminusminus")
+include("bukkit")
