@@ -27,7 +27,7 @@ import static net.buildtheearth.terracore.http.HttpStatusCodes.*;
 import static net.buildtheearth.terracore.http.InternalUtils.*;
 
 
-public class TerracoreHttpClient implements CachingHttpClient {
+public class TerracoreHttpClient implements HttpClient {
 
     private final ForkJoinPool forkJoinPool = new ForkJoinPool(20, HttpWorkerThread::new, this::unhandledException, true);
     private final ForkJoinPool semaphoreAcquireExecutor = new ForkJoinPool(1, HttpWorkerThread::new, this::unhandledException, true);

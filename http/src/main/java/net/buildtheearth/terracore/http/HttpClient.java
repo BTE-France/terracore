@@ -15,4 +15,26 @@ public interface HttpClient {
 
     void setMaxConcurrentRequests(String host, int maxConcurrentRequests);
 
+
+    /**
+     * Computes statistics about the current cache usage.
+     *
+     * @return a future of the client's cache statistics
+     */
+    CompletableFuture<CacheStatistics> cacheStatistics();
+
+    /**
+     * Performs regular maintenance on cache, removing long stale entries etc.
+     *
+     * @return a future containing statistics on the entries that were removed from the cache
+     */
+    CompletableFuture<CacheStatistics> cacheCleanup();
+
+    /**
+     * Fully clears the cache.
+     *
+     * @return a future containing statistics on the entries that were removed from the cache
+     */
+    CompletableFuture<CacheStatistics> cacheClear();
+
 }
