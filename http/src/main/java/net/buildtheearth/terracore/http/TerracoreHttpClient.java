@@ -27,6 +27,15 @@ import static net.buildtheearth.terracore.http.HttpStatusCodes.*;
 import static net.buildtheearth.terracore.http.InternalUtils.*;
 
 
+/**
+ * Default {@link HttpClient} implementation provided by Terracore.
+ * <br>
+ * This implementation is based on the {@link java.net.http.HttpClient} client implementation,
+ * and inherits is supports for HTTP 1.1 and HTTP 2.0.
+ * It also implements compliant HTTP caching.
+ *
+ * @author Smyler
+ */
 public class TerracoreHttpClient implements HttpClient {
 
     private final ForkJoinPool forkJoinPool = new ForkJoinPool(20, HttpWorkerThread::new, this::unhandledException, true);
@@ -50,6 +59,12 @@ public class TerracoreHttpClient implements HttpClient {
 
     private static final float CACHE_HEURISTIC = 0.25f;
 
+    /**
+     * Creates a new {@link TerracoreHttpClient} instance.
+     *
+     * @param logger            the logger to use
+     * @param cacheDirectory    the directory to use for caching
+     */
     public TerracoreHttpClient(Logger logger, Path cacheDirectory) {
         this.logger = logger;
         HttpCache cache;

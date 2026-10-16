@@ -11,8 +11,20 @@ import java.util.concurrent.CompletableFuture;
  */
 public interface HttpClient {
 
+    /**
+     * Performs an asynchronous GET request to the specified URL.
+     *
+     * @param url the URL to send the GET request to
+     * @return a future containing the response body as a byte array
+     */
     CompletableFuture<byte[]> get(String url);
 
+    /**
+     * Sets the maximum number of concurrent requests allowed to a specific host.
+     *
+     * @param host                  the host for which to set the maximum number of concurrent requests
+     * @param maxConcurrentRequests the maximum number of concurrent requests allowed for the specified host
+     */
     void setMaxConcurrentRequests(String host, int maxConcurrentRequests);
 
 

@@ -2,6 +2,7 @@ package net.buildtheearth.terracore.http;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 import java.io.ByteArrayInputStream;
 import java.net.URI;
@@ -15,10 +16,19 @@ import java.util.function.Predicate;
 import static net.buildtheearth.terracore.http.CacheStatistics.CacheType.*;
 
 
+/**
+ * A simple in-memory HTTP cache implementation.
+ *
+ * @author Smyler
+ */
 public class MemoryCache implements HttpCache {
 
     private final ConcurrentHashMap<URI, MemoryCacheEntry> cache = new ConcurrentHashMap<>();
 
+    /**
+     * Creates a new {@link MemoryCache} instance.
+     */
+    public MemoryCache() { }
 
     @Override
     public void put(@NotNull URI uri, long lastModified, long maxAge, @Nullable String etag, boolean immutable, boolean mustRevalidate, byte @NotNull [] body) {
@@ -57,7 +67,7 @@ public class MemoryCache implements HttpCache {
     }
 
     @Override
-    public CacheStatistics cleanup(Predicate<CacheEntry> predicate) {
+    public CacheStatistics cleanup(@NonNull Predicate<CacheEntry> predicate) {
         Collection<MemoryCacheEntry> values = this.cache.values();
         long removedCount = 0;
         long removedSize = 0;

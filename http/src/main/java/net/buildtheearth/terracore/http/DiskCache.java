@@ -1,6 +1,7 @@
 package net.buildtheearth.terracore.http;
 
 
+import lombok.NonNull;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -31,6 +32,10 @@ import static java.nio.file.StandardCopyOption.*;
 import static net.buildtheearth.terracore.http.CacheStatistics.CacheType.*;
 import static net.buildtheearth.terracore.http.InternalUtils.*;
 
+/**
+ * An implementation of the {@link HttpCache} interface that stores cached responses
+ * as files in a directory.
+ */
 public class DiskCache implements HttpCache {
 
     private static final int FILE_FORMAT_VERSION = 1;
@@ -38,7 +43,13 @@ public class DiskCache implements HttpCache {
     private final Logger logger;
     private final Path directory;
 
-    public DiskCache(Path directory, Logger logger) {
+    /**
+     * Constructs a new {@link DiskCache} instance.
+     *
+     * @param directory the directory where cached responses will be stored
+     * @param logger    the logger to use for logging
+     */
+    public DiskCache(@NonNull Path directory, @NonNull Logger logger) {
         this.logger = logger;
         this.directory = directory;
     }
@@ -47,7 +58,7 @@ public class DiskCache implements HttpCache {
     public void put(@NotNull URI uri, long lastModified, long maxAge, @Nullable String etag, boolean immutable, boolean mustRevalidate, byte @NotNull [] body) {
         Path file = this.getSaveFile(uri);
         Path tempFile = this.getTempFile();
-        try(OutputStream stream = new GZIPOutputStream(new FileOutputStream(tempFile.toFile()))) {
+        try (OutputStream stream = new GZIPOutputStream(new FileOutputStream(tempFile.toFile()))) {
             DataOutputStream data = new DataOutputStream(stream);
             data.writeInt(FILE_FORMAT_VERSION);
             data.writeUTF(uri.toString());
@@ -63,6 +74,7 @@ public class DiskCache implements HttpCache {
         } catch (IOException e) {
             this.logger.error("Error when writing cache entry");
             this.logger.catching(e);
+            return;
         }
         try {
             Files.move(tempFile, file, REPLACE_EXISTING, ATOMIC_MOVE);
@@ -102,7 +114,7 @@ public class DiskCache implements HttpCache {
     }
 
     @Override
-    public CacheStatistics cleanup(Predicate<CacheEntry> predicate) throws IOException {
+    public CacheStatistics cleanup(@org.jspecify.annotations.NonNull Predicate<CacheEntry> predicate) throws IOException {
         try (Stream<Path> paths = Files.list(this.directory)) {
             AtomicLong entries = new AtomicLong(0L);
             AtomicLong size = new AtomicLong(0L);
