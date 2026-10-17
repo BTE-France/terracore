@@ -4,7 +4,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import lombok.NonNull;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -308,10 +308,15 @@ public class TerracoreHttpClientTest {
         }
     }
 
-    static void assertGetsContent(@NonNull HttpClient client, @NonNull TestHttpEndpoint endpoint, @NonNull String content) {
+    static void assertGetsContent(@NonNull HttpClient client, @NonNull TestHttpEndpoint endpoint, @Nullable String content) {
         var data = client.get(endpoint.url()).join();
-        String responseString = new String(data);
-        assertEquals(content, responseString);
+        if (content == null) {
+            assertNull(data);
+        } else {
+            assertNotNull(data);
+            String responseString = new String(data);
+            assertEquals(content, responseString);
+        }
     }
 
     static void assertSuccessfulFutureStringEquals(@Nullable String exceptedResult, Future<byte @Nullable []> future) {
