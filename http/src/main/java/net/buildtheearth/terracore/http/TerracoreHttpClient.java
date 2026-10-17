@@ -327,6 +327,11 @@ public class TerracoreHttpClient implements HttpClient {
         }, this.forkJoinPool);
     }
 
+    @Override
+    public void close() {
+        this.client.close();
+    }
+
     private class HttpWorkerThread extends ForkJoinWorkerThread {
         protected HttpWorkerThread(ForkJoinPool pool) {
             super(pool);

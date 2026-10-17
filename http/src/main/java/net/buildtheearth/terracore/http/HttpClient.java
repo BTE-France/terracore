@@ -1,5 +1,6 @@
 package net.buildtheearth.terracore.http;
 
+import java.io.Closeable;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -9,7 +10,7 @@ import java.util.concurrent.CompletableFuture;
  *
  * @author Smyler
  */
-public interface HttpClient {
+public interface HttpClient extends Closeable {
 
     /**
      * Performs an asynchronous GET request to the specified URL.

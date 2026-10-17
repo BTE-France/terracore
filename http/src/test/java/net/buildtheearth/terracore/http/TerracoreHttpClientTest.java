@@ -42,12 +42,9 @@ public class TerracoreHttpClientTest {
             e.close();
         };
         try (var endpoint = new TestHttpEndpoint(handler)) {
-            var client = TerracoreHttpClient.builder()
-                    .logger(getLogger())
-                    .userAgent("terracore unit test")
-                    .cache(new MemoryCache())
-                    .build();
-            assertGetsContent(client, endpoint, content);
+            try (var client = noCacheClient()) {
+                assertGetsContent(client, endpoint, content);
+            }
         }
     }
 
@@ -66,20 +63,17 @@ public class TerracoreHttpClientTest {
             inFlightRequests.getAndDecrement();
         };
         try (var endpoint = new TestHttpEndpoint(handler)) {
-            var client = TerracoreHttpClient.builder()
-                    .logger(getLogger())
-                    .userAgent("terracore unit test")
-                    .cache(new EmptyCache())
-                    .build();
-            var request1 = client.get(endpoint.url());
-            var request2 = client.get(endpoint.url());
-            var request3 = client.get(endpoint.url());
+            try (var client = noCacheClient()) {
+                var request1 = client.get(endpoint.url());
+                var request2 = client.get(endpoint.url());
+                var request3 = client.get(endpoint.url());
 
-            assertSuccessfulFutureStringEquals(content, request1);
-            assertSuccessfulFutureStringEquals(content, request2);
-            assertSuccessfulFutureStringEquals(content, request3);
+                assertSuccessfulFutureStringEquals(content, request1);
+                assertSuccessfulFutureStringEquals(content, request2);
+                assertSuccessfulFutureStringEquals(content, request3);
 
-            assertEquals(3, maxInFlightRequests.get());
+                assertEquals(3, maxInFlightRequests.get());
+            }
         }
     }
 
@@ -100,30 +94,22 @@ public class TerracoreHttpClientTest {
             inFlightRequests.getAndDecrement();
         };
         try (var endpoint = new TestHttpEndpoint(handler)) {
-            var client = TerracoreHttpClient.builder()
-                    .logger(getLogger())
-                    .userAgent("terracore unit test")
-                    .cache(new EmptyCache())
-                    .build();
-            client.setMaxConcurrentRequests(endpoint.url(), threshold);
+            try (var client = noCacheClient()) {
+                client.setMaxConcurrentRequests(endpoint.url(), threshold);
 
-            for (int i = 0; i < requests.length; i++) {
-                requests[i] = client.get(endpoint.url());
+                for (int i = 0; i < requests.length; i++) {
+                    requests[i] = client.get(endpoint.url());
+                }
+
+                CompletableFuture.allOf(requests).join();
+                assertEquals(threshold, maxInFlightRequests.get());
             }
-
-            CompletableFuture.allOf(requests).join();
-            assertEquals(threshold, maxInFlightRequests.get());
         }
     }
 
     @Test
     void canSetUserAgent() throws IOException {
         final var userAgent = "Terracore unit test";
-        var client = TerracoreHttpClient.builder()
-                .logger(getLogger())
-                .userAgent(userAgent)
-                .cache(new MemoryCache())
-                .build();
         HttpHandler handler = (HttpExchange e) -> {
             var userAgents = e.getRequestHeaders().get("User-Agent");
             assertEquals(List.of(userAgent), userAgents);
@@ -131,7 +117,14 @@ public class TerracoreHttpClientTest {
             e.close();
         };
         try (var endpoint = new TestHttpEndpoint(handler)) {
-            assertGetsContent(client, endpoint, "");
+            try (var client = TerracoreHttpClient.builder()
+                    .logger(getLogger())
+                    .userAgent(userAgent)
+                    .cache(new MemoryCache())
+                    .build();
+            ) {
+                assertGetsContent(client, endpoint, "");
+            }
         }
     }
 
@@ -159,6 +152,14 @@ public class TerracoreHttpClientTest {
         }
     }
 
+    static TerracoreHttpClient noCacheClient() {
+        return TerracoreHttpClient.builder()
+                .logger(getLogger())
+                .userAgent("TerracoreHttpClientTest")
+                .cache(new EmptyCache())
+                .build();
+    }
+
     static class TestHttpEndpoint implements Closeable {
         final InetSocketAddress address = new InetSocketAddress("127.0.0.1", randPort());
         final HttpServer server;
@@ -183,7 +184,7 @@ public class TerracoreHttpClientTest {
 
         @Override
         public void close() {
-            this.server.stop(10);
+            this.server.stop(0);
             this.executor.shutdownNow();
         }
 
