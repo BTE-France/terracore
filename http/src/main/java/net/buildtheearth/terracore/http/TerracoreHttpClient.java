@@ -141,7 +141,7 @@ public class TerracoreHttpClient implements HttpClient {
         content.exceptionally(t -> {
             if (t instanceof CancellationException) {
                 this.logger.trace("Canceled request to {}", uri);
-                //response.cancel(true);
+                response.cancel(true);
             }
             return null;
         });

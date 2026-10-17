@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -149,6 +150,33 @@ public class TerracoreHttpClientTest {
         try (var endpoint = new TestHttpEndpoint(handler)) {
             try (var client = noCacheClientBuilder().userAgent(userAgent).build()) {
                 assertGetsContent(client, endpoint, "");
+            }
+        }
+    }
+
+    @Test
+    void canCancelPendingRequests() throws IOException {
+        final String content = "Should be canceled the second time";
+        final AtomicInteger requestCount = new AtomicInteger(0);
+        HttpHandler handler = (HttpExchange e) -> {
+            requestCount.incrementAndGet();
+            uncheckedSleep(1, SECONDS);
+            e.sendResponseHeaders(HTTP_OK, 0);
+            e.getResponseBody().write(content.getBytes());
+            e.close();
+        };
+        try (var endpoint = new TestHttpEndpoint(handler)) {
+            try (var client = noCacheClientBuilder().defaultConcurrencyThreshold(1).build()) {
+                var request1 = client.get(endpoint.url());  // First request reaches the server
+                var request2 = client.get(endpoint.url());  // Second request is queued since the concurrency threshold of 1 is reached
+
+                request2.cancel(true);
+
+                assertSuccessfulFutureStringEquals(content, request1);
+                assertThrows(CancellationException.class, request2::join);
+
+                assertEquals(1, requestCount.get());
+                assertGetsContent(client, endpoint, content);
             }
         }
     }
