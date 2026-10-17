@@ -462,10 +462,4 @@ public class TerracoreHttpClient implements HttpClient {
         TerracoreHttpClientBuilder() { }
     }
 
-    private Thread createThread(Runnable task) {
-        return Thread.ofVirtual()
-                .name("Terramap HTTP " + this.workerCounter.incrementAndGet())
-                .unstarted(task);
-    }
-
 }

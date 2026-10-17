@@ -11,6 +11,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Random;
@@ -181,6 +182,111 @@ public class TerracoreHttpClientTest {
         }
     }
 
+    @Test
+    void canCacheResponse() throws IOException {
+        final String response = "Cached content";
+
+        final AtomicInteger requestCounter = new AtomicInteger(0);
+
+        HttpHandler handler = exchange -> {
+            requestCounter.incrementAndGet();
+            try (OutputStream os = exchange.getResponseBody()) {
+                exchange.getResponseHeaders().set("Cache-Control", "max-age=100");
+                exchange.getResponseHeaders().set("Content-Type", "text/plain");
+                exchange.sendResponseHeaders(HTTP_OK, response.getBytes().length);
+                os.write(response.getBytes());
+            }
+        };
+        try (var endpoint = new TestHttpEndpoint(handler)) {
+            try (var client = memoryCacheClientBuilder().build()) {
+                assertGetsContent(client, endpoint, response);
+                assertEquals(1, requestCounter.get());
+                uncheckedSleep(50, MILLISECONDS);  // Wait for the cache to be written
+                assertEquals(1, client.cacheStatistics().join().entries());
+                assertGetsContent(client, endpoint, response); // Should hit the cache
+                assertEquals(1, requestCounter.get());
+            }
+        }
+    }
+
+    @Test
+    void canRefreshStaleResponseFromEtag() throws IOException {
+        final String response = "Cached content";
+        final String etag = "foobar";
+
+        final AtomicInteger initialRequestCounter = new AtomicInteger(0);
+        final AtomicInteger refreshRequestCounter = new AtomicInteger(0);
+
+        HttpHandler handler = exchange -> {
+            try (OutputStream os = exchange.getResponseBody()) {
+                String expectedEtag = exchange.getRequestHeaders().getFirst("If-None-Match");
+                if (expectedEtag != null && expectedEtag.equals(etag)) {
+                    refreshRequestCounter.incrementAndGet();
+                    exchange.sendResponseHeaders(HTTP_NOT_MODIFIED, -1);
+                    return;
+                }
+                initialRequestCounter.incrementAndGet();
+                exchange.getResponseHeaders().set("Cache-Control", "max-age=1");
+                exchange.getResponseHeaders().set("Etag", etag);
+                exchange.getResponseHeaders().set("Content-Type", "text/plain");
+                exchange.sendResponseHeaders(HTTP_OK, response.getBytes().length);
+                os.write(response.getBytes());
+            }
+        };
+        try(TestHttpEndpoint endpoint = new TestHttpEndpoint(handler)) {
+            try (var client = memoryCacheClientBuilder().build()) {
+                assertGetsContent(client, endpoint, response);
+                assertEquals(1, initialRequestCounter.get());
+                assertEquals(0, refreshRequestCounter.get());
+                uncheckedSleep(50, MILLISECONDS);  // Wait for the cache to be written
+                assertEquals(1, client.cacheStatistics().join().entries());
+                uncheckedSleep(2, SECONDS);  // Let the cache expire
+                assertGetsContent(client, endpoint, response); // Should hit the cache but not be fresh
+                assertEquals(1, initialRequestCounter.get());
+                assertEquals(1, refreshRequestCounter.get());
+                assertEquals(1, client.cacheStatistics().join().entries());
+            }
+        }
+    }
+
+    @Test
+    void canRefreshStaleResponseFromLastModified() throws IOException {
+        final String response = "Cached content";
+
+        final AtomicInteger initialRequestCounter = new AtomicInteger(0);
+        final AtomicInteger refreshRequestCounter = new AtomicInteger(0);
+
+        HttpHandler handler = exchange -> {
+            try (OutputStream os = exchange.getResponseBody()) {
+                boolean ifModifiedSince = exchange.getRequestHeaders().containsKey("If-Modified-Since");
+                if (ifModifiedSince) {
+                    refreshRequestCounter.incrementAndGet();
+                    exchange.sendResponseHeaders(HTTP_NOT_MODIFIED, -1);
+                    return;
+                }
+                initialRequestCounter.incrementAndGet();
+                exchange.getResponseHeaders().set("Cache-Control", "max-age=1");
+                exchange.getResponseHeaders().set("Content-Type", "text/plain");
+                exchange.sendResponseHeaders(HTTP_OK, response.getBytes().length);
+                os.write(response.getBytes());
+            }
+        };
+        try(TestHttpEndpoint endpoint = new TestHttpEndpoint(handler)) {
+            try (var client = memoryCacheClientBuilder().build()) {
+                assertGetsContent(client, endpoint, response);
+                assertEquals(1, initialRequestCounter.get());
+                assertEquals(0, refreshRequestCounter.get());
+                uncheckedSleep(50, MILLISECONDS);  // Wait for the cache to be written
+                assertEquals(1, client.cacheStatistics().join().entries());
+                uncheckedSleep(2, SECONDS);  // Let the cache expire
+                assertGetsContent(client, endpoint, response); // Should hit the cache but not be fresh
+                assertEquals(1, initialRequestCounter.get());
+                assertEquals(1, refreshRequestCounter.get());
+                assertEquals(1, client.cacheStatistics().join().entries());
+            }
+        }
+    }
+
     static void assertGetsContent(@NonNull HttpClient client, @NonNull TestHttpEndpoint endpoint, @NonNull String content) {
         var data = client.get(endpoint.url()).join();
         String responseString = new String(data);
@@ -203,6 +309,13 @@ public class TerracoreHttpClientTest {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    static TerracoreHttpClient.TerracoreHttpClientBuilder memoryCacheClientBuilder() {
+        return TerracoreHttpClient.builder()
+                .logger(getLogger())
+                .userAgent("TerracoreHttpClientTest")
+                .cache(new MemoryCache());
     }
 
     static TerracoreHttpClient.TerracoreHttpClientBuilder noCacheClientBuilder() {
