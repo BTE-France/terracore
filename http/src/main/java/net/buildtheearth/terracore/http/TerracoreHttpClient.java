@@ -49,6 +49,7 @@ public class TerracoreHttpClient implements HttpClient {
             .ofPattern("EEE, dd MMM yyyy HH:mm:ss 'GMT'", Locale.ENGLISH)
             .withZone(ZoneId.of("GMT"));
 
+    private final int defaultConcurrencyThreshold;
     private final ConcurrentHashMap<String, Semaphore> concurrentRequestsCounters = new ConcurrentHashMap<>();
 
     private final java.net.http.HttpClient client = java.net.http.HttpClient.newBuilder()
@@ -64,20 +65,22 @@ public class TerracoreHttpClient implements HttpClient {
      * @param logger the logger to use.
      *               As a general rule of thumb :
      *              <ul>
-     *               <li>at level <code>TRACE</code>, an arbitrary number of log events may be emitted per request;</li>
-     *               <li>at level <code>DEBUG</code>, a single event shall be emitted per request, upon completion;</li>
-     *               <li>at level <code>INFO</code>, no events shall be emitted for successful requests (HTTP status code 1XX and 2XX);</li>
-     *               <li>at level <code>WARN</code>, no events shall be emitted for requests, only for client-side recoverable errors;</li>
-     *               <li>at level <code>ERROR</code>, no events shall be emitted for requests, only for client-side irrecoverable errors.</li>
+     *                <li>at level <code>TRACE</code>, an arbitrary number of log events may be emitted per request;</li>
+     *                <li>at level <code>DEBUG</code>, a single event shall be emitted per request, upon completion;</li>
+     *                <li>at level <code>INFO</code>, no events shall be emitted for successful requests (HTTP status code 1XX and 2XX);</li>
+     *                <li>at level <code>WARN</code>, no events shall be emitted for requests, only for client-side recoverable errors;</li>
+     *                <li>at level <code>ERROR</code>, no events shall be emitted for requests, only for client-side irrecoverable errors.</li>
      *              </ul>
      *
      * @param userAgent the user agent to use when making requests.
      * @param cache the cache to use for caching responses, if unspecified, a warning will be logged and an {@link MemoryCache} instance will be created and used.
+     * @param defaultConcurrencyThreshold the default concurrency threshold to use when making requests, if unspecified, defaulting to 6.
      */
     @Builder
-    TerracoreHttpClient(@NonNull Logger logger, @NonNull String userAgent, @Nullable HttpCache cache) {
+    TerracoreHttpClient(@NonNull Logger logger, @NonNull String userAgent, @Nullable HttpCache cache, int defaultConcurrencyThreshold) {
         this.logger = logger;
         this.userAgent = userAgent;
+        this.defaultConcurrencyThreshold = defaultConcurrencyThreshold;
 
         if (cache == null) {
             this.logger.warn("No cache implementation provided, defaulting to in-memory cache");
@@ -103,7 +106,7 @@ public class TerracoreHttpClient implements HttpClient {
             }, this.forkJoinPool);
         }
 
-        final Semaphore semaphore = this.concurrentRequestsCounters.get(hostname);
+        final Semaphore semaphore = this.concurrentRequestsCounters.computeIfAbsent(hostname, k -> new Semaphore(this.defaultConcurrencyThreshold));
 
         // Prepare request
         HttpRequest request = this.createRequest(uri, cache);
@@ -276,7 +279,7 @@ public class TerracoreHttpClient implements HttpClient {
     }
 
     @Override
-    public void setMaxConcurrentRequests(String host, int maxConcurrentRequests) {
+    public void setHostConcurrencyThreshold(@org.jspecify.annotations.NonNull String host, int maxConcurrentRequests) {
         // We need to replace the old semaphore, we can't just release to the desired number,
         // that could cause a thread condition if a request is pending
         host = URI.create(host).getHost();
@@ -447,6 +450,16 @@ public class TerracoreHttpClient implements HttpClient {
             return null;
         }
 
+    }
+
+    /**
+     * Builder for {@link TerracoreHttpClient}.
+     */
+    @SuppressWarnings({ "unused", "FieldMayBeFinal" })  // Lombok auto-completes the class
+    public static class TerracoreHttpClientBuilder {
+        private int defaultConcurrencyThreshold = 6;
+
+        TerracoreHttpClientBuilder() { }
     }
 
     private Thread createThread(Runnable task) {

@@ -1,5 +1,7 @@
 package net.buildtheearth.terracore.http;
 
+import lombok.NonNull;
+
 import java.io.Closeable;
 import java.util.concurrent.CompletableFuture;
 
@@ -23,10 +25,11 @@ public interface HttpClient extends Closeable {
     /**
      * Sets the maximum number of concurrent requests allowed to a specific host.
      *
-     * @param host                  the host for which to set the maximum number of concurrent requests
+     * @param host                  the host for which to set the maximum number of concurrent requests,
+     *                              this may be provided as a full URI, in which case the host will be extracted from it
      * @param maxConcurrentRequests the maximum number of concurrent requests allowed for the specified host
      */
-    void setMaxConcurrentRequests(String host, int maxConcurrentRequests);
+    void setHostConcurrencyThreshold(@NonNull String host, int maxConcurrentRequests);
 
 
     /**

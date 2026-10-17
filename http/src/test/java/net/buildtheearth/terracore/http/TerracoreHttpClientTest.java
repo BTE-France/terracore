@@ -42,7 +42,7 @@ public class TerracoreHttpClientTest {
             e.close();
         };
         try (var endpoint = new TestHttpEndpoint(handler)) {
-            try (var client = noCacheClient()) {
+            try (var client = noCacheClientBuilder().build()) {
                 assertGetsContent(client, endpoint, content);
             }
         }
@@ -63,7 +63,7 @@ public class TerracoreHttpClientTest {
             inFlightRequests.getAndDecrement();
         };
         try (var endpoint = new TestHttpEndpoint(handler)) {
-            try (var client = noCacheClient()) {
+            try (var client = noCacheClientBuilder().build()) {
                 var request1 = client.get(endpoint.url());
                 var request2 = client.get(endpoint.url());
                 var request3 = client.get(endpoint.url());
@@ -79,7 +79,7 @@ public class TerracoreHttpClientTest {
 
     @ParameterizedTest
     @ValueSource(ints = {1, 2, 4, 8, 16, 32, 64})
-    void respectsConcurrencyThreshold(int threshold) throws IOException {
+    void respectsHostConcurrencyThreshold(int threshold) throws IOException {
         final var content = "Hello, World!";
         final var inFlightRequests = new AtomicInteger(0);
         final var maxInFlightRequests = new AtomicInteger(0);
@@ -94,8 +94,38 @@ public class TerracoreHttpClientTest {
             inFlightRequests.getAndDecrement();
         };
         try (var endpoint = new TestHttpEndpoint(handler)) {
-            try (var client = noCacheClient()) {
-                client.setMaxConcurrentRequests(endpoint.url(), threshold);
+            try (var client = noCacheClientBuilder().build()) {
+                client.setHostConcurrencyThreshold(endpoint.url(), threshold);
+
+                for (int i = 0; i < requests.length; i++) {
+                    requests[i] = client.get(endpoint.url());
+                }
+
+                CompletableFuture.allOf(requests).join();
+                assertEquals(threshold, maxInFlightRequests.get());
+            }
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {1, 2, 4, 8, 16, 32, 64})
+    void respectsDefaultConcurrencyThreshold(int threshold) throws IOException {
+        final var content = "Hello, World!";
+        final var inFlightRequests = new AtomicInteger(0);
+        final var maxInFlightRequests = new AtomicInteger(0);
+        final var requests = new CompletableFuture<?>[64];
+        HttpHandler handler = (HttpExchange e) -> {
+            var inFlight = inFlightRequests.incrementAndGet();
+            maxInFlightRequests.updateAndGet(i -> Math.max(i, inFlight));
+            uncheckedSleep(100, MILLISECONDS);
+            e.sendResponseHeaders(HTTP_OK, 0);
+            e.getResponseBody().write(content.getBytes(UTF_8));
+            e.close();
+            inFlightRequests.getAndDecrement();
+        };
+        try (var endpoint = new TestHttpEndpoint(handler)) {
+            try (var client = noCacheClientBuilder().defaultConcurrencyThreshold(threshold).build()) {
+                client.setHostConcurrencyThreshold(endpoint.url(), threshold);
 
                 for (int i = 0; i < requests.length; i++) {
                     requests[i] = client.get(endpoint.url());
@@ -117,12 +147,7 @@ public class TerracoreHttpClientTest {
             e.close();
         };
         try (var endpoint = new TestHttpEndpoint(handler)) {
-            try (var client = TerracoreHttpClient.builder()
-                    .logger(getLogger())
-                    .userAgent(userAgent)
-                    .cache(new MemoryCache())
-                    .build();
-            ) {
+            try (var client = noCacheClientBuilder().userAgent(userAgent).build()) {
                 assertGetsContent(client, endpoint, "");
             }
         }
@@ -152,12 +177,11 @@ public class TerracoreHttpClientTest {
         }
     }
 
-    static TerracoreHttpClient noCacheClient() {
+    static TerracoreHttpClient.TerracoreHttpClientBuilder noCacheClientBuilder() {
         return TerracoreHttpClient.builder()
                 .logger(getLogger())
                 .userAgent("TerracoreHttpClientTest")
-                .cache(new EmptyCache())
-                .build();
+                .cache(new EmptyCache());
     }
 
     static class TestHttpEndpoint implements Closeable {

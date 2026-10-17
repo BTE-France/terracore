@@ -22,6 +22,11 @@ public class EmptyCache implements HttpCache {
 
     private static final CacheStatistics EMPTY_STATISTICS = new CacheStatistics(0, 0, MEMORY);
 
+    /**
+     * Creates a new {@link EmptyCache} instance.
+     */
+    public EmptyCache() { }
+
     @Override
     public void put(@NonNull URI uri, long lastModified, long maxAge, @Nullable String etag, boolean immutable, boolean mustRevalidate, byte @NonNull [] body) {
         // No-op
