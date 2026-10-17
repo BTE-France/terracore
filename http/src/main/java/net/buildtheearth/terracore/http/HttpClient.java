@@ -1,6 +1,7 @@
 package net.buildtheearth.terracore.http;
 
 import lombok.NonNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.Closeable;
 import java.util.concurrent.CompletableFuture;
@@ -18,9 +19,9 @@ public interface HttpClient extends Closeable {
      * Performs an asynchronous GET request to the specified URL.
      *
      * @param url the URL to send the GET request to
-     * @return a future containing the response body as a byte array
+     * @return a future containing the response body as a byte array, or null if the server returned a 404 Not Found response
      */
-    CompletableFuture<byte[]> get(String url);
+    @NonNull CompletableFuture<byte @Nullable []> get(@NonNull String url);
 
     /**
      * Sets the maximum number of concurrent requests allowed to a specific host.

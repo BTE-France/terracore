@@ -4,6 +4,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import lombok.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -287,17 +288,42 @@ public class TerracoreHttpClientTest {
         }
     }
 
+    @Test
+    void notFoundReturnsNull() throws IOException {
+        final String response = "Not Found";
+        HttpHandler handler = exchange -> {
+            try (OutputStream os = exchange.getResponseBody()) {
+                exchange.getResponseHeaders().set("Content-Type", "text/plain");
+                exchange.getResponseHeaders().set("Etag", "my 404 content");
+                exchange.sendResponseHeaders(HTTP_NOT_FOUND, response.getBytes().length);
+                os.write(response.getBytes());
+            }
+        };
+        try (var endpoint = new TestHttpEndpoint(handler)) {
+            try (var client = memoryCacheClientBuilder().build()) {
+                assertSuccessfulFutureStringEquals(null, client.get(endpoint.url()));
+                uncheckedSleep(100, MILLISECONDS);
+                assertSuccessfulFutureStringEquals(null, client.get(endpoint.url()));
+            }
+        }
+    }
+
     static void assertGetsContent(@NonNull HttpClient client, @NonNull TestHttpEndpoint endpoint, @NonNull String content) {
         var data = client.get(endpoint.url()).join();
         String responseString = new String(data);
         assertEquals(content, responseString);
     }
 
-    static void assertSuccessfulFutureStringEquals(String exceptedResult, Future<byte[]> future) {
+    static void assertSuccessfulFutureStringEquals(@Nullable String exceptedResult, Future<byte @Nullable []> future) {
         try {
             var data = future.get();
-            var result = new String(data, UTF_8);
-            assertEquals(exceptedResult, result);
+            if (exceptedResult == null) {
+                assertNull(data);
+            } else {
+                assertNotNull(data);
+                var result = new String(data, UTF_8);
+                assertEquals(exceptedResult, result);
+            }
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
         }

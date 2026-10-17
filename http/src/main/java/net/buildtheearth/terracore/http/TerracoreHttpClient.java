@@ -91,7 +91,7 @@ public class TerracoreHttpClient implements HttpClient {
     }
 
     @Override
-    public CompletableFuture<byte[]> get(String url) {
+    public @org.jspecify.annotations.NonNull CompletableFuture<byte[]> get(@org.jspecify.annotations.NonNull String url) {
 
         URI uri = URI.create(url);
         String hostname = uri.getHost();
@@ -167,7 +167,9 @@ public class TerracoreHttpClient implements HttpClient {
 
     private byte @Nullable [] getContent(HttpResponse<byte[]> response, CacheEntry cache) {
         byte[] content;
-        if (response.statusCode() == HTTP_NOT_MODIFIED) {
+        if (response.statusCode() == HTTP_NOT_FOUND) {
+            return null;
+        } else if (response.statusCode() == HTTP_NOT_MODIFIED) {
             if (cache == null) {
                 this.logger.warn("Unexpected response: 304 not modified but cache is null");
                 return null;
@@ -187,7 +189,7 @@ public class TerracoreHttpClient implements HttpClient {
     private void cacheResponse(HttpResponse<byte[]> response, byte[] content) {
         int statusCode = response.statusCode();
         if (statusCode != HTTP_OK && statusCode != HTTP_NO_CONTENT && statusCode != HTTP_NOT_MODIFIED) {
-            return;
+            return;  // We don't support caching other statuses at this point
         }
         Optional<String> header = response.headers().firstValue("Cache-Control");
         if (header.isPresent()) {
