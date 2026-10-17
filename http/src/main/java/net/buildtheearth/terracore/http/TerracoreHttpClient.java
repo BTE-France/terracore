@@ -1,5 +1,7 @@
 package net.buildtheearth.terracore.http;
 
+import lombok.Builder;
+import lombok.NonNull;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -9,8 +11,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.*;
         import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -21,7 +21,6 @@ import static java.lang.Math.max;
 import static java.lang.Math.round;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Arrays.stream;
-import static java.util.Objects.requireNonNull;
 import static net.buildtheearth.terracore.http.CacheStatistics.CacheType.*;
 import static net.buildtheearth.terracore.http.HttpStatusCodes.*;
 import static net.buildtheearth.terracore.http.InternalUtils.*;
@@ -33,6 +32,8 @@ import static net.buildtheearth.terracore.http.InternalUtils.*;
  * This implementation is based on the {@link java.net.http.HttpClient} client implementation,
  * and inherits is supports for HTTP 1.1 and HTTP 2.0.
  * It also implements compliant HTTP caching.
+ * <br>
+ * Create new {@link TerracoreHttpClient} instances with {@link TerracoreHttpClient#builder()}.
  *
  * @author Smyler
  */
@@ -42,7 +43,7 @@ public class TerracoreHttpClient implements HttpClient {
     private final ForkJoinPool semaphoreAcquireExecutor = new ForkJoinPool(1, HttpWorkerThread::new, this::unhandledException, true);
     private final AtomicLong workerCounter = new AtomicLong(0);
 
-    private static final String USER_AGENT = "terracore/0.0.0";
+    private final String userAgent;
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter
             .ofPattern("EEE, dd MMM yyyy HH:mm:ss 'GMT'", Locale.ENGLISH)
@@ -60,24 +61,30 @@ public class TerracoreHttpClient implements HttpClient {
     private static final float CACHE_HEURISTIC = 0.25f;
 
     /**
-     * Creates a new {@link TerracoreHttpClient} instance.
+     * @param logger the logger to use.
+     *               As a general rule of thumb :
+     *              <ul>
+     *               <li>at level <code>TRACE</code>, an arbitrary number of log events may be emitted per request;</li>
+     *               <li>at level <code>DEBUG</code>, a single event shall be emitted per request, upon completion;</li>
+     *               <li>at level <code>INFO</code>, no events shall be emitted for successful requests (HTTP status code 1XX and 2XX);</li>
+     *               <li>at level <code>WARN</code>, no events shall be emitted for requests, only for client-side recoverable errors;</li>
+     *               <li>at level <code>ERROR</code>, no events shall be emitted for requests, only for client-side irrecoverable errors.</li>
+     *              </ul>
      *
-     * @param logger            the logger to use
-     * @param cacheDirectory    the directory to use for caching
+     * @param userAgent the user agent to use when making requests.
+     * @param cache the cache to use for caching responses, if unspecified, a warning will be logged and an {@link MemoryCache} instance will be created and used.
      */
-    public TerracoreHttpClient(Logger logger, Path cacheDirectory) {
+    @Builder
+    TerracoreHttpClient(@NonNull Logger logger, @NonNull String userAgent, @Nullable HttpCache cache) {
         this.logger = logger;
-        HttpCache cache;
-        try {
-            requireNonNull(cacheDirectory);
-            Files.createDirectories(cacheDirectory);
-            cache = new DiskCache(cacheDirectory, this.logger);
-        } catch (Exception e) {
-            this.logger.warn("Failed to create cache directory, falling back to memory cache");
-            this.logger.catching(e);
-            cache = new MemoryCache();
+        this.userAgent = userAgent;
+
+        if (cache == null) {
+            this.logger.warn("No cache implementation provided, defaulting to in-memory cache");
+            this.cache = new MemoryCache();
+        } else {
+            this.cache = cache;
         }
-        this.cache = cache;
     }
 
     @Override
@@ -144,7 +151,7 @@ public class TerracoreHttpClient implements HttpClient {
         HttpRequest.Builder builder = HttpRequest.newBuilder();
         builder.GET()
                 .uri(uri)
-                .header("User-Agent", USER_AGENT);
+                .header("User-Agent", this.userAgent);
         if (cache != null) {
             if (cache.etag() != null) {
                 builder.header("If-None-Match", cache.etag());

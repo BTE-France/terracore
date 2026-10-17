@@ -5,14 +5,14 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import lombok.NonNull;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.nio.file.Path;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -28,11 +28,13 @@ import static java.util.concurrent.TimeUnit.*;
 import static net.buildtheearth.terracore.http.HttpStatusCodes.*;
 import static org.apache.logging.log4j.LogManager.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.parallel.ExecutionMode.*;
 
+@Execution(CONCURRENT)
 public class TerracoreHttpClientTest {
 
     @Test
-    void canSendSingleGetRequest(@TempDir Path cacheDir) throws IOException {
+    void canSendSingleGetRequest() throws IOException {
         final var content = "Hello, World!";
         HttpHandler handler = (HttpExchange e) -> {
             e.sendResponseHeaders(HTTP_OK, 0);
@@ -40,13 +42,17 @@ public class TerracoreHttpClientTest {
             e.close();
         };
         try (var endpoint = new TestHttpEndpoint(handler)) {
-            var client = new TerracoreHttpClient(getLogger(), cacheDir);
+            var client = TerracoreHttpClient.builder()
+                    .logger(getLogger())
+                    .userAgent("terracore unit test")
+                    .cache(new MemoryCache())
+                    .build();
             assertGetsContent(client, endpoint, content);
         }
     }
 
     @Test
-    void canSendConcurrentGetRequests(@TempDir Path cacheDir) throws IOException {
+    void canSendConcurrentGetRequests() throws IOException {
         final var content = "Hello, World!";
         final var inFlightRequests = new AtomicInteger(0);
         final var maxInFlightRequests = new AtomicInteger(0);
@@ -60,7 +66,11 @@ public class TerracoreHttpClientTest {
             inFlightRequests.getAndDecrement();
         };
         try (var endpoint = new TestHttpEndpoint(handler)) {
-            var client = new TerracoreHttpClient(getLogger(), cacheDir);
+            var client = TerracoreHttpClient.builder()
+                    .logger(getLogger())
+                    .userAgent("terracore unit test")
+                    .cache(new MemoryCache())
+                    .build();
             var request1 = client.get(endpoint.url() + "?cacheBurst=1");
             var request2 = client.get(endpoint.url() + "?cacheBurst=2");
             var request3 = client.get(endpoint.url() + "?cacheBurst=3");
@@ -75,7 +85,7 @@ public class TerracoreHttpClientTest {
 
     @ParameterizedTest
     @ValueSource(ints = {1, 2, 4, 8, 16, 32, 64})
-    void respectsConcurrencyThreshold(int threshold, @TempDir Path cacheDir) throws IOException {
+    void respectsConcurrencyThreshold(int threshold) throws IOException {
         final var content = "Hello, World!";
         final var inFlightRequests = new AtomicInteger(0);
         final var maxInFlightRequests = new AtomicInteger(0);
@@ -90,7 +100,11 @@ public class TerracoreHttpClientTest {
             inFlightRequests.getAndDecrement();
         };
         try (var endpoint = new TestHttpEndpoint(handler)) {
-            var client = new TerracoreHttpClient(getLogger(), cacheDir);
+            var client = TerracoreHttpClient.builder()
+                    .logger(getLogger())
+                    .userAgent("terracore unit test")
+                    .cache(new MemoryCache())
+                    .build();
             client.setMaxConcurrentRequests(endpoint.url(), threshold);
 
             for (int i = 0; i < requests.length; i++) {
@@ -102,6 +116,24 @@ public class TerracoreHttpClientTest {
         }
     }
 
+    @Test
+    void canSetUserAgent() throws IOException {
+        final var userAgent = "Terracore unit test";
+        var client = TerracoreHttpClient.builder()
+                .logger(getLogger())
+                .userAgent(userAgent)
+                .cache(new MemoryCache())
+                .build();
+        HttpHandler handler = (HttpExchange e) -> {
+            var userAgents = e.getRequestHeaders().get("User-Agent");
+            assertEquals(List.of(userAgent), userAgents);
+            e.sendResponseHeaders(HTTP_NO_CONTENT, -1);
+            e.close();
+        };
+        try (var endpoint = new TestHttpEndpoint(handler)) {
+            assertGetsContent(client, endpoint, "");
+        }
+    }
 
     static void assertGetsContent(@NonNull HttpClient client, @NonNull TestHttpEndpoint endpoint, @NonNull String content) {
         var data = client.get(endpoint.url()).join();
@@ -109,19 +141,10 @@ public class TerracoreHttpClientTest {
         assertEquals(content, responseString);
     }
 
-    static <T> void assertSuccessfulFutureStringEquals(String exceptedResult, Future<byte[]> future) {
+    static void assertSuccessfulFutureStringEquals(String exceptedResult, Future<byte[]> future) {
         try {
             var data = future.get();
             var result = new String(data, UTF_8);
-            assertEquals(exceptedResult, result);
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    static <T> void assertSuccessfulFutureEquals(T exceptedResult, Future<T> future) {
-        try {
-            T result = future.get();
             assertEquals(exceptedResult, result);
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
