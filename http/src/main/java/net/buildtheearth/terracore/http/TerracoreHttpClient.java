@@ -94,7 +94,7 @@ public class TerracoreHttpClient implements HttpClient {
         String hostname = uri.getHost();
 
         // Lookup cache, use it if fresh
-        CacheEntry cache = this.cache.lookup(uri);
+        CacheEntry cache = this.cache.lookup(uri).orElse(null);
         if (cache != null && cache.isFresh()) {
             return CompletableFuture.supplyAsync(() -> {
                 byte[] data =  this.readCache(cache);

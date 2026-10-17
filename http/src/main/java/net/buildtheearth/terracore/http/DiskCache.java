@@ -21,6 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Predicate;
@@ -34,7 +35,9 @@ import static net.buildtheearth.terracore.http.InternalUtils.*;
 
 /**
  * An implementation of the {@link HttpCache} interface that stores cached responses
- * as files in a directory.
+ * as compressed files in a directory.
+ *
+ * @author Smyler
  */
 public class DiskCache implements HttpCache {
 
@@ -85,21 +88,21 @@ public class DiskCache implements HttpCache {
     }
 
     @Override
-    public @Nullable CacheEntry lookup(URI uri) {
+    public @NonNull Optional<CacheEntry> lookup(@NonNull URI uri) {
         File file = this.getSaveFile(uri).toFile();
         if (!file.isFile()) {
-            return null;
+            return Optional.empty();
         }
         CacheEntry entry = this.readEntry(file);
         if (entry != null && !entry.uri().equals(uri)) {
-            // Hash collision in file name
-            return null;
+            // Hash collision in file name, this is rare and there is nothing for the user to fix, so we simply remain silent about it
+            return Optional.empty();
         }
-        return entry;
+        return Optional.ofNullable(entry);
     }
 
     @Override
-    public CacheStatistics statistics() throws IOException {
+    public @NonNull CacheStatistics statistics() throws IOException {
         try (Stream<Path> paths = Files.list(this.directory)) {
             AtomicLong counter = new AtomicLong(0L);
             long size = paths.parallel()
@@ -114,7 +117,7 @@ public class DiskCache implements HttpCache {
     }
 
     @Override
-    public CacheStatistics cleanup(@org.jspecify.annotations.NonNull Predicate<CacheEntry> predicate) throws IOException {
+    public @NonNull CacheStatistics cleanup(@NonNull Predicate<CacheEntry> predicate) throws IOException {
         try (Stream<Path> paths = Files.list(this.directory)) {
             AtomicLong entries = new AtomicLong(0L);
             AtomicLong size = new AtomicLong(0L);

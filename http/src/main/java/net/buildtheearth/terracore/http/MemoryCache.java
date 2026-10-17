@@ -9,6 +9,7 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Predicate;
@@ -33,11 +34,6 @@ public class MemoryCache implements HttpCache {
     @Override
     public void put(@NotNull URI uri, long lastModified, long maxAge, @Nullable String etag, boolean immutable, boolean mustRevalidate, byte @NotNull [] body) {
         byte[] copy = Arrays.copyOf(body, body.length);
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
         this.cache.put(uri, new MemoryCacheEntry(new CacheEntry(
                 uri,
                 lastModified, maxAge, etag,
@@ -48,16 +44,16 @@ public class MemoryCache implements HttpCache {
     }
 
     @Override
-    public @Nullable CacheEntry lookup(URI uri) {
+    public @NonNull Optional<CacheEntry> lookup(@NonNull URI uri) {
         MemoryCacheEntry entry = this.cache.get(uri);
         if (entry == null) {
-            return null;
+            return Optional.empty();
         }
-        return entry.entry;
+        return Optional.of(entry.entry);
     }
 
     @Override
-    public CacheStatistics statistics() {
+    public @NonNull CacheStatistics statistics() {
         AtomicLong counter = new AtomicLong();
         long size = this.cache.values().stream()
                 .peek(e -> counter.getAndIncrement())
@@ -67,7 +63,7 @@ public class MemoryCache implements HttpCache {
     }
 
     @Override
-    public CacheStatistics cleanup(@NonNull Predicate<CacheEntry> predicate) {
+    public @NonNull CacheStatistics cleanup(@NonNull Predicate<CacheEntry> predicate) {
         Collection<MemoryCacheEntry> values = this.cache.values();
         long removedCount = 0;
         long removedSize = 0;

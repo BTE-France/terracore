@@ -6,8 +6,8 @@ import lombok.NonNull;
  * Cache usage statistics.
  *
  * @param entries   number of entries in the cache
- * @param size      total storage space used by the cache
- * @param type      the type of cache in use
+ * @param size      estimated total storage space used by the cache, in bytes
+ * @param type      the storage medium of the cache
  */
 public record CacheStatistics(long entries, long size, @NonNull CacheType type) {
 
@@ -17,7 +17,7 @@ public record CacheStatistics(long entries, long size, @NonNull CacheType type) 
     public CacheStatistics { }
 
     /**
-     * An enum representing the type of cache in use.
+     * An enum representing the storage medium of the cache.
      */
     public enum CacheType {
 
@@ -28,7 +28,6 @@ public record CacheStatistics(long entries, long size, @NonNull CacheType type) 
 
         /**
          * Cache is fully in memory.
-         * Should not be used outside of development.
          */
         MEMORY,
 

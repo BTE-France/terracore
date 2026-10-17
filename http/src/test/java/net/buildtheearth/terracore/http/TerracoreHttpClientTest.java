@@ -69,11 +69,11 @@ public class TerracoreHttpClientTest {
             var client = TerracoreHttpClient.builder()
                     .logger(getLogger())
                     .userAgent("terracore unit test")
-                    .cache(new MemoryCache())
+                    .cache(new EmptyCache())
                     .build();
-            var request1 = client.get(endpoint.url() + "?cacheBurst=1");
-            var request2 = client.get(endpoint.url() + "?cacheBurst=2");
-            var request3 = client.get(endpoint.url() + "?cacheBurst=3");
+            var request1 = client.get(endpoint.url());
+            var request2 = client.get(endpoint.url());
+            var request3 = client.get(endpoint.url());
 
             assertSuccessfulFutureStringEquals(content, request1);
             assertSuccessfulFutureStringEquals(content, request2);
@@ -103,12 +103,12 @@ public class TerracoreHttpClientTest {
             var client = TerracoreHttpClient.builder()
                     .logger(getLogger())
                     .userAgent("terracore unit test")
-                    .cache(new MemoryCache())
+                    .cache(new EmptyCache())
                     .build();
             client.setMaxConcurrentRequests(endpoint.url(), threshold);
 
             for (int i = 0; i < requests.length; i++) {
-                requests[i] = client.get(endpoint.url() + "?cacheBurst=" + i);
+                requests[i] = client.get(endpoint.url());
             }
 
             CompletableFuture.allOf(requests).join();
