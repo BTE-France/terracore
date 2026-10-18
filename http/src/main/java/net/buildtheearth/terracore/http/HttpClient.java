@@ -19,7 +19,10 @@ public interface HttpClient extends Closeable {
      * Performs an asynchronous GET request to the specified URL.
      *
      * @param url the URL to send the GET request to
-     * @return a future containing the response body as a byte array, or null if the server returned a 404 Not Found response
+     *
+     * @return a future containing the response body as a byte array,
+     *         or null if the server returned a 404 Not Found response,
+     *         and which throws an {@link UnsupportedHttpStatus} if the server returned an unsupported status code
      */
     @NonNull CompletableFuture<byte @Nullable []> get(@NonNull String url);
 

@@ -6,6 +6,7 @@ import com.sun.net.httpserver.HttpServer;
 import lombok.NonNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -34,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.parallel.ExecutionMode.*;
 
 @Execution(CONCURRENT)
+@Timeout(10)
 public class TerracoreHttpClientTest {
 
     @Test
@@ -304,6 +307,40 @@ public class TerracoreHttpClientTest {
                 assertSuccessfulFutureStringEquals(null, client.get(endpoint.url()));
                 uncheckedSleep(100, MILLISECONDS);
                 assertSuccessfulFutureStringEquals(null, client.get(endpoint.url()));
+            }
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {
+            HTTP_CREATED, HTTP_ACCEPTED, HTTP_NON_AUTHORITATIVE_INFORMATION, HTTP_NO_CONTENT, HTTP_RESET_CONTENT, HTTP_PARTIAL_CONTENT, HTTP_MULTI_STATUS, HTTP_ALREADY_REPORTED, HTTP_IM_USED,
+            HTTP_MULTIPLE_CHOICES, HTTP_NOT_MODIFIED, HTTP_USE_PROXY, HTTP_UNUSED,
+            HTTP_BAD_REQUEST, HTTP_UNAUTHORIZED, HTTP_PAYMENT_REQUIRED, HTTP_FORBIDDEN, HTTP_METHOD_NOT_ALLOWED, HTTP_NOT_ACCEPTABLE, HTTP_PROXY_AUTHENTICATION_REQUIRED, HTTP_REQUEST_TIMEOUT, HTTP_CONFLICT, HTTP_GONE, HTTP_LENGTH_REQUIRED, HTTP_PRECONDITION_FAILED, HTTP_REQUEST_ENTITY_TOO_LARGE, HTTP_REQUEST_URI_TOO_LONG, HTTP_UNSUPPORTED_MEDIA_TYPE, HTTP_REQUESTED_RANGE_NOT_SATISFIABLE, HTTP_EXPECTATION_FAILED, HTTP_I_M_A_TEAPOT, HTTP_UNPROCESSABLE_ENTITY, HTTP_LOCKED, HTTP_FAILED_DEPENDENCY, HTTP_TOO_EARLY, HTTP_UPGRADE_REQUIRED, HTTP_PRECONDITION_REQUIRED, HTTP_TOO_MANY_REQUESTS, HTTP_REQUEST_HEADER_FIELDS_TOO_LARGE, HTTP_UNAVAILABLE_FOR_LEGAL_REASONS,
+            HTTP_INTERNAL_SERVER_ERROR, HTTP_NOT_IMPLEMENTED, HTTP_BAD_GATEWAY, HTTP_SERVICE_UNAVAILABLE, HTTP_GATEWAY_TIMEOUT, HTTP_VERSION_NOT_SUPPORTED, HTTP_VARIANT_ALSO_NEGOTIATES, HTTP_INSUFFICIENT_STORAGE, HTTP_LOOP_DETECTED, HTTP_NOT_EXTENDED, HTTP_NETWORK_AUTHENTICATION_REQUIRED,
+            208, 365, 473, 587, 999
+    })
+    void unsupportedHttpCodesThrowException(int statusCode) throws IOException {
+        final String response = "Catch!";
+        HttpHandler handler = exchange -> {
+            try (OutputStream os = exchange.getResponseBody()) {
+                exchange.getResponseHeaders().set("Content-Type", "text/plain");
+                exchange.sendResponseHeaders(statusCode, response.getBytes().length);
+                os.write(response.getBytes());
+            }
+        };
+        try (var endpoint = new TestHttpEndpoint(handler)) {
+            try (var client = memoryCacheClientBuilder().build()) {
+                try {
+                    client.get(endpoint.url()).join();
+                } catch (CompletionException e) {
+                    assertInstanceOf(UnsupportedHttpStatus.class, e.getCause());
+                }
+                uncheckedSleep(100, MILLISECONDS);
+                try {
+                    client.get(endpoint.url()).join();
+                } catch (CompletionException e) {
+                    assertInstanceOf(UnsupportedHttpStatus.class, e.getCause());
+                }
             }
         }
     }

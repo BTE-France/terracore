@@ -76,7 +76,7 @@ final class HttpStatusCodes {
     final int HTTP_BAD_GATEWAY = 502;
     final int HTTP_SERVICE_UNAVAILABLE = 503;
     final int HTTP_GATEWAY_TIMEOUT = 504;
-    final int HTTP_HTTP_VERSION_NOT_SUPPORTED = 505;
+    final int HTTP_VERSION_NOT_SUPPORTED = 505;
     final int HTTP_VARIANT_ALSO_NEGOTIATES = 506;
     final int HTTP_INSUFFICIENT_STORAGE = 507;
     final int HTTP_LOOP_DETECTED = 508;
