@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -394,13 +393,12 @@ public class TerracoreHttpClientTest {
     }
 
     static class TestHttpEndpoint implements Closeable {
-        final InetSocketAddress address = new InetSocketAddress("127.0.0.1", randPort());
         final HttpServer server;
         final ExecutorService executor;
         final String uri;
 
         TestHttpEndpoint(String uri, HttpHandler handler) throws IOException {
-            this.server = HttpServer.create(this.address, 0);
+            this.server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
             this.uri = uri;
             this.server.createContext(uri, handler);
             this.executor = Executors.newCachedThreadPool();
@@ -412,7 +410,8 @@ public class TerracoreHttpClientTest {
         }
 
         public String url() {
-            return "http://" + this.address.getHostName() + ":" + this.address.getPort() + this.uri;
+            var address = this.server.getAddress();
+            return "http://" + address.getHostName() + ":" + address.getPort() + this.uri;
         }
 
         @Override
@@ -421,11 +420,6 @@ public class TerracoreHttpClientTest {
             this.executor.shutdownNow();
         }
 
-    }
-
-    private static int randPort() {
-        Random random = new Random();
-        return random.nextInt(65535 - 1024) + 1024;
     }
 
 }
