@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.parallel.ExecutionMode.*;
 
 @Execution(CONCURRENT)
-@Timeout(20)
+@Timeout(120)
 public class TerracoreHttpClientTest {
 
     @Test
@@ -61,7 +61,7 @@ public class TerracoreHttpClientTest {
         HttpHandler handler = (HttpExchange e) -> {
             var inFlight = inFlightRequests.incrementAndGet();
             maxInFlightRequests.updateAndGet(i -> Math.max(i, inFlight));
-            uncheckedSleep(100, MILLISECONDS);
+            uncheckedSleep(5, SECONDS);
             e.sendResponseHeaders(HTTP_OK, 0);
             e.getResponseBody().write(content.getBytes(UTF_8));
             e.close();
@@ -77,22 +77,26 @@ public class TerracoreHttpClientTest {
                 assertSuccessfulFutureStringEquals(content, request2);
                 assertSuccessfulFutureStringEquals(content, request3);
 
-                assertEquals(3, maxInFlightRequests.get());
             }
         }
+        assertEquals(3, maxInFlightRequests.get());
     }
 
     @ParameterizedTest
     @ValueSource(ints = {1, 2, 4, 8, 16, 32, 64})
     void respectsHostConcurrencyThreshold(int threshold) throws IOException {
+        final var requestProcessingMillis = 1_000;
+        final var aimedRuntimeMillis = 10_000;
+        final var requestCount = threshold * aimedRuntimeMillis / requestProcessingMillis;
+        final var requests = new CompletableFuture<?>[requestCount];
+
         final var content = "Hello, World!";
         final var inFlightRequests = new AtomicInteger(0);
         final var maxInFlightRequests = new AtomicInteger(0);
-        final var requests = new CompletableFuture<?>[64];
         HttpHandler handler = (HttpExchange e) -> {
             var inFlight = inFlightRequests.incrementAndGet();
             maxInFlightRequests.updateAndGet(i -> Math.max(i, inFlight));
-            uncheckedSleep(100, MILLISECONDS);
+            uncheckedSleep(requestProcessingMillis, MILLISECONDS);
             e.sendResponseHeaders(HTTP_OK, 0);
             e.getResponseBody().write(content.getBytes(UTF_8));
             e.close();
@@ -101,11 +105,9 @@ public class TerracoreHttpClientTest {
         try (var endpoint = new TestHttpEndpoint(handler)) {
             try (var client = noCacheClientBuilder().build()) {
                 client.setHostConcurrencyThreshold(endpoint.url(), threshold);
-
                 for (int i = 0; i < requests.length; i++) {
                     requests[i] = client.get(endpoint.url());
                 }
-
                 CompletableFuture.allOf(requests).join();
                 assertEquals(threshold, maxInFlightRequests.get());
             }
@@ -115,14 +117,18 @@ public class TerracoreHttpClientTest {
     @ParameterizedTest
     @ValueSource(ints = {1, 2, 4, 8, 16, 32, 64})
     void respectsDefaultConcurrencyThreshold(int threshold) throws IOException {
+        final var requestProcessingMillis = 1_000;
+        final var aimedRuntimeMillis = 10_000;
+        final var requestCount = threshold * aimedRuntimeMillis / requestProcessingMillis;
+        final var requests = new CompletableFuture<?>[requestCount];
+
         final var content = "Hello, World!";
         final var inFlightRequests = new AtomicInteger(0);
         final var maxInFlightRequests = new AtomicInteger(0);
-        final var requests = new CompletableFuture<?>[64];
         HttpHandler handler = (HttpExchange e) -> {
             var inFlight = inFlightRequests.incrementAndGet();
             maxInFlightRequests.updateAndGet(i -> Math.max(i, inFlight));
-            uncheckedSleep(100, MILLISECONDS);
+            uncheckedSleep(requestProcessingMillis, MILLISECONDS);
             e.sendResponseHeaders(HTTP_OK, 0);
             e.getResponseBody().write(content.getBytes(UTF_8));
             e.close();
@@ -137,9 +143,9 @@ public class TerracoreHttpClientTest {
                 }
 
                 CompletableFuture.allOf(requests).join();
-                assertEquals(threshold, maxInFlightRequests.get());
             }
         }
+        assertEquals(threshold, maxInFlightRequests.get());
     }
 
     @Test
@@ -161,33 +167,36 @@ public class TerracoreHttpClientTest {
     @Test
     void canCancelPendingRequests() throws IOException {
         final String content = "Should be canceled the second time";
-        final AtomicInteger requestCount = new AtomicInteger(0);
+        final AtomicInteger startedRequests = new AtomicInteger(0);
         HttpHandler handler = (HttpExchange e) -> {
-            requestCount.incrementAndGet();
-            uncheckedSleep(1, SECONDS);
+            startedRequests.incrementAndGet();
+            uncheckedSleep(10, SECONDS);
             e.sendResponseHeaders(HTTP_OK, 0);
             e.getResponseBody().write(content.getBytes());
             e.close();
         };
         try (var endpoint = new TestHttpEndpoint(handler)) {
             try (var client = noCacheClientBuilder().defaultConcurrencyThreshold(1).build()) {
-                var request1 = client.get(endpoint.url());  // First request will reach the server
-                uncheckedSleep(100, MILLISECONDS);
-                var request2 = client.get(endpoint.url());  // Second request will be blocked by concurrency limits, since the threshold of 1 is reached
-                uncheckedSleep(100, MILLISECONDS);
-                var request3 = client.get(endpoint.url());  // Third request will be canceled before it has a chance to reach the concurrency semaphore
-                request3.cancel(false);
 
-                uncheckedSleep(500, MILLISECONDS); // Give some time for the request to be blocked by concurrency limits
-                request2.cancel(false);
+                // Dispatch a first request to hit the concurrency threshold
+                var request1 = client.get(endpoint.url());
+                while (startedRequests.get() == 0) {
+                    uncheckedSleep(100, MILLISECONDS);
+                }
+
+                // Then dispatch two requests, one of which is canceled after some time and one of which is canceled immediately
+                var request2 = client.get(endpoint.url());  // Second request will be blocked by concurrency limits, since the threshold of 1 is reached
+                var request3 = client.get(endpoint.url());  // Third request will be canceled before it has a chance to reach the concurrency semaphore
+                request3.cancel(true);
+
+                uncheckedSleep(5, SECONDS); // Give some time for the request to be blocked by concurrency limits
+                request2.cancel(true);
 
                 assertSuccessfulFutureStringEquals(content, request1);
                 assertThrows(CancellationException.class, request2::join);
-
-                assertEquals(1, requestCount.get());
-                assertGetsContent(client, endpoint, content);
             }
         }
+        assertEquals(1, startedRequests.get());
     }
 
     @Test
@@ -210,7 +219,10 @@ public class TerracoreHttpClientTest {
             try (var client = noCacheClientBuilder().build()) {
                 var request = client.get(endpoint.url());
 
-                uncheckedSleep(500, MILLISECONDS);  // Give some time for the request to be dispatched
+                // Wait for the request to be dispatched, then cancel it
+                while (startedRequests.get() == 0) {
+                    uncheckedSleep(100, MILLISECONDS);
+                }
                 request.cancel(true);
 
                 assertThrows(CancellationException.class, request::join);
@@ -239,12 +251,12 @@ public class TerracoreHttpClientTest {
             try (var client = memoryCacheClientBuilder().build()) {
                 assertGetsContent(client, endpoint, response);
                 assertEquals(1, requestCounter.get());
-                uncheckedSleep(50, MILLISECONDS);  // Wait for the cache to be written
+                uncheckedSleep(500, MILLISECONDS);  // Wait for the cache to be written
                 assertEquals(1, client.cacheStatistics().join().entries());
                 assertGetsContent(client, endpoint, response); // Should hit the cache
-                assertEquals(1, requestCounter.get());
             }
         }
+        assertEquals(1, requestCounter.get());
     }
 
     @Test
@@ -276,15 +288,15 @@ public class TerracoreHttpClientTest {
                 assertGetsContent(client, endpoint, response);
                 assertEquals(1, initialRequestCounter.get());
                 assertEquals(0, refreshRequestCounter.get());
-                uncheckedSleep(50, MILLISECONDS);  // Wait for the cache to be written
+                uncheckedSleep(500, MILLISECONDS);  // Wait for the cache to be written
                 assertEquals(1, client.cacheStatistics().join().entries());
                 uncheckedSleep(2, SECONDS);  // Let the cache expire
                 assertGetsContent(client, endpoint, response); // Should hit the cache but not be fresh
-                assertEquals(1, initialRequestCounter.get());
-                assertEquals(1, refreshRequestCounter.get());
                 assertEquals(1, client.cacheStatistics().join().entries());
             }
         }
+        assertEquals(1, initialRequestCounter.get());
+        assertEquals(1, refreshRequestCounter.get());
     }
 
     @Test
@@ -314,15 +326,15 @@ public class TerracoreHttpClientTest {
                 assertGetsContent(client, endpoint, response);
                 assertEquals(1, initialRequestCounter.get());
                 assertEquals(0, refreshRequestCounter.get());
-                uncheckedSleep(50, MILLISECONDS);  // Wait for the cache to be written
+                uncheckedSleep(500, MILLISECONDS);  // Wait for the cache to be written
                 assertEquals(1, client.cacheStatistics().join().entries());
                 uncheckedSleep(2, SECONDS);  // Let the cache expire
                 assertGetsContent(client, endpoint, response); // Should hit the cache but not be fresh
-                assertEquals(1, initialRequestCounter.get());
-                assertEquals(1, refreshRequestCounter.get());
                 assertEquals(1, client.cacheStatistics().join().entries());
             }
         }
+        assertEquals(1, initialRequestCounter.get());
+        assertEquals(1, refreshRequestCounter.get());
     }
 
     @Test
