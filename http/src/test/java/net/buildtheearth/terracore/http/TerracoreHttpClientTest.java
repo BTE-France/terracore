@@ -171,10 +171,15 @@ public class TerracoreHttpClientTest {
         };
         try (var endpoint = new TestHttpEndpoint(handler)) {
             try (var client = noCacheClientBuilder().defaultConcurrencyThreshold(1).build()) {
-                var request1 = client.get(endpoint.url());  // First request reaches the server
-                var request2 = client.get(endpoint.url());  // Second request is queued since the concurrency threshold of 1 is reached
+                var request1 = client.get(endpoint.url());  // First request will reach the server
+                uncheckedSleep(100, MILLISECONDS);
+                var request2 = client.get(endpoint.url());  // Second request will be blocked by concurrency limits, since the threshold of 1 is reached
+                uncheckedSleep(100, MILLISECONDS);
+                var request3 = client.get(endpoint.url());  // Third request will be canceled before it has a chance to reach the concurrency semaphore
+                request3.cancel(false);
 
-                request2.cancel(true);
+                uncheckedSleep(500, MILLISECONDS); // Give some time for the request to be blocked by concurrency limits
+                request2.cancel(false);
 
                 assertSuccessfulFutureStringEquals(content, request1);
                 assertThrows(CancellationException.class, request2::join);
@@ -183,6 +188,36 @@ public class TerracoreHttpClientTest {
                 assertGetsContent(client, endpoint, content);
             }
         }
+    }
+
+    @Test
+    void canCancelInFlightRequests() throws IOException {
+        final int contentSize = 1_024;
+        final var startedRequests = new AtomicInteger(0);
+        final var completedRequests = new AtomicInteger(0);
+        HttpHandler handler = (HttpExchange e) -> {
+            startedRequests.incrementAndGet();
+            try (var body = e.getResponseBody()) {
+                e.sendResponseHeaders(HTTP_OK, contentSize);
+                for (int i = 0; i < contentSize; i++) {
+                    body.write(i & 0xFF);
+                    uncheckedSleep(10, MILLISECONDS);
+                }
+            }
+            completedRequests.incrementAndGet();
+        };
+        try (var endpoint = new TestHttpEndpoint(handler)) {
+            try (var client = noCacheClientBuilder().build()) {
+                var request = client.get(endpoint.url());
+
+                uncheckedSleep(500, MILLISECONDS);  // Give some time for the request to be dispatched
+                request.cancel(true);
+
+                assertThrows(CancellationException.class, request::join);
+            }
+        }
+        assertEquals(1, startedRequests.get());
+        assertEquals(0, completedRequests.get());
     }
 
     @Test

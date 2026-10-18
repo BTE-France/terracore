@@ -3,7 +3,6 @@ package net.buildtheearth.terracore.http;
 import lombok.Builder;
 import lombok.NonNull;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -12,15 +11,15 @@ import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.*;
-        import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
-        import java.util.concurrent.*;
-        import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.*;
 
 import static java.lang.Math.max;
 import static java.lang.Math.round;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Arrays.stream;
+import static java.util.concurrent.Executors.*;
 import static net.buildtheearth.terracore.http.CacheStatistics.CacheType.*;
 import static net.buildtheearth.terracore.http.HttpStatusCodes.*;
 import static net.buildtheearth.terracore.http.InternalUtils.*;
@@ -39,9 +38,12 @@ import static net.buildtheearth.terracore.http.InternalUtils.*;
  */
 public class TerracoreHttpClient implements HttpClient {
 
-    private final ForkJoinPool forkJoinPool = new ForkJoinPool(20, HttpWorkerThread::new, this::unhandledException, true);
-    private final ForkJoinPool semaphoreAcquireExecutor = new ForkJoinPool(1, HttpWorkerThread::new, this::unhandledException, true);
-    private final AtomicLong workerCounter = new AtomicLong(0);
+    private final ExecutorService workerExecutor = newThreadPerTaskExecutor(
+            Thread.ofVirtual()
+                    .name("Terracore HTTP worker ", 1)
+                    .uncaughtExceptionHandler(this::unhandledException)
+                    .factory()
+    );
 
     private final String userAgent;
 
@@ -54,7 +56,7 @@ public class TerracoreHttpClient implements HttpClient {
 
     private final java.net.http.HttpClient client = java.net.http.HttpClient.newBuilder()
             .followRedirects(java.net.http.HttpClient.Redirect.NORMAL)
-            .executor(this.forkJoinPool)
+            .executor(this.workerExecutor)
             .build();
     private final Logger logger;
     private final HttpCache cache;
@@ -92,65 +94,119 @@ public class TerracoreHttpClient implements HttpClient {
 
     @Override
     public @NonNull CompletableFuture<byte[]> get(@NonNull String url) {
-
         URI uri = URI.create(url);
-        String hostname = uri.getHost();
+        var future = new InterruptibleFuture<byte[]>();
+        this.workerExecutor.execute(() -> {
+            try (var ignored = future.enterInterruptibleScope()) {
+                var data = this.doGet(uri, future);
+                future.complete(data);
+            } catch (CancellationException e) {
+                if (!future.isCancelled()) {
+                    this.logger.error("Got CancellationException for uncancelled future, something is not right");
+                }
+                // The throwing code is responsible for logging the cancellation point
+            } catch (Throwable t) {
+                future.completeExceptionally(t);
+            }
+        });
+        return future;
+    }
+
+    // Runs asynchronously in a virtual thread, so blocking is fine
+    private byte @Nullable[] doGet(@NonNull URI uri, InterruptibleFuture<byte[]> future) throws CancellationException {
+        var requestId = UUID.randomUUID();
+        var hostname = uri.getHost();
+        this.logger.trace("[{}] New request: {}", requestId, uri);
+
+        if (future.isCancelled()) {
+            this.logger.trace("[{}] Request canceled before permit acquisition", requestId);
+            throw new CancellationException();
+        }
 
         // Lookup cache, use it if fresh
         CacheEntry cache = this.cache.lookup(uri).orElse(null);
         if (cache != null && cache.isFresh()) {
-            return CompletableFuture.supplyAsync(() -> {
-                byte[] data =  this.readCache(cache);
-                this.logger.debug("[   ] {} {} (was fresh)", data.length, uri);
-                return data;
-            }, this.forkJoinPool);
+            byte[] data =  this.readCache(cache);
+            this.logger.debug("[   ] {} {} (was fresh)", data.length, uri);
+            return data;
         }
 
-        final Semaphore semaphore = this.concurrentRequestsCounters.computeIfAbsent(hostname, k -> new Semaphore(this.defaultConcurrencyThreshold));
+        // Prepare everything we need for the request
+        final var request = this.createRequest(uri, cache);
+        final var permit = this.getHostConcurrencySemaphore(hostname);
+        HttpResponse<byte[]> response;
 
-        // Prepare request
-        HttpRequest request = this.createRequest(uri, cache);
-
-        final RequestContext context = new RequestContext(
-                uri, hostname, request, cache, semaphore
-        );
-
-        // Request semaphore to respect concurrent request limits
-        CompletableFuture<Void> permitAcquired = CompletableFuture.runAsync(context::acquirePermit, this.semaphoreAcquireExecutor);
-
-        // Send the request
-        CompletableFuture<HttpResponse<byte[]>> response = permitAcquired.thenComposeAsync(context::sendRequest,
-                this.forkJoinPool
-        );
-
-        response.exceptionally(t -> {
-            this.logger.error(t);
-            return null;
-        });
-
-        // Release concurrent request semaphore
-        response.whenCompleteAsync(context::releasePermit, this.forkJoinPool);
-
-        // Get resource content, either from the request or the cache
-        CompletableFuture<byte[]> content = response.thenApplyAsync(context::readContent, this.forkJoinPool);
-
-        // Update cache
-        content.thenCombineAsync(response, context::cache, this.forkJoinPool);
-
-        // Make sure a cancellation of the downstream future is propagated to the request
-        content.exceptionally(t -> {
-            if (t instanceof CancellationException) {
-                this.logger.trace("Canceled request to {}", uri);
-                response.cancel(true);
+        try {
+            this.logger.trace("[{}] Waiting for permit: {}", requestId, hostname);
+            permit.acquire();
+            this.logger.trace("[{}] Acquired permit: {}", requestId, hostname);
+        } catch (InterruptedException e) {
+            if (future.isCancelled()) {
+                this.logger.trace("[{}] Request canceled while acquiring permit: {}", requestId, hostname);
+                throw new CancellationException();
             }
-            return null;
-        });
+            this.logger.error("[{}] Interrupted while acquiring permit for {}", requestId, hostname);
+            throw new RuntimeException(e);
+        }
 
-        this.logger.trace("Queued request to {}", uri);
+        try {
+            response = this.doRequest(request, requestId, future);
+        } finally {
+            permit.release();
+            this.logger.trace("[{}] Released permit for {}", requestId, hostname);
+        }
+
+        var content = this.getContent(response, cache);
+
+        // And update the cache async
+        CompletableFuture.runAsync(() -> this.cacheResponse(requestId, response, content), this.workerExecutor);
+
         return content;
     }
 
-    private HttpRequest createRequest(URI uri, CacheEntry cache) {
+    private @NonNull HttpResponse<byte[]> doRequest(@NonNull HttpRequest request, @NonNull UUID requestId, @NonNull InterruptibleFuture<byte[]> future) {
+        this.logger.trace(
+                "[{}] {} {} {}",
+                requestId,
+                request.method(),
+                request.version().orElse(this.client.version()).toString(),
+                request.uri()
+        );
+
+        var responseFuture = this.client.sendAsync(request, HttpResponse.BodyHandlers.ofByteArray());
+
+        try {
+            var response = responseFuture.get();
+            this.logger.trace(
+                    "[{}] {} {} {} {} {}",
+                    requestId,
+                    response.statusCode(),
+                    response.headers().firstValue("Content-Type").orElse("application/unknown"),
+                    request.method(),
+                    response.version(),
+                    request.uri()
+            );
+            return response;
+        } catch (InterruptedException e) {
+            if (!future.isCancelled()) {
+                this.logger.error("[{}] Unexpected interruption while sending request", requestId);
+                throw new RuntimeException(e);
+            }
+            this.logger.trace("[{}] Request canceled in-flight", requestId);
+            responseFuture.cancel(true);
+            throw new CancellationException();
+        } catch (CancellationException e) {
+            this.logger.error("[{}] Unexpected cancellation of the response future", requestId);
+            throw new RuntimeException(e);
+        } catch (ExecutionException e) {
+            this.logger.error("[{}] Error while making request", requestId);
+            this.logger.catching(e);
+            throw new RuntimeException(e.getCause());
+        }
+
+    }
+
+    private HttpRequest createRequest(@NonNull URI uri, @Nullable CacheEntry cache) {
         HttpRequest.Builder builder = HttpRequest.newBuilder();
         builder.GET()
                 .uri(uri)
@@ -186,24 +242,24 @@ public class TerracoreHttpClient implements HttpClient {
         return content;
     }
 
-    private void cacheResponse(HttpResponse<byte[]> response, byte[] content) {
+    private void cacheResponse(UUID requestId, HttpResponse<byte[]> response, byte[] content) {
         int statusCode = response.statusCode();
         if (statusCode != HTTP_OK && statusCode != HTTP_NO_CONTENT && statusCode != HTTP_NOT_MODIFIED) {
             return;  // We don't support caching other statuses at this point
         }
         Optional<String> header = response.headers().firstValue("Cache-Control");
         if (header.isPresent()) {
-            this.cacheResponseWithCacheControl(response, header.get(), content);
+            this.cacheResponseWithCacheControl(requestId, response, header.get(), content);
         } else {
-            this.cacheResponseWithHeuristics(response, content);
+            this.cacheResponseWithHeuristics(requestId, response, content);
         }
     }
 
-    private void cacheResponseWithCacheControl(HttpResponse<byte[]> response, String cacheControl, byte[] content) {
+    private void cacheResponseWithCacheControl(UUID requestId, HttpResponse<byte[]> response, String cacheControl, byte[] content) {
         CacheControlResponseDirectives directives = CacheControlResponseDirectives.from(cacheControl);
 
         if (directives.noStore() || directives.mustUnderstand()) {
-            this.logger.trace("Cache no-store for {}", response.uri());
+            this.logger.trace("[{}] Cache no-store for {}", requestId, response.uri());
             return;
         }
 
@@ -234,13 +290,13 @@ public class TerracoreHttpClient implements HttpClient {
 
         URI uri = response.uri();
         this.logger.trace(
-                "Cache control for {}, lastModified={} age={} max-age={} etag='{}' immutable={}",
-                uri, lastModified, age, maxAge, etag, immutable
+                "[{}] Cache control for {}, lastModified={} age={} max-age={} etag='{}' immutable={}",
+                requestId, uri, lastModified, age, maxAge, etag, immutable
         );
         this.cache.put(response.uri(), lastModified, maxAge, etag, immutable, directives.mustRevalidate(), content);
     }
 
-    private void cacheResponseWithHeuristics(HttpResponse<byte[]> response, byte[] content) {
+    private void cacheResponseWithHeuristics(UUID requestId, HttpResponse<byte[]> response, byte[] content) {
         String etagHeader = response.headers().firstValue("Etag")
                 .orElse(null);
         long date = response.headers().firstValue("Date")
@@ -254,8 +310,8 @@ public class TerracoreHttpClient implements HttpClient {
                 .orElse(date - lastModified);
         long maxAge = max(0, round(age * CACHE_HEURISTIC));
         this.logger.trace(
-                "Cache heuristic for {}: lastModified={} age={} maxAge={} etag={}",
-                response.uri(), lastModified, age, maxAge, etagHeader
+                "[{}] Cache heuristic for {}: lastModified={} age={} maxAge={} etag={}",
+                requestId, response.uri(), lastModified, age, maxAge, etagHeader
         );
         this.cache.put(response.uri(), lastModified, maxAge, etagHeader, false, true, content);
     }
@@ -303,7 +359,7 @@ public class TerracoreHttpClient implements HttpClient {
                 this.logger.catching(e);
                 return new CacheStatistics(0, 0, ERROR);
             }
-        }, this.forkJoinPool);
+        }, this.workerExecutor);
     }
 
     @Override
@@ -316,7 +372,7 @@ public class TerracoreHttpClient implements HttpClient {
                 this.logger.catching(e);
                 return new CacheStatistics(0, 0, ERROR);
             }
-        }, this.forkJoinPool);
+        }, this.workerExecutor);
     }
 
     @Override
@@ -329,24 +385,22 @@ public class TerracoreHttpClient implements HttpClient {
                 this.logger.catching(e);
                 return new CacheStatistics(0, 0, ERROR);
             }
-        }, this.forkJoinPool);
+        }, this.workerExecutor);
     }
 
     @Override
     public void close() {
         this.client.close();
-    }
-
-    private class HttpWorkerThread extends ForkJoinWorkerThread {
-        protected HttpWorkerThread(ForkJoinPool pool) {
-            super(pool);
-            this.setName("HTTP thread " + TerracoreHttpClient.this.workerCounter.getAndIncrement());
-        }
+        this.workerExecutor.close();
     }
 
     private void unhandledException(Thread thread, Throwable throwable) {
-        this.logger.error("Unhandled exception in HTTP client in thread {}", thread.getName());
+        this.logger.error("Unhandled exception in HTTP client in thread {}, we might be leaking futures", thread.getName());
         this.logger.catching(throwable);
+    }
+
+    private @NonNull Semaphore getHostConcurrencySemaphore(@NonNull String hostname) {
+        return this.concurrentRequestsCounters.computeIfAbsent(hostname, k -> new Semaphore(this.defaultConcurrencyThreshold));
     }
 
     private static class CacheControlResponseDirectives {
@@ -357,7 +411,7 @@ public class TerracoreHttpClient implements HttpClient {
         }
 
         public boolean noCache() {
-            // In reality no-cache is more powerful than just a boolean switch
+            // In reality, no-cache is more powerful than just a boolean switch
             return this.content.containsKey("no-cache");
         }
 
@@ -384,72 +438,6 @@ public class TerracoreHttpClient implements HttpClient {
                     .map(s -> s.split("=", 2))
                     .forEach(kv -> directives.content.put(kv[0].toLowerCase(), kv.length > 1 ? kv[1] : null));
             return directives;
-        }
-
-    }
-
-    private class RequestContext {
-
-        private final @NotNull URI uri;
-        private final @NotNull String host;
-
-        private final @NotNull HttpRequest request;
-        private final @Nullable CacheEntry cache;
-        private final @Nullable Semaphore semaphore;
-
-        private final Logger logger = TerracoreHttpClient.this.logger;
-
-        RequestContext(@NotNull URI uri, @NotNull String host, @NotNull HttpRequest request, @Nullable CacheEntry cache, @Nullable Semaphore semaphore) {
-            this.uri = uri;
-            this.host = host;
-            this.request = request;
-            this.cache = cache;
-            this.semaphore = semaphore;
-        }
-
-        void acquirePermit() {
-            try {
-                if (this.semaphore != null) {
-                    this.semaphore.acquire();
-                    this.logger.trace("Acquired semaphore for {}", this.uri);
-                }
-            } catch (InterruptedException e) {
-                this.logger.error("Interrupted when acquiring request semaphore for host {}", this.host);
-                this.logger.error(e);
-            }
-        }
-
-        CompletableFuture<HttpResponse<byte[]>> sendRequest(Void v) {
-            this.logger.trace(
-                    "{} {} {}",
-                    this.request.method(),
-                    this.request.version().map(Object::toString).orElse(""),
-                    this.request.uri()
-            );
-            return TerracoreHttpClient.this.client.sendAsync(request, HttpResponse.BodyHandlers.ofByteArray());
-        }
-
-        void releasePermit(HttpResponse<byte[]> response, Throwable throwable) {
-            if (this.semaphore != null) {
-                this.semaphore.release();
-                this.logger.trace("Released semaphore for {}", this.host);
-            }
-        }
-
-        byte[] readContent(HttpResponse<byte[]> response) {
-            return TerracoreHttpClient.this.getContent(response, this.cache);
-        }
-
-        Void cache(byte[] content, HttpResponse<byte[]> response) {
-            // Content might have been read from cache
-
-            if (content == null) {
-                // HTTP errors should null
-                return null;
-            }
-
-            TerracoreHttpClient.this.cacheResponse(response, content);
-            return null;
         }
 
     }
