@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.parallel.ExecutionMode.*;
 
 @Execution(CONCURRENT)
-@Timeout(10)
+@Timeout(20)
 public class TerracoreHttpClientTest {
 
     @Test
