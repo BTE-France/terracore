@@ -93,12 +93,12 @@ public class TerracoreHttpClient implements HttpClient {
     }
 
     @Override
-    public @NonNull CompletableFuture<byte[]> get(@NonNull String url) {
+    public @NonNull CompletableFuture<byte[]> get(@NonNull RequestOptions options, @NonNull String url) {
         URI uri = URI.create(url);
         var future = new InterruptibleFuture<byte[]>();
         this.workerExecutor.execute(() -> {
             try (var ignored = future.enterInterruptibleScope()) {
-                var data = this.doGet(future, uri);
+                var data = this.doGet(options, future, uri);
                 future.complete(data);
             } catch (CancellationException e) {
                 if (!future.isCancelled()) {
@@ -113,12 +113,12 @@ public class TerracoreHttpClient implements HttpClient {
     }
 
     @Override
-    public @NonNull CompletableFuture<byte @Nullable []> getFirst(@NonNull String... urls) {
+    public @NonNull CompletableFuture<byte @Nullable []> getFirst(@NonNull RequestOptions options, @NonNull String... urls) {
         if (urls.length == 0) {
             throw new IllegalArgumentException("No URLs provided");
         }
         if (urls.length == 1) {
-            return this.get(urls[0]);
+            return this.get(options, urls[0]);
         }
 
         var uris = Arrays.stream(urls).map(URI::create).toArray(URI[]::new);
@@ -126,7 +126,7 @@ public class TerracoreHttpClient implements HttpClient {
         var future = new InterruptibleFuture<byte[]>();
         this.workerExecutor.execute(() -> {
             try (var ignored = future.enterInterruptibleScope()) {
-                var data = this.doGetSequence(future, uris);
+                var data = this.doGetSequence(options, future, uris);
                 future.complete(data);
             } catch (CancellationException e) {
                 if (!future.isCancelled()) {
@@ -151,7 +151,7 @@ public class TerracoreHttpClient implements HttpClient {
      *
      * @throws CancellationException if the request was canceled
      */
-    private byte @Nullable[] doGet(InterruptibleFuture<byte[]> future, @NonNull URI uri) throws CancellationException {
+    private byte @Nullable[] doGet(@NonNull RequestOptions options, InterruptibleFuture<byte[]> future, @NonNull URI uri) throws CancellationException {
         var requestId = UUID.randomUUID();
         var hostname = uri.getHost();
         this.logger.trace("[{}] New request: {}", requestId, uri);
@@ -162,11 +162,14 @@ public class TerracoreHttpClient implements HttpClient {
         }
 
         // Lookup cache, use it if fresh
-        CacheEntry cache = this.cache.lookup(uri).orElse(null);
-        if (cache != null && cache.isFresh()) {
-            byte[] data =  this.readCache(cache);
-            this.logger.debug("[   ] {} {} (was fresh)", data.length, uri);
-            return data;
+        CacheEntry cache = null;
+        if (options.readFromCache()) {
+            cache = this.cache.lookup(uri).orElse(null);
+            if (cache != null && cache.isFresh()) {
+                byte[] data =  this.readCache(cache);
+                this.logger.debug("[   ] {} {} (was fresh)", data.length, uri);
+                return data;
+            }
         }
 
         // Prepare everything we need for the request
@@ -197,12 +200,14 @@ public class TerracoreHttpClient implements HttpClient {
         var content = this.getContent(response, cache);
 
         // And update the cache async
-        CompletableFuture.runAsync(() -> this.cacheResponse(requestId, response, content), this.workerExecutor);
+        if (options.writeToCache()) {
+            CompletableFuture.runAsync(() -> this.cacheResponse(requestId, response, content), this.workerExecutor);
+        }
 
         return content;
     }
 
-    private byte @Nullable[] doGetSequence(InterruptibleFuture<byte[]> future, @NonNull URI... uris) throws CancellationException {
+    private byte @Nullable[] doGetSequence(@NonNull RequestOptions options, @NonNull InterruptibleFuture<byte[]> future, @NonNull URI... uris) throws CancellationException {
         var sequenceId = UUID.randomUUID();
         this.logger.trace("[{}] Sequence started ({} URLs to try)", sequenceId, uris.length);
         var exceptions = new ArrayList<Throwable>(uris.length);
@@ -210,7 +215,7 @@ public class TerracoreHttpClient implements HttpClient {
         for (var uri : uris) {
             try {
                 this.logger.trace("[{}][{}/{}] Trying {}", sequenceId, ++count, uris.length, uri);
-                var content = this.doGet(future, uri);
+                var content = this.doGet(options, future, uri);
                 if (content != null) {
                     this.logger.trace("[{}][{}/{}] Sequence succeeded with {}", sequenceId, count, uris.length, uri);
                     return content;

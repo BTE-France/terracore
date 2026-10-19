@@ -338,6 +338,131 @@ public class TerracoreHttpClientTest {
     }
 
     @Test
+    void doesNotReadFromCacheWhenReadFromCacheOptionIsFalse() throws IOException {
+        final String response = "Cached content";
+        final AtomicInteger requestCounter = new AtomicInteger(0);
+        HttpHandler handler = exchange -> {
+            requestCounter.incrementAndGet();
+            try (OutputStream os = exchange.getResponseBody()) {
+                exchange.getResponseHeaders().set("Cache-Control", "max-age=100");
+                exchange.getResponseHeaders().set("Content-Type", "text/plain");
+                exchange.sendResponseHeaders(HTTP_OK, response.getBytes().length);
+                os.write(response.getBytes());
+            }
+        };
+        try (var endpoint = new TestHttpEndpoint(handler)) {
+            try (var client = memoryCacheClientBuilder().build()) {
+                // Populate the cache with a default request
+                assertGetsContent(client, endpoint, response);
+                assertEquals(1, requestCounter.get());
+                while (client.cacheStatistics().join().entries() != 1) {
+                    uncheckedSleep(100, MILLISECONDS);  // Wait for the cache to be written
+                }
+
+                // A request with readFromCache=false should bypass the fresh cache entry and hit the server
+                var noReadOptions = RequestOptions.builder().readFromCache(false).build();
+                assertSuccessfulFutureStringEquals(response, client.get(noReadOptions, endpoint.url()));
+                assertEquals(2, requestCounter.get());
+            }
+        }
+    }
+
+    @Test
+    void doesNotWriteToCacheWhenWriteToCacheOptionIsFalse() throws IOException {
+        final String response = "Not cached content";
+        final AtomicInteger requestCounter = new AtomicInteger(0);
+        HttpHandler handler = exchange -> {
+            requestCounter.incrementAndGet();
+            try (OutputStream os = exchange.getResponseBody()) {
+                exchange.getResponseHeaders().set("Cache-Control", "max-age=100");
+                exchange.getResponseHeaders().set("Content-Type", "text/plain");
+                exchange.sendResponseHeaders(HTTP_OK, response.getBytes().length);
+                os.write(response.getBytes());
+            }
+        };
+        try (var endpoint = new TestHttpEndpoint(handler)) {
+            try (var client = memoryCacheClientBuilder().build()) {
+                // A request with writeToCache=false should not populate the cache
+                var noWriteOptions = RequestOptions.builder().writeToCache(false).build();
+                assertSuccessfulFutureStringEquals(response, client.get(noWriteOptions, endpoint.url()));
+                assertEquals(1, requestCounter.get());
+                uncheckedSleep(5, SECONDS);  // Wait in case a cache write was attempted
+                assertEquals(0, client.cacheStatistics().join().entries());
+
+                // A subsequent default request should hit the server again, proving nothing was cached
+                assertGetsContent(client, endpoint, response);
+                assertEquals(2, requestCounter.get());
+            }
+        }
+    }
+
+    @Test
+    void honorsBothCacheOptionsWhenReadFromCacheAndWriteToCacheAreFalse() throws IOException {
+        final AtomicInteger requestCounter = new AtomicInteger(0);
+        HttpHandler handler = exchange -> {
+            int count = requestCounter.incrementAndGet();
+            String response = "Response " + count;
+            try (OutputStream os = exchange.getResponseBody()) {
+                exchange.getResponseHeaders().set("Cache-Control", "max-age=100");
+                exchange.getResponseHeaders().set("Content-Type", "text/plain");
+                exchange.sendResponseHeaders(HTTP_OK, response.getBytes().length);
+                os.write(response.getBytes());
+            }
+        };
+        try (var endpoint = new TestHttpEndpoint(handler)) {
+            try (var client = memoryCacheClientBuilder().build()) {
+                // First request populates the cache with "Response 1"
+                assertGetsContent(client, endpoint, "Response 1");
+                assertEquals(1, requestCounter.get());
+                while (client.cacheStatistics().join().entries() != 1) {
+                    uncheckedSleep(100, MILLISECONDS);  // Wait for the cache to be written
+                }
+
+                // Second request with both options false bypasses the cache read and does not write
+                var noCacheOptions = RequestOptions.builder().readFromCache(false).writeToCache(false).build();
+                assertSuccessfulFutureStringEquals("Response 2", client.get(noCacheOptions, endpoint.url()));
+                assertEquals(2, requestCounter.get());
+                uncheckedSleep(5, SECONDS);  // Wait in case a cache write was attempted
+                assertEquals(1, client.cacheStatistics().join().entries());
+
+                // Third request with default options reads from cache: should get "Response 1" if the second request did not write
+                assertGetsContent(client, endpoint, "Response 1");
+                assertEquals(2, requestCounter.get());  // Server not hit again
+            }
+        }
+    }
+
+    @Test
+    void getFirstHonorsReadFromCacheOption() throws IOException {
+        final String response = "Cached content";
+        final AtomicInteger requestCounter = new AtomicInteger(0);
+        HttpHandler handler = exchange -> {
+            requestCounter.incrementAndGet();
+            try (OutputStream os = exchange.getResponseBody()) {
+                exchange.getResponseHeaders().set("Cache-Control", "max-age=100");
+                exchange.getResponseHeaders().set("Content-Type", "text/plain");
+                exchange.sendResponseHeaders(HTTP_OK, response.getBytes().length);
+                os.write(response.getBytes());
+            }
+        };
+        try (var endpoint = new TestHttpEndpoint(handler)) {
+            try (var client = memoryCacheClientBuilder().build()) {
+                // Populate the cache
+                assertGetsContent(client, endpoint, response);
+                assertEquals(1, requestCounter.get());
+                while (client.cacheStatistics().join().entries() != 1) {
+                    uncheckedSleep(100, MILLISECONDS);  // Wait for the cache to be written
+                }
+
+                // getFirst with readFromCache=false should bypass the fresh cache entry and hit the server
+                var noReadOptions = RequestOptions.builder().readFromCache(false).build();
+                assertSuccessfulFutureStringEquals(response, client.getFirst(noReadOptions, endpoint.url()));
+                assertEquals(2, requestCounter.get());
+            }
+        }
+    }
+
+    @Test
     void notFoundReturnsNull() throws IOException {
         final String response = "Not Found";
         HttpHandler handler = exchange -> {
