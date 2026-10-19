@@ -27,6 +27,19 @@ public interface HttpClient extends Closeable {
     @NonNull CompletableFuture<byte @Nullable []> get(@NonNull String url);
 
     /**
+     * Performs asynchronous GET requests to the specified URLs, returning the first successful response.
+     *
+     * @param url the URLs to send the GET requests to
+     *
+     * @return a future containing the response body as a byte array if at least one server returned a successful response,
+     *         or null if all servers returned a 404 Not Found response,
+     *         or throws an {@link UnsupportedHttpStatus} if all servers returned an unsupported status code.
+     *
+     * @throws IllegalArgumentException if no URLs are provided
+     */
+    @NonNull CompletableFuture<byte @Nullable []> getFirst(@NonNull String... url);
+
+    /**
      * Sets the maximum number of concurrent requests allowed to a specific host.
      *
      * @param host                  the host for which to set the maximum number of concurrent requests,

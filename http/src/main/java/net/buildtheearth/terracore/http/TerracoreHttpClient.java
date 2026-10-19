@@ -98,11 +98,11 @@ public class TerracoreHttpClient implements HttpClient {
         var future = new InterruptibleFuture<byte[]>();
         this.workerExecutor.execute(() -> {
             try (var ignored = future.enterInterruptibleScope()) {
-                var data = this.doGet(uri, future);
+                var data = this.doGet(future, uri);
                 future.complete(data);
             } catch (CancellationException e) {
                 if (!future.isCancelled()) {
-                    this.logger.error("Got CancellationException for uncancelled future, something is not right");
+                    this.logger.error("Got CancellationException for uncancelled request future, something is not right");
                 }
                 // The throwing code is responsible for logging the cancellation point
             } catch (Throwable t) {
@@ -112,8 +112,46 @@ public class TerracoreHttpClient implements HttpClient {
         return future;
     }
 
-    // Runs asynchronously in a virtual thread, so blocking is fine
-    private byte @Nullable[] doGet(@NonNull URI uri, InterruptibleFuture<byte[]> future) throws CancellationException {
+    @Override
+    public @NonNull CompletableFuture<byte @Nullable []> getFirst(@NonNull String... urls) {
+        if (urls.length == 0) {
+            throw new IllegalArgumentException("No URLs provided");
+        }
+        if (urls.length == 1) {
+            return this.get(urls[0]);
+        }
+
+        var uris = Arrays.stream(urls).map(URI::create).toArray(URI[]::new);
+
+        var future = new InterruptibleFuture<byte[]>();
+        this.workerExecutor.execute(() -> {
+            try (var ignored = future.enterInterruptibleScope()) {
+                var data = this.doGetSequence(future, uris);
+                future.complete(data);
+            } catch (CancellationException e) {
+                if (!future.isCancelled()) {
+                    this.logger.error("Got CancellationException for sequence uncancelled future, something is not right");
+                }
+                // The throwing code is responsible for logging the cancellation point
+            } catch (Throwable t) {
+                future.completeExceptionally(t);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Synchronously performs a single GET request.
+     * This is expected to be running in a virtual thread and might be interrupted if the request's future gets canceled, so blocking is fine.
+     *
+     * @param future the future that will complete with the result, so the method can check for cancellation (it MUST NOT complete the future itself)
+     * @param uri    the URI of the request
+     *
+     * @return the data to complete the future with, or null if the response was a 404
+     *
+     * @throws CancellationException if the request was canceled
+     */
+    private byte @Nullable[] doGet(InterruptibleFuture<byte[]> future, @NonNull URI uri) throws CancellationException {
         var requestId = UUID.randomUUID();
         var hostname = uri.getHost();
         this.logger.trace("[{}] New request: {}", requestId, uri);
@@ -162,6 +200,40 @@ public class TerracoreHttpClient implements HttpClient {
         CompletableFuture.runAsync(() -> this.cacheResponse(requestId, response, content), this.workerExecutor);
 
         return content;
+    }
+
+    private byte @Nullable[] doGetSequence(InterruptibleFuture<byte[]> future, @NonNull URI... uris) throws CancellationException {
+        var sequenceId = UUID.randomUUID();
+        this.logger.trace("[{}] Sequence started ({} URLs to try)", sequenceId, uris.length);
+        var exceptions = new ArrayList<Throwable>(uris.length);
+        var count = 0;
+        for (var uri : uris) {
+            try {
+                this.logger.trace("[{}][{}/{}] Trying {}", sequenceId, ++count, uris.length, uri);
+                var content = this.doGet(future, uri);
+                if (content != null) {
+                    this.logger.trace("[{}][{}/{}] Sequence succeeded with {}", sequenceId, count, uris.length, uri);
+                    return content;
+                }
+                this.logger.trace("[{}][{}/{}] Sequence continuing", sequenceId, count, uris.length);
+            } catch (CancellationException e) {
+                this.logger.trace("[{}][{}/{}] Sequence canceled", sequenceId, count, uris.length);
+                throw e;
+            } catch (Throwable t) {
+                // doGet(...) has already logged the error
+                exceptions.add(t);
+            }
+        }
+        if (!exceptions.isEmpty()) {
+            var exception = exceptions.getFirst();
+            if (exception instanceof RuntimeException re) {
+                throw re;
+            } else {
+                throw new RuntimeException(exception);
+            }
+        }
+
+        return null;  // All 404s
     }
 
     private @NonNull HttpResponse<byte[]> doRequest(@NonNull HttpRequest request, @NonNull UUID requestId, @NonNull InterruptibleFuture<byte[]> future) {

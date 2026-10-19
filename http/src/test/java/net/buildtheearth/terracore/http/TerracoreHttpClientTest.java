@@ -391,6 +391,72 @@ public class TerracoreHttpClientTest {
         }
     }
 
+    @Test
+    void getFirstReturnsFirstSuccessfulResponse() throws IOException {
+        final var content = "Hello, World!";
+        try (var endpoint = new TestHttpEndpoint(responseTypeHandler(content))) {
+            try (var client = noCacheClientBuilder().build()) {
+                var notFoundUrl = endpoint.url() + "?notfound";
+                var errorUrl = endpoint.url() + "?error";
+                var okUrl = endpoint.url() + "?ok";
+
+                assertSuccessfulFutureStringEquals(content, client.getFirst(notFoundUrl, okUrl));
+                assertSuccessfulFutureStringEquals(content, client.getFirst(okUrl, notFoundUrl));
+                assertSuccessfulFutureStringEquals(content, client.getFirst(notFoundUrl, errorUrl, okUrl));
+            }
+        }
+    }
+
+    @Test
+    void getFirstReturnsNullWhenAllServersReturnNotFound() throws IOException {
+        try (var endpoint = new TestHttpEndpoint(responseTypeHandler(""))) {
+            try (var client = noCacheClientBuilder().build()) {
+                var notFoundUrl = endpoint.url() + "?notfound";
+                assertSuccessfulFutureStringEquals(null, client.getFirst(notFoundUrl, notFoundUrl));
+            }
+        }
+    }
+
+    @Test
+    void getFirstThrowsWhenAllServersReturnUnsupportedStatusCodes() throws IOException {
+        try (var endpoint = new TestHttpEndpoint(responseTypeHandler(""))) {
+            try (var client = noCacheClientBuilder().build()) {
+                var errorUrl = endpoint.url() + "?error";
+                var future = client.getFirst(errorUrl, errorUrl);
+                var exception = assertThrows(CompletionException.class, future::join);
+                assertInstanceOf(UnsupportedHttpStatus.class, exception.getCause());
+            }
+        }
+    }
+
+    /**
+     * A handler that responds based on the query string of the request:
+     * {@code ?ok} gets a 200 OK response with the given content,
+     * {@code ?notfound} a 404 Not Found response,
+     * and {@code ?error} a 500 Internal Server Error response.
+     */
+    static HttpHandler responseTypeHandler(String content) {
+        return e -> {
+            switch (e.getRequestURI().getQuery()) {
+                case "ok" -> {
+                    e.sendResponseHeaders(HTTP_OK, 0);
+                    e.getResponseBody().write(content.getBytes(UTF_8));
+                }
+                case "notfound" -> e.sendResponseHeaders(HTTP_NOT_FOUND, -1);
+                case "error" -> e.sendResponseHeaders(HTTP_INTERNAL_SERVER_ERROR, -1);
+                default -> throw new IllegalArgumentException("Unknown response type: " + e.getRequestURI().getQuery());
+            }
+            e.close();
+        };
+    }
+
+    @Test
+    void getFirstWithoutUrlsThrowsIllegalArgumentException() {
+        try (var client = noCacheClientBuilder().build()) {
+            assertThrows(IllegalArgumentException.class, client::getFirst);
+        }
+    }
+
     static void assertGetsContent(@NonNull HttpClient client, @NonNull TestHttpEndpoint endpoint, @Nullable String content) {
         var data = client.get(endpoint.url()).join();
         if (content == null) {
