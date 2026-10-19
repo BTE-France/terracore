@@ -44,7 +44,7 @@ class InternalUtils {
     String hexString(byte @NotNull [] data) {
         StringBuilder builder = new StringBuilder();
         for (byte b : data) {
-            builder.append(HEX_DIGITS[(b >> 8) & 0X0f]);
+            builder.append(HEX_DIGITS[(b >> 4) & 0X0f]);
             builder.append(HEX_DIGITS[ b       & 0x0f]);
         }
         return builder.toString();
