@@ -57,7 +57,7 @@ Terra-- versions are split into two parts, the first of which represents the sem
 
 For example, version `2.0.0-1.21.4` implements version `2.0.0` of the Terra-- API and aims to be compatible with Minecraft `1.21.4`.
 
-The Minecraft compatibility version influences the content of the default data files (e.g. [`osm.json5`](src/main/resources/net/buildtheearth/terraminusminus/dataset/osm/osm.json5)),
+The Minecraft compatibility version influences the content of the default data files (e.g. [`osm.json5`](terraminusminus/src/main/resources/net/buildtheearth/terraminusminus/dataset/osm/osm.json5)),
 as well as the versions of dependencies Terra-- has in common with Minecraft (e.g. Gson).
 
 
