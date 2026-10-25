@@ -4,10 +4,11 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.google.common.base.Preconditions;
 import lombok.Getter;
 import net.buildtheearth.terraminusminus.projection.GeographicProjection;
 import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
+
+import static net.daporkchop.lib.common.util.PValidation.*;
 
 /**
  * Applies a simple translation to the projected space, such that:
@@ -30,7 +31,7 @@ public class OffsetProjectionTransform extends ProjectionTransform {
             @JsonProperty(value = "dx", required = true) double dx,
             @JsonProperty(value = "dy", required = true) double dy) {
         super(delegate);
-        Preconditions.checkArgument(Double.isFinite(dx) && Double.isFinite(dy), "Projection offsets have to be finite doubles");
+        checkArg(Double.isFinite(dx) && Double.isFinite(dy), "Projection offsets have to be finite doubles");
         this.dx = dx;
         this.dy = dy;
     }

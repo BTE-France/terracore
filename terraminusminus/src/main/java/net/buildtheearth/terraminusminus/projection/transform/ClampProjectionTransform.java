@@ -4,12 +4,13 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.google.common.base.Preconditions;
 import lombok.Getter;
 import net.buildtheearth.terraminusminus.projection.GeographicProjection;
 import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
 
 import java.util.Arrays;
+
+import static net.daporkchop.lib.common.util.PValidation.*;
 
 /**
  * @author DaPorkchop_
@@ -33,7 +34,7 @@ public class ClampProjectionTransform extends ProjectionTransform {
             @JsonProperty(value = "minY", required = true) double minY,
             @JsonProperty(value = "maxY", required = true) double maxY) {
         super(delegate);
-        Preconditions.checkArgument(Double.isFinite(minX) && Double.isFinite(maxX) && Double.isFinite(minY) && Double.isFinite(maxY), "Projection bounds must be finite doubles");
+        checkArg(Double.isFinite(minX) && Double.isFinite(maxX) && Double.isFinite(minY) && Double.isFinite(maxY), "Projection bounds must be finite doubles");
         this.minX = minX;
         this.maxX = maxX;
         this.minY = minY;
