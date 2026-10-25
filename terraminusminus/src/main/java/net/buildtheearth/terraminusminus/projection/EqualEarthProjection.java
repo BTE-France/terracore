@@ -2,8 +2,9 @@ package net.buildtheearth.terraminusminus.projection;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-import net.buildtheearth.terraminusminus.TerraConstants;
 import net.buildtheearth.terraminusminus.util.MathUtils;
+
+import static net.buildtheearth.terracore.geo.GeoConstants.*;
 
 /**
  * Implementation of the Equal Earth projection
@@ -77,7 +78,7 @@ public class EqualEarthProjection implements GeographicProjection {
 
     @Override
     public double metersPerUnit() {
-        return TerraConstants.EARTH_CIRCUMFERENCE / (2 * this.bounds()[2]);
+        return EARTH_CIRCUMFERENCE / (2 * this.bounds()[2]);
     }
 
     @Override

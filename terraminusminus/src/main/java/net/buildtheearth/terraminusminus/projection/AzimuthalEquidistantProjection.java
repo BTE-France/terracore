@@ -6,11 +6,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.collect.ImmutableMap;
 import lombok.Getter;
-import net.buildtheearth.terraminusminus.TerraConstants;
 
 import java.util.Map;
 
 import static java.lang.Math.*;
+import static net.buildtheearth.terracore.geo.GeoConstants.*;
 
 /**
  * https://mathworld.wolfram.com/AzimuthalEquidistantProjection.html
@@ -93,7 +93,7 @@ public class AzimuthalEquidistantProjection implements GeographicProjection {
 
     @Override
     public double metersPerUnit() {
-        return TerraConstants.EARTH_CIRCUMFERENCE / (2 * this.bounds()[2]);
+        return EARTH_CIRCUMFERENCE / (2 * this.bounds()[2]);
     }
 
     @Override

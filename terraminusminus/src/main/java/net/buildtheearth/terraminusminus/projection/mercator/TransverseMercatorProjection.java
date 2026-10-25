@@ -2,9 +2,10 @@ package net.buildtheearth.terraminusminus.projection.mercator;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-import net.buildtheearth.terraminusminus.TerraConstants;
 import net.buildtheearth.terraminusminus.projection.GeographicProjection;
 import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
+
+import static net.buildtheearth.terracore.geo.GeoConstants.*;
 
 /**
  * Implementation of the universal transverse Mercator projection.
@@ -21,7 +22,7 @@ public class TransverseMercatorProjection implements GeographicProjection {
      */
     public static final double ZONE_WIDTH = Math.toRadians(6.0);
 
-    private static final double METERS_PER_UNIT = TerraConstants.EARTH_CIRCUMFERENCE / (2 * Math.PI);
+    private static final double METERS_PER_UNIT = EARTH_CIRCUMFERENCE / (2 * Math.PI);
 
     /**
      * @param longitude - longitude in radians

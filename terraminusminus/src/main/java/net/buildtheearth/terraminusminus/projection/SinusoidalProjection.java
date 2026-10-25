@@ -2,7 +2,7 @@ package net.buildtheearth.terraminusminus.projection;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-import net.buildtheearth.terraminusminus.TerraConstants;
+import static net.buildtheearth.terracore.geo.GeoConstants.*;
 
 /**
  * Implementation of the Sinusoidal projection.
@@ -24,7 +24,7 @@ public class SinusoidalProjection implements GeographicProjection {
 
     @Override
     public double metersPerUnit() {
-        return TerraConstants.EARTH_CIRCUMFERENCE / 360.0; //gotta make good on that exact area
+        return EARTH_CIRCUMFERENCE / 360.0; //gotta make good on that exact area
     }
 
     @Override

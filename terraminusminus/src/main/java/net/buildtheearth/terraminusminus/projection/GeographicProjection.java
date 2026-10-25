@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 
+import static net.buildtheearth.terracore.geo.GeoConstants.*;
+
 /**
  * Support for various projection types.
  * <p>
@@ -123,8 +125,8 @@ public interface GeographicProjection {
         double[] geo = this.toGeo(x, y);
 
         //TODO: east may be slightly off because earth not a sphere
-        double[] off = this.fromGeo(geo[0] + east * 360.0 / (Math.cos(Math.toRadians(geo[1])) * TerraConstants.EARTH_CIRCUMFERENCE),
-                geo[1] + north * 360.0 / TerraConstants.EARTH_POLAR_CIRCUMFERENCE);
+        double[] off = this.fromGeo(geo[0] + east * 360.0 / (Math.cos(Math.toRadians(geo[1])) * EARTH_CIRCUMFERENCE),
+                geo[1] + north * 360.0 / EARTH_POLAR_CIRCUMFERENCE);
 
         return new double[]{ off[0] - x, off[1] - y };
     }
@@ -142,7 +144,7 @@ public interface GeographicProjection {
     @Deprecated
     default double[] tissot(double longitude, double latitude, double d) throws OutOfProjectionBoundsException {
 
-        double R = TerraConstants.EARTH_CIRCUMFERENCE / (2 * Math.PI);
+        double R = EARTH_CIRCUMFERENCE / (2 * Math.PI);
 
         double ddeg = Math.toDegrees(d);
 
