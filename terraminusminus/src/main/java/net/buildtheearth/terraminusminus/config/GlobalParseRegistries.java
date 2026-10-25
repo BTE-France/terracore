@@ -2,8 +2,6 @@ package net.buildtheearth.terraminusminus.config;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.UtilityClass;
 import net.buildtheearth.terraminusminus.config.condition.AndDC;
 import net.buildtheearth.terraminusminus.config.condition.DoubleCondition;
@@ -58,6 +56,8 @@ import net.buildtheearth.terraminusminus.projection.transform.RotateProjectionTr
 import net.buildtheearth.terraminusminus.projection.transform.ScaleProjectionTransform;
 import net.buildtheearth.terraminusminus.projection.transform.SwapAxesProjectionTransform;
 
+import static java.util.Map.*;
+
 /**
  * Identifies implementation classes by their type names.
  * <p>
@@ -67,98 +67,75 @@ import net.buildtheearth.terraminusminus.projection.transform.SwapAxesProjection
  */
 @UtilityClass
 public class GlobalParseRegistries {
-    public final BiMap<String, Class<? extends GeographicProjection>> PROJECTIONS = new BiMapBuilder<String, Class<? extends GeographicProjection>>()
+    public final BiMap<String, Class<? extends GeographicProjection>> PROJECTIONS = HashBiMap.create(ofEntries(
             //normal projections
-            .put("centered_mercator", CenteredMercatorProjection.class)
-            .put("web_mercator", WebMercatorProjection.class)
-            .put("transverse_mercator", TransverseMercatorProjection.class)
-            .put("equirectangular", EquirectangularProjection.class)
-            .put("sinusoidal", SinusoidalProjection.class)
-            .put("equal_earth", EqualEarthProjection.class)
-            .put("bte_conformal_dymaxion", BTEDymaxionProjection.class)
-            .put("dymaxion", DymaxionProjection.class)
-            .put("conformal_dymaxion", ConformalDynmaxionProjection.class)
-            .put("lambert_azimuthal", LambertAzimuthalProjection.class)
-            .put("azimuthal_equidistant", AzimuthalEquidistantProjection.class)
-            .put("stereographic", StereographicProjection.class)
+            entry("centered_mercator", CenteredMercatorProjection.class),
+            entry("web_mercator", WebMercatorProjection.class),
+            entry("transverse_mercator", TransverseMercatorProjection.class),
+            entry("equirectangular", EquirectangularProjection.class),
+            entry("sinusoidal", SinusoidalProjection.class),
+            entry("equal_earth", EqualEarthProjection.class),
+            entry("bte_conformal_dymaxion", BTEDymaxionProjection.class),
+            entry("dymaxion", DymaxionProjection.class),
+            entry("conformal_dymaxion", ConformalDynmaxionProjection.class),
+            entry("lambert_azimuthal", LambertAzimuthalProjection.class),
+            entry("azimuthal_equidistant", AzimuthalEquidistantProjection.class),
+            entry("stereographic", StereographicProjection.class),
             //transformations
-            .put("clamp", ClampProjectionTransform.class)
-            .put("flip_horizontal", FlipHorizontalProjectionTransform.class)
-            .put("flip_vertical", FlipVerticalProjectionTransform.class)
-            .put("offset", OffsetProjectionTransform.class)
-            .put("rotate", RotateProjectionTransform.class)
-            .put("scale", ScaleProjectionTransform.class)
-            .put("swap_axes", SwapAxesProjectionTransform.class)
-            .build();
+            entry("clamp", ClampProjectionTransform.class),
+            entry("flip_horizontal", FlipHorizontalProjectionTransform.class),
+            entry("flip_vertical", FlipVerticalProjectionTransform.class),
+            entry("offset", OffsetProjectionTransform.class),
+            entry("rotate", RotateProjectionTransform.class),
+            entry("scale", ScaleProjectionTransform.class),
+            entry("swap_axes", SwapAxesProjectionTransform.class)
+    ));
 
-    public final BiMap<String, Class<? extends DoubleCondition>> DOUBLE_CONDITIONS = new BiMapBuilder<String, Class<? extends DoubleCondition>>()
+    public final BiMap<String, Class<? extends DoubleCondition>> DOUBLE_CONDITIONS = HashBiMap.create(ofEntries(
             //conditions
-            .put("equal", EqualDC.class)
-            .put("greater_than", GreaterThanDC.class)
-            .put("less_than", LessThanDC.class)
+            entry("equal", EqualDC.class),
+            entry("greater_than", GreaterThanDC.class),
+            entry("less_than", LessThanDC.class),
             //logical operators
-            .put("and", AndDC.class)
-            .put("not", NotDC.class)
-            .put("or", OrDC.class)
-            .build();
+            entry("and", AndDC.class),
+            entry("not", NotDC.class),
+            entry("or", OrDC.class)
+    ));
 
-    public final BiMap<String, Class<? extends DoubleScalarParser>> SCALAR_PARSERS_DOUBLE = new BiMapBuilder<String, Class<? extends DoubleScalarParser>>()
+    public final BiMap<String, Class<? extends DoubleScalarParser>> SCALAR_PARSERS_DOUBLE = HashBiMap.create(ofEntries(
             //arithmetic operators
-            .put("add", AddDSP.class)
-            .put("divide", DivideDSP.class)
-            .put("multiply", MultiplyDSP.class)
+            entry("add", AddDSP.class),
+            entry("divide", DivideDSP.class),
+            entry("multiply", MultiplyDSP.class),
             //conversion operators
-            .put("flip_x", FlipXDSP.class)
-            .put("flip_z", FlipZDSP.class)
-            .put("from_int", FromIntDSP.class)
-            .put("swap_axes", SwapAxesDSP.class)
+            entry("flip_x", FlipXDSP.class),
+            entry("flip_z", FlipZDSP.class),
+            entry("from_int", FromIntDSP.class),
+            entry("swap_axes", SwapAxesDSP.class),
             //parse operators (including deprecated ParseTiffXXXXDSPs)
-            .put("parse_png_terrarium", ParseTerrariumPngDSP.class)
-            .put("parse_tiff", ParseTiffDSP.class)
-            .put("parse_tiff_auto", ParseTiffAutoDSP.class)
-            .put("parse_tiff_fp", ParseTiffFloatingPointDSP.class)
-            .put("parse_tiff_int", ParseTiffIntDSP.class)
-            .build();
+            entry("parse_png_terrarium", ParseTerrariumPngDSP.class),
+            entry("parse_tiff", ParseTiffDSP.class),
+            entry("parse_tiff_auto", ParseTiffAutoDSP.class),
+            entry("parse_tiff_fp", ParseTiffFloatingPointDSP.class),
+            entry("parse_tiff_int", ParseTiffIntDSP.class)
+    ));
 
-    public final BiMap<String, Class<? extends IntScalarParser>> SCALAR_PARSERS_INT = new BiMapBuilder<String, Class<? extends IntScalarParser>>()
+    public final BiMap<String, Class<? extends IntScalarParser>> SCALAR_PARSERS_INT = HashBiMap.create(ofEntries(
             //arithmetic operators
-            .put("add", AddISP.class)
+            entry("add", AddISP.class),
             //logical operators
-            .put("and", AndISP.class)
+            entry("and", AndISP.class),
             //conversion operators
-            .put("flip_x", FlipXISP.class)
-            .put("flip_z", FlipZISP.class)
-            .put("grayscale_extract", GrayscaleExtractISP.class)
-            .put("require_opaque", RequireOpaqueISP.class)
-            .put("rgb_extract", RGBExtractISP.class)
-            .put("swap_axes", SwapAxesISP.class)
+            entry("flip_x", FlipXISP.class),
+            entry("flip_z", FlipZISP.class),
+            entry("grayscale_extract", GrayscaleExtractISP.class),
+            entry("require_opaque", RequireOpaqueISP.class),
+            entry("rgb_extract", RGBExtractISP.class),
+            entry("swap_axes", SwapAxesISP.class),
             //parse operators
-            .put("parse_jpg", ParseJpgISP.class)
-            .put("parse_png", ParsePngISP.class)
-            .put("parse_tiff", ParseTiffISP.class)
-            .build();
+            entry("parse_jpg", ParseJpgISP.class),
+            entry("parse_png", ParsePngISP.class),
+            entry("parse_tiff", ParseTiffISP.class)
+    ));
 
-    /**
-     * Stupid builder class so that I can populate the initial values cleanly using chained method calls.
-     *
-     * @author DaPorkchop_
-     */
-    @RequiredArgsConstructor
-    private static class BiMapBuilder<K, V> {
-        @NonNull
-        private final BiMap<K, V> delegate;
-
-        public BiMapBuilder() {
-            this(HashBiMap.create());
-        }
-
-        public BiMapBuilder<K, V> put(K key, V value) {
-            this.delegate.put(key, value);
-            return this;
-        }
-
-        public BiMap<K, V> build() {
-            return this.delegate;
-        }
-    }
 }
