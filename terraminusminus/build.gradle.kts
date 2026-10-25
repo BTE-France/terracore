@@ -3,6 +3,8 @@ plugins {
 }
 
 dependencies {
+    implementation(project(":geo"))
+
     implementation("org.apache.commons:commons-imaging:1.0.0-alpha5")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.19.2")
     implementation("net.daporkchop.lib:binary:0.5.7-SNAPSHOT")  {

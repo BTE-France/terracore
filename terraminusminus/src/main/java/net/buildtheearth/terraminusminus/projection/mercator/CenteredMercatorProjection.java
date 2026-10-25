@@ -2,9 +2,10 @@ package net.buildtheearth.terraminusminus.projection.mercator;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-import net.buildtheearth.terraminusminus.TerraConstants;
 import net.buildtheearth.terraminusminus.projection.GeographicProjection;
 import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
+
+import static net.buildtheearth.terracore.geo.GeoConstants.*;
 
 /**
  * Implementation of the Mercator projection, normalized between -1 and 1.
@@ -40,7 +41,7 @@ public class CenteredMercatorProjection implements GeographicProjection {
 
     @Override
     public double metersPerUnit() {
-        return Math.cos(Math.toRadians(30)) * TerraConstants.EARTH_CIRCUMFERENCE / 2; //Accurate at about 30 degrees
+        return Math.cos(Math.toRadians(30)) * EARTH_CIRCUMFERENCE / 2; //Accurate at about 30 degrees
     }
 
     @Override
