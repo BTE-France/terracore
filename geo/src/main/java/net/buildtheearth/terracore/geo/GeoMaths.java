@@ -1,11 +1,11 @@
-package net.buildtheearth.terraminusminus.util;
+package net.buildtheearth.terracore.geo;
 
 import lombok.experimental.UtilityClass;
 
 import static net.daporkchop.lib.common.util.PValidation.*;
 
 @UtilityClass
-public class MathUtils {
+public class GeoMaths {
     /**
      * Square root of 3
      */

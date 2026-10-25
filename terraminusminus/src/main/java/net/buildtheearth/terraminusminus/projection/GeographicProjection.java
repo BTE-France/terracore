@@ -8,7 +8,7 @@ import net.buildtheearth.terraminusminus.TerraConstants;
 import net.buildtheearth.terraminusminus.config.GlobalParseRegistries;
 import net.buildtheearth.terraminusminus.config.TypedDeserializer;
 import net.buildtheearth.terraminusminus.config.TypedSerializer;
-import net.buildtheearth.terraminusminus.util.MathUtils;
+import net.buildtheearth.terracore.geo.GeoMaths;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -204,8 +204,8 @@ public interface GeographicProjection {
         double y2 = y + d * Math.cos(Math.toRadians(angle));
         double[] geo1 = this.toGeo(x, y);
         double[] geo2 = this.toGeo(x2, y2);
-        MathUtils.toRadians(geo1);
-        MathUtils.toRadians(geo2);
+        GeoMaths.toRadians(geo1);
+        GeoMaths.toRadians(geo2);
         double dlon = geo2[0] - geo1[0];
         double dlat = geo2[1] - geo1[1];
         double a = Math.toDegrees(Math.atan2(dlat, dlon*Math.cos(geo1[1])));

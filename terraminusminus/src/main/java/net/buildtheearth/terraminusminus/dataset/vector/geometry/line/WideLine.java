@@ -12,7 +12,7 @@ import net.buildtheearth.terraminusminus.dataset.geojson.geometry.MultiLineStrin
 import net.buildtheearth.terraminusminus.dataset.vector.draw.DrawFunction;
 import net.buildtheearth.terraminusminus.generator.CachedChunkData;
 import net.buildtheearth.terraminusminus.substitutes.ChunkPos;
-import net.buildtheearth.terraminusminus.util.MathUtils;
+import net.buildtheearth.terracore.geo.GeoMaths;
 import net.buildtheearth.terraminusminus.util.bvh.Bounds2d;
 
 /**
@@ -47,10 +47,10 @@ public final class WideLine extends AbstractLine {
             for (int x = minX; x < maxX; x++) {
                 for (int z = minZ; z < maxZ; z++) {
                     double r = ((x - lon0) * (lon1 - lon0) + (z - lat0) * (lat1 - lat0)) / segmentLengthSq;
-                    r = MathUtils.clamp(r, 0.0d, 1.0d);
+                    r = GeoMaths.clamp(r, 0.0d, 1.0d);
 
-                    double dx = MathUtils.lerp(r, lon0, lon1) - x;
-                    double dz = MathUtils.lerp(r, lat0, lat1) - z;
+                    double dx = GeoMaths.lerp(r, lon0, lon1) - x;
+                    double dz = GeoMaths.lerp(r, lat0, lat1) - z;
                     double dSq = dx * dx + dz * dz;
                     if (dSq < radiusSq) {
                         this.draw.drawOnto(builder, x, z, floorI(radius - sqrt(dSq)));
