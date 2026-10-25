@@ -2,7 +2,7 @@ package net.buildtheearth.terraminusminus.projection;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-import net.buildtheearth.terraminusminus.util.MathUtils;
+import net.buildtheearth.terracore.geo.GeoMaths;
 
 import static net.buildtheearth.terracore.geo.GeoConstants.*;
 
@@ -51,14 +51,14 @@ public class EqualEarthProjection implements GeographicProjection {
         dx += 7 * A3 * (tpow *= thetasquare * thetasquare); //7 A3 t^6
         dx += 9 * A4 * (tpow *= thetasquare); //9 A4 t^8
 
-        return new double[]{ Math.toDegrees(x * dx * 3 / (2 * MathUtils.ROOT3 * Math.cos(theta))),
-                Math.toDegrees(Math.asin(Math.sin(theta) * 2 / MathUtils.ROOT3)) };
+        return new double[]{ Math.toDegrees(x * dx * 3 / (2 * GeoMaths.ROOT3 * Math.cos(theta))),
+                Math.toDegrees(Math.asin(Math.sin(theta) * 2 / GeoMaths.ROOT3)) };
     }
 
     @Override
     public double[] fromGeo(double longitude, double latitude) throws OutOfProjectionBoundsException {
     	OutOfProjectionBoundsException.checkLongitudeLatitudeInRange(longitude, latitude);
-        double sintheta = MathUtils.ROOT3 * Math.sin(Math.toRadians(latitude)) / 2;
+        double sintheta = GeoMaths.ROOT3 * Math.sin(Math.toRadians(latitude)) / 2;
         double theta = Math.asin(sintheta);
         double tpow = theta;
 
@@ -73,7 +73,7 @@ public class EqualEarthProjection implements GeographicProjection {
 
         double costheta = Math.sqrt(1 - sintheta * sintheta);
 
-        return new double[]{ (2 * MathUtils.ROOT3 * Math.toRadians(longitude) * costheta / 3) / x, y };
+        return new double[]{ (2 * GeoMaths.ROOT3 * Math.toRadians(longitude) * costheta / 3) / x, y };
     }
 
     @Override
