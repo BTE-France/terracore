@@ -4,10 +4,11 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.google.common.base.Preconditions;
 import lombok.Getter;
 import net.buildtheearth.terraminusminus.projection.GeographicProjection;
 import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
+
+import static net.daporkchop.lib.common.util.PValidation.*;
 
 /**
  * Scales the warps projection's projected space up or down.
@@ -32,8 +33,8 @@ public class ScaleProjectionTransform extends ProjectionTransform {
             @JsonProperty(value = "x", required = true) double x,
             @JsonProperty(value = "y", required = true) double y) {
         super(delegate);
-        Preconditions.checkArgument(Double.isFinite(x) && Double.isFinite(y), "Projection scales should be finite");
-        Preconditions.checkArgument(x != 0 && y != 0, "Projection scale cannot be 0!");
+        checkArg(Double.isFinite(x) && Double.isFinite(y), "Projection scales should be finite");
+        checkArg(x != 0 && y != 0, "Projection scale cannot be 0!");
         this.x = x;
         this.y = y;
     }

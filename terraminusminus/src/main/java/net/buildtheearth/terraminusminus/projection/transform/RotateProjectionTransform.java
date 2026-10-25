@@ -4,12 +4,12 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.google.common.base.Preconditions;
 import lombok.Getter;
 import net.buildtheearth.terraminusminus.projection.GeographicProjection;
 import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
 
 import static java.lang.Math.*;
+import static net.daporkchop.lib.common.util.PValidation.*;
 
 /**
  * @author DaPorkchop_
@@ -33,7 +33,7 @@ public class RotateProjectionTransform extends ProjectionTransform {
             @JsonProperty(value = "delegate", required = true) GeographicProjection delegate,
             @JsonProperty(value = "by", required = true) double by) {
         super(delegate);
-        Preconditions.checkArgument(Double.isFinite(by), "Projection rotation must be a finite double");
+        checkArg(Double.isFinite(by), "Projection rotation must be a finite double");
         this.by = by;
 
         this.sin = Math.sin(toRadians(by));

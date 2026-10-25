@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.google.common.collect.ImmutableMap;
 import lombok.Getter;
 
 import java.util.Map;
@@ -97,9 +96,9 @@ public class LambertAzimuthalProjection implements GeographicProjection {
 
     @Override
     public Map<String, Object> properties() {
-        return ImmutableMap.<String, Object>builder()
-                .put("centerX", this.centerX)
-                .put("centerY", this.centerY)
-                .build();
+        return Map.of(
+                "centerX", this.centerX,
+                "centerY", this.centerY
+        );
     }
 }
