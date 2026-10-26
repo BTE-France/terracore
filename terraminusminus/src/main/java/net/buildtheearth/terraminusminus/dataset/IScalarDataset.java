@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import lombok.NonNull;
 import net.buildtheearth.terraminusminus.dataset.scalar.ConfigurableDoubleTiledDataset;
-import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
+import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
 import net.buildtheearth.terraminusminus.util.CornerBoundingBox2d;
 
 /**

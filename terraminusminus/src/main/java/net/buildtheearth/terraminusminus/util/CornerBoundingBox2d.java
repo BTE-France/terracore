@@ -2,8 +2,8 @@ package net.buildtheearth.terraminusminus.util;
 
 import lombok.NonNull;
 import lombok.ToString;
-import net.buildtheearth.terraminusminus.projection.GeographicProjection;
-import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
+import net.buildtheearth.terracore.geo.projection.GeographicProjection;
+import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
 import net.buildtheearth.terraminusminus.util.bvh.Bounds2d;
 
 import static java.lang.Math.*;

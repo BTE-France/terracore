@@ -1,8 +1,8 @@
-package net.buildtheearth.terraminusminus.projection.transform;
+package net.buildtheearth.terracore.geo.projection.transform;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import lombok.Getter;
-import net.buildtheearth.terraminusminus.projection.GeographicProjection;
+import net.buildtheearth.terracore.geo.projection.GeographicProjection;
 
 /**
  * Warps a Geographic projection and applies a transformation to it.

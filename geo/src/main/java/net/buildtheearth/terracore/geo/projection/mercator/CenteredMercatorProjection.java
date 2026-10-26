@@ -1,9 +1,9 @@
-package net.buildtheearth.terraminusminus.projection.mercator;
+package net.buildtheearth.terracore.geo.projection.mercator;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-import net.buildtheearth.terraminusminus.projection.GeographicProjection;
-import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
+import net.buildtheearth.terracore.geo.projection.GeographicProjection;
+import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
 
 import static net.buildtheearth.terracore.geo.GeoConstants.*;
 

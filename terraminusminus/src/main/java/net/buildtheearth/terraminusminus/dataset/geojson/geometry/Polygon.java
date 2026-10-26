@@ -5,8 +5,8 @@ import static net.daporkchop.lib.common.util.PValidation.checkArg;
 import lombok.Data;
 import lombok.NonNull;
 import net.buildtheearth.terraminusminus.dataset.geojson.Geometry;
-import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
-import net.buildtheearth.terraminusminus.projection.ProjectionFunction;
+import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
+import net.buildtheearth.terracore.geo.projection.ProjectionFunction;
 import net.buildtheearth.terraminusminus.util.bvh.Bounds2d;
 
 /**

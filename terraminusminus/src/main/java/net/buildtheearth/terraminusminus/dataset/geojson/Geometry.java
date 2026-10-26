@@ -23,8 +23,8 @@ package net.buildtheearth.terraminusminus.dataset.geojson;
 import com.google.gson.annotations.JsonAdapter;
 
 import lombok.NonNull;
-import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
-import net.buildtheearth.terraminusminus.projection.ProjectionFunction;
+import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
+import net.buildtheearth.terracore.geo.projection.ProjectionFunction;
 import net.buildtheearth.terraminusminus.util.bvh.Bounds2d;
 
 /**

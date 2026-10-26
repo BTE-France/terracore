@@ -18,8 +18,8 @@ import net.buildtheearth.terraminusminus.dataset.geojson.object.Feature;
 import net.buildtheearth.terraminusminus.dataset.geojson.object.Reference;
 import net.buildtheearth.terraminusminus.dataset.osm.OSMMapper;
 import net.buildtheearth.terraminusminus.dataset.vector.geometry.VectorGeometry;
-import net.buildtheearth.terraminusminus.projection.GeographicProjection;
-import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
+import net.buildtheearth.terracore.geo.projection.GeographicProjection;
+import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
 import net.daporkchop.lib.common.util.PorkUtil;
 
 /**

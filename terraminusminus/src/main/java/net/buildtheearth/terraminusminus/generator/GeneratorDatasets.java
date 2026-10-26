@@ -2,7 +2,7 @@ package net.buildtheearth.terraminusminus.generator;
 
 import lombok.Getter;
 import lombok.NonNull;
-import net.buildtheearth.terraminusminus.projection.GeographicProjection;
+import net.buildtheearth.terracore.geo.projection.GeographicProjection;
 import net.buildtheearth.terraminusminus.util.CustomAttributeContainer;
 
 import java.util.Map;

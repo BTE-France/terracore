@@ -3,7 +3,7 @@ package net.buildtheearth.terraminusminus.dataset;
 import java.util.concurrent.CompletableFuture;
 
 import lombok.NonNull;
-import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
+import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
 import net.buildtheearth.terraminusminus.util.CornerBoundingBox2d;
 
 /**

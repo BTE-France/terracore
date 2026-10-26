@@ -1,4 +1,4 @@
-package net.buildtheearth.terraminusminus.projection;
+package net.buildtheearth.terracore.geo.projection;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
@@ -12,11 +12,11 @@ import static java.lang.Math.*;
 import static net.buildtheearth.terracore.geo.GeoConstants.*;
 
 /**
- * https://mathworld.wolfram.com/LambertAzimuthalEqual-AreaProjection.html
+ * https://mathworld.wolfram.com/AzimuthalEquidistantProjection.html
  */
 @JsonDeserialize
 @Getter(onMethod_ = { @JsonGetter })
-public class LambertAzimuthalProjection implements GeographicProjection {
+public class AzimuthalEquidistantProjection implements GeographicProjection {
     private static double modDegrees(double val, double bound) {
         if (val == bound * 0.5d) {
             return val;
@@ -34,7 +34,7 @@ public class LambertAzimuthalProjection implements GeographicProjection {
     private final double centerY;
 
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
-    public LambertAzimuthalProjection(
+    public AzimuthalEquidistantProjection(
             @JsonProperty("centerX") Double centerX,
             @JsonProperty("centerY") Double centerY) {
         this.centerX = modDegrees(centerX != null ? centerX : 0.0d, 360.0d);
@@ -46,15 +46,20 @@ public class LambertAzimuthalProjection implements GeographicProjection {
         double phi1 = toRadians(this.centerY);
         double lambda0 = toRadians(this.centerX);
 
-        double p = sqrt(x * x + y * y);
-        double c = 2.0d * asin((1.0d / 2.0d) * p);
-
-        if (Double.isNaN(c)) {
+        double c = sqrt(x * x + y * y);
+        if (c >= PI) {
             throw OutOfProjectionBoundsException.get();
         }
 
-        double phi = asin(cos(c) * sin(phi1) + (y * sin(c) * cos(phi1)) / p);
-        double lambda = lambda0 + atan2(x * sin(c), p * cos(phi1) * cos(c) - y * sin(phi1) * sin(c));
+        double phi = asin(cos(c) * sin(phi1) + (y * sin(c) * cos(phi1) / c));
+        double lambda;
+        if (this.centerY == -90.0d) {
+            lambda = lambda0 + atan2(x, y);
+        } else if (this.centerY == 90.0d) {
+            lambda = lambda0 + PI + atan2(-x, y);
+        } else {
+            lambda = lambda0 + atan2(x * sin(c), c * cos(phi1) * cos(c) - y * sin(phi1) * sin(c));
+        }
 
         double longitude = -modDegrees(toDegrees(lambda), 360.0d);
         double latitude = toDegrees(phi);
@@ -71,17 +76,18 @@ public class LambertAzimuthalProjection implements GeographicProjection {
         double phi = toRadians(latitude);
         double lambda = -toRadians(longitude);
 
-        double k = sqrt(2.0d / (1.0d + sin(phi1) * sin(phi) + cos(phi1) * cos(phi) * cos(lambda - lambda0)));
+        double p = acos(sin(phi1) * sin(phi) + cos(phi1) * cos(phi) * cos(lambda - lambda0));
+        double t = atan2(cos(phi) * sin(lambda - lambda0), cos(phi1) * sin(phi) - sin(phi1) * cos(phi) * cos(lambda - lambda0));
 
-        double x = k * cos(phi) * sin(lambda - lambda0);
-        double y = k * (cos(phi1) * sin(phi) - sin(phi1) * cos(phi) * cos(lambda - lambda0));
+        double x = p * sin(t);
+        double y = p * cos(t);
 
         return new double[]{ x, y };
     }
 
     @Override
     public double[] bounds() {
-        return new double[]{ -2.0d, -2.0d, 2.0d, 2.0d };
+        return new double[]{ -PI, -PI, PI, PI };
     }
 
     @Override
@@ -91,7 +97,7 @@ public class LambertAzimuthalProjection implements GeographicProjection {
 
     @Override
     public String toString() {
-        return "Lambert Azimuthal";
+        return "Azimuthal Equidistant";
     }
 
     @Override

@@ -1,6 +1,8 @@
 package net.buildtheearth.terraminusminus.projection;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import net.buildtheearth.terracore.geo.projection.GeographicProjection;
+import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
 import net.buildtheearth.terraminusminus.TerraConstants;
 import net.buildtheearth.terraminusminus.TerraMinusMinusTest;
 import org.junit.jupiter.api.Test;
