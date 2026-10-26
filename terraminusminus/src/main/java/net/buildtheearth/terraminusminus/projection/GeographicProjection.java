@@ -4,10 +4,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.NonNull;
 import lombok.SneakyThrows;
-import net.buildtheearth.terraminusminus.TerraConstants;
-import net.buildtheearth.terraminusminus.config.GlobalParseRegistries;
-import net.buildtheearth.terraminusminus.config.TypedDeserializer;
-import net.buildtheearth.terraminusminus.config.TypedSerializer;
 import net.buildtheearth.terracore.geo.GeoMaths;
 
 import java.io.IOException;
@@ -27,12 +23,12 @@ import static net.buildtheearth.terracore.geo.GeoConstants.*;
  * All geographic coordinates are in degrees.
  *
  */
-@JsonDeserialize(using = GeographicProjection.Deserializer.class)
-@JsonSerialize(using = GeographicProjection.Serializer.class)
+@JsonDeserialize(using = ProjectionJson.Deserializer.class)
+@JsonSerialize(using = ProjectionJson.Serializer.class)
 public interface GeographicProjection {
     @SneakyThrows(IOException.class)
     static GeographicProjection parse(@NonNull String config) {
-        return TerraConstants.JSON_MAPPER.readValue(config, GeographicProjection.class);
+        return ProjectionJson.MAPPER.readValue(config, GeographicProjection.class);
     }
 
     /**
@@ -239,17 +235,4 @@ public interface GeographicProjection {
         return Collections.emptyMap();
     }
 
-    class Deserializer extends TypedDeserializer<GeographicProjection> {
-        @Override
-        protected Map<String, Class<? extends GeographicProjection>> registry() {
-            return GlobalParseRegistries.PROJECTIONS;
-        }
-    }
-
-    class Serializer extends TypedSerializer<GeographicProjection> {
-        @Override
-        protected Map<Class<? extends GeographicProjection>, String> registry() {
-            return GlobalParseRegistries.PROJECTIONS.inverse();
-        }
-    }
 }
