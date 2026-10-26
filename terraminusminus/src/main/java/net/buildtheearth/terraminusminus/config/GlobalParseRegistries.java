@@ -35,26 +35,6 @@ import net.buildtheearth.terraminusminus.config.scalarparse.i.ParseTiffISP;
 import net.buildtheearth.terraminusminus.config.scalarparse.i.RGBExtractISP;
 import net.buildtheearth.terraminusminus.config.scalarparse.i.RequireOpaqueISP;
 import net.buildtheearth.terraminusminus.config.scalarparse.i.SwapAxesISP;
-import net.buildtheearth.terraminusminus.projection.AzimuthalEquidistantProjection;
-import net.buildtheearth.terraminusminus.projection.LambertAzimuthalProjection;
-import net.buildtheearth.terraminusminus.projection.EqualEarthProjection;
-import net.buildtheearth.terraminusminus.projection.EquirectangularProjection;
-import net.buildtheearth.terraminusminus.projection.GeographicProjection;
-import net.buildtheearth.terraminusminus.projection.SinusoidalProjection;
-import net.buildtheearth.terraminusminus.projection.StereographicProjection;
-import net.buildtheearth.terraminusminus.projection.dymaxion.BTEDymaxionProjection;
-import net.buildtheearth.terraminusminus.projection.dymaxion.ConformalDynmaxionProjection;
-import net.buildtheearth.terraminusminus.projection.dymaxion.DymaxionProjection;
-import net.buildtheearth.terraminusminus.projection.mercator.CenteredMercatorProjection;
-import net.buildtheearth.terraminusminus.projection.mercator.TransverseMercatorProjection;
-import net.buildtheearth.terraminusminus.projection.mercator.WebMercatorProjection;
-import net.buildtheearth.terraminusminus.projection.transform.ClampProjectionTransform;
-import net.buildtheearth.terraminusminus.projection.transform.FlipHorizontalProjectionTransform;
-import net.buildtheearth.terraminusminus.projection.transform.FlipVerticalProjectionTransform;
-import net.buildtheearth.terraminusminus.projection.transform.OffsetProjectionTransform;
-import net.buildtheearth.terraminusminus.projection.transform.RotateProjectionTransform;
-import net.buildtheearth.terraminusminus.projection.transform.ScaleProjectionTransform;
-import net.buildtheearth.terraminusminus.projection.transform.SwapAxesProjectionTransform;
 
 import static java.util.Map.*;
 
@@ -67,30 +47,6 @@ import static java.util.Map.*;
  */
 @UtilityClass
 public class GlobalParseRegistries {
-    public final BiMap<String, Class<? extends GeographicProjection>> PROJECTIONS = HashBiMap.create(ofEntries(
-            //normal projections
-            entry("centered_mercator", CenteredMercatorProjection.class),
-            entry("web_mercator", WebMercatorProjection.class),
-            entry("transverse_mercator", TransverseMercatorProjection.class),
-            entry("equirectangular", EquirectangularProjection.class),
-            entry("sinusoidal", SinusoidalProjection.class),
-            entry("equal_earth", EqualEarthProjection.class),
-            entry("bte_conformal_dymaxion", BTEDymaxionProjection.class),
-            entry("dymaxion", DymaxionProjection.class),
-            entry("conformal_dymaxion", ConformalDynmaxionProjection.class),
-            entry("lambert_azimuthal", LambertAzimuthalProjection.class),
-            entry("azimuthal_equidistant", AzimuthalEquidistantProjection.class),
-            entry("stereographic", StereographicProjection.class),
-            //transformations
-            entry("clamp", ClampProjectionTransform.class),
-            entry("flip_horizontal", FlipHorizontalProjectionTransform.class),
-            entry("flip_vertical", FlipVerticalProjectionTransform.class),
-            entry("offset", OffsetProjectionTransform.class),
-            entry("rotate", RotateProjectionTransform.class),
-            entry("scale", ScaleProjectionTransform.class),
-            entry("swap_axes", SwapAxesProjectionTransform.class)
-    ));
-
     public final BiMap<String, Class<? extends DoubleCondition>> DOUBLE_CONDITIONS = HashBiMap.create(ofEntries(
             //conditions
             entry("equal", EqualDC.class),
