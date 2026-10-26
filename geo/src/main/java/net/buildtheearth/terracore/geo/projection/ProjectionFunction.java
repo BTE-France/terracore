@@ -1,4 +1,4 @@
-package net.buildtheearth.terraminusminus.projection;
+package net.buildtheearth.terracore.geo.projection;
 
 /**
  * A function that can apply a projection to a pair of lon/lat or x/y coordinates.

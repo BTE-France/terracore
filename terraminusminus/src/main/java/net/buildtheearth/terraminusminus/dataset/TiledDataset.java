@@ -3,7 +3,7 @@ package net.buildtheearth.terraminusminus.dataset;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import net.buildtheearth.terraminusminus.projection.GeographicProjection;
+import net.buildtheearth.terracore.geo.projection.GeographicProjection;
 import net.buildtheearth.terraminusminus.substitutes.ChunkPos;
 
 @RequiredArgsConstructor

@@ -1,4 +1,4 @@
-package net.buildtheearth.terraminusminus.projection;
+package net.buildtheearth.terracore.geo.projection;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
@@ -10,14 +10,13 @@ import java.util.Map;
 
 import static java.lang.Math.*;
 import static net.buildtheearth.terracore.geo.GeoConstants.*;
-import static net.daporkchop.lib.common.util.PValidation.*;
 
 /**
- * https://mathworld.wolfram.com/StereographicProjection.html
+ * https://mathworld.wolfram.com/LambertAzimuthalEqual-AreaProjection.html
  */
 @JsonDeserialize
 @Getter(onMethod_ = { @JsonGetter })
-public class StereographicProjection implements GeographicProjection {
+public class LambertAzimuthalProjection implements GeographicProjection {
     private static double modDegrees(double val, double bound) {
         if (val == bound * 0.5d) {
             return val;
@@ -33,19 +32,13 @@ public class StereographicProjection implements GeographicProjection {
 
     private final double centerX;
     private final double centerY;
-    private final double radius;
 
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
-    public StereographicProjection(
+    public LambertAzimuthalProjection(
             @JsonProperty("centerX") Double centerX,
-            @JsonProperty("centerY") Double centerY,
-            @JsonProperty("radius") Double radius) {
+            @JsonProperty("centerY") Double centerY) {
         this.centerX = modDegrees(centerX != null ? centerX : 0.0d, 360.0d);
         this.centerY = modDegrees(centerY != null ? centerY : 0.0d, 180.0d);
-        this.radius = radius != null ? radius : 90.0d;
-
-        checkArg(this.radius > 0.0d, "radius must be positive!");
-        checkArg(this.radius < 180.0d, "radius must be less than 180!");
     }
 
     @Override
@@ -54,7 +47,7 @@ public class StereographicProjection implements GeographicProjection {
         double lambda0 = toRadians(this.centerX);
 
         double p = sqrt(x * x + y * y);
-        double c = 2.0d * atan2(p, 2.0d);
+        double c = 2.0d * asin((1.0d / 2.0d) * p);
 
         if (Double.isNaN(c)) {
             throw OutOfProjectionBoundsException.get();
@@ -73,24 +66,22 @@ public class StereographicProjection implements GeographicProjection {
     public double[] fromGeo(double longitude, double latitude) throws OutOfProjectionBoundsException {
         OutOfProjectionBoundsException.checkLongitudeLatitudeInRange(longitude, latitude);
 
-        double phi = toRadians(latitude - this.centerY);
-        double lambda = -toRadians(longitude + this.centerX);
+        double phi1 = toRadians(this.centerY);
+        double lambda0 = toRadians(this.centerX);
+        double phi = toRadians(latitude);
+        double lambda = -toRadians(longitude);
 
-        double k = 2.0d / (1.0d + cos(phi) * cos(lambda));
+        double k = sqrt(2.0d / (1.0d + sin(phi1) * sin(phi) + cos(phi1) * cos(phi) * cos(lambda - lambda0)));
 
-        double x = k * cos(phi) * sin(lambda);
-        double y = k * sin(phi);
+        double x = k * cos(phi) * sin(lambda - lambda0);
+        double y = k * (cos(phi1) * sin(phi) - sin(phi1) * cos(phi) * cos(lambda - lambda0));
 
         return new double[]{ x, y };
     }
 
     @Override
     public double[] bounds() {
-        double lambda = toRadians(this.radius);
-        double k = 2.0d / (1.0d + cos(lambda));
-        double r = abs(k * sin(lambda));
-
-        return new double[]{ -r, -r, r, r };
+        return new double[]{ -2.0d, -2.0d, 2.0d, 2.0d };
     }
 
     @Override
@@ -107,8 +98,7 @@ public class StereographicProjection implements GeographicProjection {
     public Map<String, Object> properties() {
         return Map.of(
                 "centerX", this.centerX,
-                "centerY", this.centerY,
-                "radius", this.radius
+                "centerY", this.centerY
         );
     }
 }

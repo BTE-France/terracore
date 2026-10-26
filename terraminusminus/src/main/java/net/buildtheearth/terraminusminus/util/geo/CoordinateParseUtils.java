@@ -7,11 +7,11 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
+import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
 import net.daporkchop.lib.common.util.PArrays;
 
 
-import static net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException.*;
+import static net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException.*;
 import static net.buildtheearth.terraminusminus.util.Strings.*;
 
 /**

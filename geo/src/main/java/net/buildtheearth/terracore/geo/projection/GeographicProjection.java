@@ -1,4 +1,4 @@
-package net.buildtheearth.terraminusminus.projection;
+package net.buildtheearth.terracore.geo.projection;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;

@@ -1,11 +1,11 @@
-package net.buildtheearth.terraminusminus.projection.transform;
+package net.buildtheearth.terracore.geo.projection.transform;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-import net.buildtheearth.terraminusminus.projection.GeographicProjection;
-import net.buildtheearth.terraminusminus.projection.OutOfProjectionBoundsException;
+import net.buildtheearth.terracore.geo.projection.GeographicProjection;
+import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
 
 /**
  * Inverses the warped projection such that x becomes y and y becomes x.

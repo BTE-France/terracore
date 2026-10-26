@@ -8,7 +8,7 @@ import com.google.common.collect.ImmutableMap;
 
 import io.netty.buffer.ByteBuf;
 import lombok.NonNull;
-import net.buildtheearth.terraminusminus.projection.GeographicProjection;
+import net.buildtheearth.terracore.geo.projection.GeographicProjection;
 import net.buildtheearth.terraminusminus.substitutes.ChunkPos;
 import net.buildtheearth.terraminusminus.util.http.Http;
 import net.daporkchop.lib.common.misc.string.PStrings;

@@ -1,4 +1,4 @@
-package net.buildtheearth.terraminusminus.projection;
+package net.buildtheearth.terracore.geo.projection;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
@@ -10,13 +10,14 @@ import java.util.Map;
 
 import static java.lang.Math.*;
 import static net.buildtheearth.terracore.geo.GeoConstants.*;
+import static net.daporkchop.lib.common.util.PValidation.*;
 
 /**
- * https://mathworld.wolfram.com/AzimuthalEquidistantProjection.html
+ * https://mathworld.wolfram.com/StereographicProjection.html
  */
 @JsonDeserialize
 @Getter(onMethod_ = { @JsonGetter })
-public class AzimuthalEquidistantProjection implements GeographicProjection {
+public class StereographicProjection implements GeographicProjection {
     private static double modDegrees(double val, double bound) {
         if (val == bound * 0.5d) {
             return val;
@@ -32,13 +33,19 @@ public class AzimuthalEquidistantProjection implements GeographicProjection {
 
     private final double centerX;
     private final double centerY;
+    private final double radius;
 
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
-    public AzimuthalEquidistantProjection(
+    public StereographicProjection(
             @JsonProperty("centerX") Double centerX,
-            @JsonProperty("centerY") Double centerY) {
+            @JsonProperty("centerY") Double centerY,
+            @JsonProperty("radius") Double radius) {
         this.centerX = modDegrees(centerX != null ? centerX : 0.0d, 360.0d);
         this.centerY = modDegrees(centerY != null ? centerY : 0.0d, 180.0d);
+        this.radius = radius != null ? radius : 90.0d;
+
+        checkArg(this.radius > 0.0d, "radius must be positive!");
+        checkArg(this.radius < 180.0d, "radius must be less than 180!");
     }
 
     @Override
@@ -46,20 +53,15 @@ public class AzimuthalEquidistantProjection implements GeographicProjection {
         double phi1 = toRadians(this.centerY);
         double lambda0 = toRadians(this.centerX);
 
-        double c = sqrt(x * x + y * y);
-        if (c >= PI) {
+        double p = sqrt(x * x + y * y);
+        double c = 2.0d * atan2(p, 2.0d);
+
+        if (Double.isNaN(c)) {
             throw OutOfProjectionBoundsException.get();
         }
 
-        double phi = asin(cos(c) * sin(phi1) + (y * sin(c) * cos(phi1) / c));
-        double lambda;
-        if (this.centerY == -90.0d) {
-            lambda = lambda0 + atan2(x, y);
-        } else if (this.centerY == 90.0d) {
-            lambda = lambda0 + PI + atan2(-x, y);
-        } else {
-            lambda = lambda0 + atan2(x * sin(c), c * cos(phi1) * cos(c) - y * sin(phi1) * sin(c));
-        }
+        double phi = asin(cos(c) * sin(phi1) + (y * sin(c) * cos(phi1)) / p);
+        double lambda = lambda0 + atan2(x * sin(c), p * cos(phi1) * cos(c) - y * sin(phi1) * sin(c));
 
         double longitude = -modDegrees(toDegrees(lambda), 360.0d);
         double latitude = toDegrees(phi);
@@ -71,23 +73,24 @@ public class AzimuthalEquidistantProjection implements GeographicProjection {
     public double[] fromGeo(double longitude, double latitude) throws OutOfProjectionBoundsException {
         OutOfProjectionBoundsException.checkLongitudeLatitudeInRange(longitude, latitude);
 
-        double phi1 = toRadians(this.centerY);
-        double lambda0 = toRadians(this.centerX);
-        double phi = toRadians(latitude);
-        double lambda = -toRadians(longitude);
+        double phi = toRadians(latitude - this.centerY);
+        double lambda = -toRadians(longitude + this.centerX);
 
-        double p = acos(sin(phi1) * sin(phi) + cos(phi1) * cos(phi) * cos(lambda - lambda0));
-        double t = atan2(cos(phi) * sin(lambda - lambda0), cos(phi1) * sin(phi) - sin(phi1) * cos(phi) * cos(lambda - lambda0));
+        double k = 2.0d / (1.0d + cos(phi) * cos(lambda));
 
-        double x = p * sin(t);
-        double y = p * cos(t);
+        double x = k * cos(phi) * sin(lambda);
+        double y = k * sin(phi);
 
         return new double[]{ x, y };
     }
 
     @Override
     public double[] bounds() {
-        return new double[]{ -PI, -PI, PI, PI };
+        double lambda = toRadians(this.radius);
+        double k = 2.0d / (1.0d + cos(lambda));
+        double r = abs(k * sin(lambda));
+
+        return new double[]{ -r, -r, r, r };
     }
 
     @Override
@@ -97,14 +100,15 @@ public class AzimuthalEquidistantProjection implements GeographicProjection {
 
     @Override
     public String toString() {
-        return "Azimuthal Equidistant";
+        return "Lambert Azimuthal";
     }
 
     @Override
     public Map<String, Object> properties() {
         return Map.of(
                 "centerX", this.centerX,
-                "centerY", this.centerY
+                "centerY", this.centerY,
+                "radius", this.radius
         );
     }
 }

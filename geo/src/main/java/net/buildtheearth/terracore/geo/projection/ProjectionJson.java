@@ -1,4 +1,4 @@
-package net.buildtheearth.terraminusminus.projection;
+package net.buildtheearth.terracore.geo.projection;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
@@ -15,19 +15,19 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import lombok.experimental.UtilityClass;
-import net.buildtheearth.terraminusminus.projection.dymaxion.BTEDymaxionProjection;
-import net.buildtheearth.terraminusminus.projection.dymaxion.ConformalDynmaxionProjection;
-import net.buildtheearth.terraminusminus.projection.dymaxion.DymaxionProjection;
-import net.buildtheearth.terraminusminus.projection.mercator.CenteredMercatorProjection;
-import net.buildtheearth.terraminusminus.projection.mercator.TransverseMercatorProjection;
-import net.buildtheearth.terraminusminus.projection.mercator.WebMercatorProjection;
-import net.buildtheearth.terraminusminus.projection.transform.ClampProjectionTransform;
-import net.buildtheearth.terraminusminus.projection.transform.FlipHorizontalProjectionTransform;
-import net.buildtheearth.terraminusminus.projection.transform.FlipVerticalProjectionTransform;
-import net.buildtheearth.terraminusminus.projection.transform.OffsetProjectionTransform;
-import net.buildtheearth.terraminusminus.projection.transform.RotateProjectionTransform;
-import net.buildtheearth.terraminusminus.projection.transform.ScaleProjectionTransform;
-import net.buildtheearth.terraminusminus.projection.transform.SwapAxesProjectionTransform;
+import net.buildtheearth.terracore.geo.projection.dymaxion.BTEDymaxionProjection;
+import net.buildtheearth.terracore.geo.projection.dymaxion.ConformalDynmaxionProjection;
+import net.buildtheearth.terracore.geo.projection.dymaxion.DymaxionProjection;
+import net.buildtheearth.terracore.geo.projection.mercator.CenteredMercatorProjection;
+import net.buildtheearth.terracore.geo.projection.mercator.TransverseMercatorProjection;
+import net.buildtheearth.terracore.geo.projection.mercator.WebMercatorProjection;
+import net.buildtheearth.terracore.geo.projection.transform.ClampProjectionTransform;
+import net.buildtheearth.terracore.geo.projection.transform.FlipHorizontalProjectionTransform;
+import net.buildtheearth.terracore.geo.projection.transform.FlipVerticalProjectionTransform;
+import net.buildtheearth.terracore.geo.projection.transform.OffsetProjectionTransform;
+import net.buildtheearth.terracore.geo.projection.transform.RotateProjectionTransform;
+import net.buildtheearth.terracore.geo.projection.transform.ScaleProjectionTransform;
+import net.buildtheearth.terracore.geo.projection.transform.SwapAxesProjectionTransform;
 import net.daporkchop.lib.common.util.PorkUtil;
 
 import java.io.IOException;

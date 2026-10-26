@@ -11,7 +11,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import net.buildtheearth.terraminusminus.config.scalarparse.d.DoubleScalarParser;
 import net.buildtheearth.terraminusminus.dataset.BlendMode;
-import net.buildtheearth.terraminusminus.projection.GeographicProjection;
+import net.buildtheearth.terracore.geo.projection.GeographicProjection;
 
 /**
  * Implementation of {@link DoubleTiledDataset} whose behavior is defined by JSON configuration.

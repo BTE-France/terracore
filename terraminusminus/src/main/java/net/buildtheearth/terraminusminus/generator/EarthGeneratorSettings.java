@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.With;
 import net.buildtheearth.terraminusminus.TerraConstants;
-import net.buildtheearth.terraminusminus.projection.GeographicProjection;
+import net.buildtheearth.terracore.geo.projection.GeographicProjection;
 import net.daporkchop.lib.binary.oio.StreamUtil;
 import net.daporkchop.lib.common.reference.ReferenceStrength;
 import net.daporkchop.lib.common.reference.cache.Cached;

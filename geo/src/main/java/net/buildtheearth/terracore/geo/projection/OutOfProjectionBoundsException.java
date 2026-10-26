@@ -1,4 +1,4 @@
-package net.buildtheearth.terraminusminus.projection;
+package net.buildtheearth.terracore.geo.projection;
 
 public final class OutOfProjectionBoundsException extends Exception {
     private static final OutOfProjectionBoundsException INSTANCE = new OutOfProjectionBoundsException(false);
