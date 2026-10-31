@@ -1,4 +1,4 @@
-package net.buildtheearth.terraminusminus.util.interval;
+package net.buildtheearth.terracore.geo.interval;
 
 import io.netty.util.concurrent.FastThreadLocal;
 import io.netty.util.internal.InternalThreadLocalMap;

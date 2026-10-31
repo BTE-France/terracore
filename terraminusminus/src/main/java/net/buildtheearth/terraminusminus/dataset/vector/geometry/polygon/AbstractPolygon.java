@@ -20,7 +20,7 @@ import net.buildtheearth.terraminusminus.dataset.geojson.geometry.Polygon;
 import net.buildtheearth.terraminusminus.dataset.vector.draw.DrawFunction;
 import net.buildtheearth.terraminusminus.dataset.vector.geometry.AbstractVectorGeometry;
 import net.buildtheearth.terraminusminus.dataset.vector.geometry.Segment;
-import net.buildtheearth.terraminusminus.util.interval.IntervalTree;
+import net.buildtheearth.terracore.geo.interval.IntervalTree;
 
 /**
  * @author DaPorkchop_

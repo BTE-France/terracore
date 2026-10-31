@@ -1,4 +1,4 @@
-package net.buildtheearth.terraminusminus.util.interval;
+package net.buildtheearth.terracore.geo.interval;
 
 /**
  * A 1-dimensional interval represented using double-precision floating-point coordinates.
