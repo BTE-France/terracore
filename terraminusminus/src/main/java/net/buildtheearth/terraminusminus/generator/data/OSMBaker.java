@@ -5,13 +5,13 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.CompletableFuture;
 
+import net.buildtheearth.terracore.minecraft.ChunkPos;
 import net.buildtheearth.terraminusminus.dataset.IElementDataset;
 import net.buildtheearth.terraminusminus.dataset.vector.geometry.VectorGeometry;
 import net.buildtheearth.terraminusminus.generator.CachedChunkData;
 import net.buildtheearth.terraminusminus.generator.EarthGeneratorPipelines;
 import net.buildtheearth.terraminusminus.generator.GeneratorDatasets;
 import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
-import net.buildtheearth.terraminusminus.substitutes.ChunkPos;
 import net.buildtheearth.terracore.geo.CornerBoundingBox2d;
 import net.buildtheearth.terracore.geo.bvh.BVH;
 import net.buildtheearth.terracore.geo.bvh.Bounds2d;

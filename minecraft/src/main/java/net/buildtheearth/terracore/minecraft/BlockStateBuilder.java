@@ -1,4 +1,4 @@
-package net.buildtheearth.terraminusminus.substitutes;
+package net.buildtheearth.terracore.minecraft;
 
 import net.daporkchop.lib.common.reference.ReferenceStrength;
 import net.daporkchop.lib.common.reference.cache.Cached;

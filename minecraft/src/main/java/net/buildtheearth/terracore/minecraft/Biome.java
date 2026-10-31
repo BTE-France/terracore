@@ -1,4 +1,4 @@
-package net.buildtheearth.terraminusminus.substitutes;
+package net.buildtheearth.terracore.minecraft;
 
 /**
  * A Minecraft biome.
@@ -6,7 +6,7 @@ package net.buildtheearth.terraminusminus.substitutes;
  * <br>
  * Canonical implementations of this interface can be obtained with {@link #byId(Identifier)} and {@link #parse(String)}.
  * <br>
- * Implementations of this class are expected to be immutable and thread safe.
+ * Implementations of this class are expected to be immutable and thread-safe.
  *
  * @see <a href="https://minecraft.wiki/w/Biome">The Minecraft wiki on biomes</a>
  *

@@ -7,10 +7,10 @@ import com.google.gson.stream.JsonReader;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import net.buildtheearth.terracore.minecraft.BlockState;
 import net.buildtheearth.terraminusminus.TerraConstants;
 import net.buildtheearth.terraminusminus.dataset.osm.JsonParser;
 import net.buildtheearth.terraminusminus.generator.CachedChunkData;
-import net.buildtheearth.terraminusminus.substitutes.BlockState;
 
 /**
  * {@link DrawFunction} which sets the surface block to a fixed block state.

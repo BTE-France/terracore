@@ -10,10 +10,10 @@ import static net.daporkchop.lib.common.util.PValidation.positive;
 import java.util.Arrays;
 
 import lombok.NonNull;
+import net.buildtheearth.terracore.minecraft.ChunkPos;
 import net.buildtheearth.terraminusminus.dataset.geojson.geometry.MultiPolygon;
 import net.buildtheearth.terraminusminus.dataset.vector.draw.DrawFunction;
 import net.buildtheearth.terraminusminus.generator.CachedChunkData;
-import net.buildtheearth.terraminusminus.substitutes.ChunkPos;
 import net.buildtheearth.terracore.geo.bvh.Bounds2d;
 
 /**

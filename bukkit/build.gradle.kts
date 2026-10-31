@@ -7,8 +7,10 @@ repositories {
 }
 
 dependencies {
-    api(project(":terraminusminus"))
+    api(project(":minecraft"))
     compileOnly("org.spigotmc:spigot-api:1.21.4-R0.1-SNAPSHOT")
+
+    testImplementation(project(":minecraft"))
     testImplementation("org.spigotmc:spigot-api:1.21.4-R0.1-SNAPSHOT")
 }
 

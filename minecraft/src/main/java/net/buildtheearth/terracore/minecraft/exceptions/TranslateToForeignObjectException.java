@@ -1,12 +1,12 @@
-package net.buildtheearth.terraminusminus.substitutes.exceptions;
+package net.buildtheearth.terracore.minecraft.exceptions;
 
 import lombok.Getter;
 import lombok.NonNull;
-import net.buildtheearth.terraminusminus.substitutes.BlockState;
+import net.buildtheearth.terracore.minecraft.BlockState;
 
 /**
- * Indicates failure in an attempt to translate a Terra-- substitute object into a foreign implementation
- * (e.g. failed to convert a Terra-- {@link BlockState} into a Bukkit BlockData).
+ * Indicates failure in an attempt to translate a Terracore substitute object into a foreign implementation
+ * (e.g., failed to convert a Terracore {@link BlockState} into a Bukkit BlockData).
  *
  * @author Smyler
  */

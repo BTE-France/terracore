@@ -6,9 +6,9 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import net.buildtheearth.terracore.minecraft.BlockState;
+import net.buildtheearth.terracore.minecraft.Biome;
 import net.buildtheearth.terraminusminus.dataset.osm.BlockStateParser;
-import net.buildtheearth.terraminusminus.substitutes.BlockState;
-import net.buildtheearth.terraminusminus.substitutes.Biome;
 import net.buildtheearth.terraminusminus.util.BiomeDeserializeMixin;
 
 import java.io.IOException;

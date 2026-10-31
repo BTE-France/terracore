@@ -1,6 +1,6 @@
 package net.buildtheearth.terraminusminus;
 
-import net.buildtheearth.terraminusminus.substitutes.Biome;
+import net.buildtheearth.terracore.minecraft.Biome;
 
 public class TerraConfig {
 

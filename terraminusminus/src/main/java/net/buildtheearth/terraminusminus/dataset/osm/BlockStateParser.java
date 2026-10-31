@@ -7,9 +7,9 @@ import com.google.gson.stream.JsonToken;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import net.buildtheearth.terraminusminus.substitutes.BlockStateBuilder;
-import net.buildtheearth.terraminusminus.substitutes.BlockState;
-import net.buildtheearth.terraminusminus.substitutes.Identifier;
+import net.buildtheearth.terracore.minecraft.BlockState;
+import net.buildtheearth.terracore.minecraft.BlockStateBuilder;
+import net.buildtheearth.terracore.minecraft.Identifier;
 
 /**
  * Parses block states.

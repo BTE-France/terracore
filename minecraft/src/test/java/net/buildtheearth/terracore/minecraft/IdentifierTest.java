@@ -1,12 +1,11 @@
-package net.buildtheearth.terraminusminus.substitutes;
+package net.buildtheearth.terracore.minecraft;
 
-import net.buildtheearth.terraminusminus.TerraMinusMinusTest;
-import net.buildtheearth.terraminusminus.substitutes.exceptions.SubstituteParseException;
+import net.buildtheearth.terracore.minecraft.exceptions.SubstituteParseException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class IdentifierTest extends TerraMinusMinusTest {
+public class IdentifierTest {
 
     @Test
     void canParseIdentifier() {

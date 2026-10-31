@@ -1,12 +1,11 @@
-package net.buildtheearth.terraminusminus.substitutes;
+package net.buildtheearth.terracore.minecraft;
 
 
-import net.buildtheearth.terraminusminus.TerraMinusMinusTest;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class BlockStateTest extends TerraMinusMinusTest {
+public class BlockStateTest {
 
     @Test
     void testBuilder() {

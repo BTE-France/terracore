@@ -1,8 +1,8 @@
-package net.buildtheearth.terraminusminus.substitutes.exceptions;
+package net.buildtheearth.terracore.minecraft.exceptions;
 
-import net.buildtheearth.terraminusminus.substitutes.Biome;
-import net.buildtheearth.terraminusminus.substitutes.BlockState;
-import net.buildtheearth.terraminusminus.substitutes.Identifier;
+import net.buildtheearth.terracore.minecraft.Biome;
+import net.buildtheearth.terracore.minecraft.BlockState;
+import net.buildtheearth.terracore.minecraft.Identifier;
 
 /**
  * Thrown when a problem is encountered working with content substitutes

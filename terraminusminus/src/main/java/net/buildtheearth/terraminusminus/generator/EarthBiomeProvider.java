@@ -10,10 +10,10 @@ import com.google.common.cache.LoadingCache;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import net.buildtheearth.terracore.minecraft.Biome;
+import net.buildtheearth.terracore.minecraft.BlockPos;
+import net.buildtheearth.terracore.minecraft.ChunkPos;
 import net.buildtheearth.terraminusminus.generator.biome.IEarthBiomeFilter;
-import net.buildtheearth.terraminusminus.substitutes.BlockPos;
-import net.buildtheearth.terraminusminus.substitutes.ChunkPos;
-import net.buildtheearth.terraminusminus.substitutes.Biome;
 import net.buildtheearth.terraminusminus.util.ImmutableCompactArray;
 import org.jetbrains.annotations.Nullable;
 

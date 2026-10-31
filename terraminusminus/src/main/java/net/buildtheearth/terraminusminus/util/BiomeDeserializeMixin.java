@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.util.StdConverter;
 
 import lombok.NonNull;
-import net.buildtheearth.terraminusminus.substitutes.Biome;
+import net.buildtheearth.terracore.minecraft.Biome;
 
 /**
  * @author DaPorkchop_

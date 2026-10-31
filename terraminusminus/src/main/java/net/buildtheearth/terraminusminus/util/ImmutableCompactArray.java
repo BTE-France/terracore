@@ -9,7 +9,7 @@ import java.util.List;
 import it.unimi.dsi.fastutil.objects.Reference2IntMap;
 import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap;
 import lombok.NonNull;
-import net.buildtheearth.terraminusminus.substitutes.BlockState;
+import net.buildtheearth.terracore.minecraft.BlockState;
 import net.daporkchop.lib.binary.bit.BitArray;
 import net.daporkchop.lib.binary.bit.padded.PaddedBitArray;
 

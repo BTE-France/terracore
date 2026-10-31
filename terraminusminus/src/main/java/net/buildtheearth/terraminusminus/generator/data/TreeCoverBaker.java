@@ -6,12 +6,12 @@ import static net.daporkchop.lib.common.math.PMath.clamp;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 
+import net.buildtheearth.terracore.minecraft.ChunkPos;
 import net.buildtheearth.terraminusminus.dataset.IScalarDataset;
 import net.buildtheearth.terraminusminus.generator.CachedChunkData;
 import net.buildtheearth.terraminusminus.generator.EarthGeneratorPipelines;
 import net.buildtheearth.terraminusminus.generator.GeneratorDatasets;
 import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
-import net.buildtheearth.terraminusminus.substitutes.ChunkPos;
 import net.buildtheearth.terracore.geo.CornerBoundingBox2d;
 import net.buildtheearth.terracore.geo.bvh.Bounds2d;
 

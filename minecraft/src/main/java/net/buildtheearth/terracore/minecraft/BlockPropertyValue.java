@@ -1,4 +1,4 @@
-package net.buildtheearth.terraminusminus.substitutes;
+package net.buildtheearth.terracore.minecraft;
 
 /**
  * The value of a block property.

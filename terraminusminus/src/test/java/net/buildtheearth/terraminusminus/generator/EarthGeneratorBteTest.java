@@ -1,9 +1,9 @@
 package net.buildtheearth.terraminusminus.generator;
 
+import net.buildtheearth.terracore.minecraft.Biome;
+import net.buildtheearth.terracore.minecraft.ChunkPos;
 import net.buildtheearth.terraminusminus.TerraMinusMinusTest;
 import net.buildtheearth.terracore.geo.projection.GeographicProjection;
-import net.buildtheearth.terraminusminus.substitutes.Biome;
-import net.buildtheearth.terraminusminus.substitutes.ChunkPos;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
