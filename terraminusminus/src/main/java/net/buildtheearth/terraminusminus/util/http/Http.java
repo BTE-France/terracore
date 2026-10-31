@@ -31,7 +31,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.UtilityClass;
-import net.buildtheearth.terraminusminus.TerraConfig;
 import net.daporkchop.lib.common.function.throwing.EFunction;
 import net.daporkchop.lib.common.reference.cache.Cached;
 import org.apache.logging.log4j.LogManager;
@@ -181,7 +180,7 @@ public class Http {
 
                         long now = System.currentTimeMillis();
                         if (cacheEntry.isStale(now)) { //attempt to revalidate response data
-                            if (!TerraConfig.reducedConsoleMessages) {
+                            if (!Http.CONFIG.reducedLogging) {
                                 LOGGER.info("Cache stale: {}", this.parsed);
                             }
 
@@ -189,18 +188,18 @@ public class Http {
                             this.cachedData = cachedData.retain();
                             cacheEntry.touch(this.nextHeaders = new DefaultHttpHeaders());
                         } else if (cacheEntry.isExpired(now)) { //discard data and pretend it doesn't exist
-                            if (!TerraConfig.reducedConsoleMessages) {
+                            if (!Http.CONFIG.reducedLogging) {
                                 LOGGER.info("Cache expired: {}", this.parsed);
                             }
                         } else { //return cached response value
-                            if (!TerraConfig.reducedConsoleMessages) {
+                            if (!Http.CONFIG.reducedLogging) {
                                 LOGGER.info("Cache hit: {}", this.parsed);
                             }
                             this.handleCacheEntry(cacheEntry, cachedData);
                             return;
                         }
                     } else {
-                        if (!TerraConfig.reducedConsoleMessages) {
+                        if (!Http.CONFIG.reducedLogging) {
                             LOGGER.info("Cache miss: {}", this.parsed);
                         }
                     }
@@ -247,12 +246,12 @@ public class Http {
 
                     if (throwable != null) {
                         if (this.cacheEntry != null) { //fall back to stale cache data
-                            if (!TerraConfig.reducedConsoleMessages) {
+                            if (!Http.CONFIG.reducedLogging) {
                                 LOGGER.warn("Refresh failed, falling back to stale data in cache: {}", this.parsed);
                             }
                             this.handleCacheEntry(this.cacheEntry, this.cachedData);
                         } else {
-                            if (!TerraConfig.reducedConsoleMessages) {
+                            if (!Http.CONFIG.reducedLogging) {
                                 LOGGER.warn("Request failed: {}", this.parsed);
                             }
                             future.completeExceptionally(throwable);
@@ -262,7 +261,7 @@ public class Http {
                     //attempt to parse cache entry
                     CacheEntry cacheEntry = new CacheEntry(response, this.parsed);
 
-                    if (!TerraConfig.reducedConsoleMessages) {
+                    if (!Http.CONFIG.reducedLogging) {
                         LOGGER.info(this.cacheEntry != null ? cacheEntry.status == CacheEntry.STATUS_NOT_MODIFIED
                                 ? "Refresh succeeded, data in cache not modified: {}"
                                 : "Refresh succeeded, updating data in cache: {}"
@@ -312,7 +311,7 @@ public class Http {
 
                 if ("file".equalsIgnoreCase(this.parsed.getProtocol())) { //it's a file, read from disk (also async)
                     Path path = Paths.get(url.substring("file://".length()));
-                    if (!TerraConfig.reducedConsoleMessages) {
+                    if (!Http.CONFIG.reducedLogging) {
                         future.whenComplete((data, t) -> {
                             if (t != null) {
                                 LOGGER.error("Failed to read file: " + path, t);
@@ -534,6 +533,8 @@ public class Http {
         public boolean cache = true;
 
         public int cacheTTL = 1440;
+
+        public boolean reducedLogging = false;
     }
 
 }
