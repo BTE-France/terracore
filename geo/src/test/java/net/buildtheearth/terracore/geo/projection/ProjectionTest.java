@@ -1,19 +1,14 @@
-package net.buildtheearth.terraminusminus.projection;
+package net.buildtheearth.terracore.geo.projection;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import net.buildtheearth.terracore.geo.projection.GeographicProjection;
-import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
-import net.buildtheearth.terraminusminus.TerraConstants;
-import net.buildtheearth.terraminusminus.TerraMinusMinusTest;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 
-public class ProjectionTest extends TerraMinusMinusTest {
+public class ProjectionTest {
 
     @Test
-    void testBteProjection() throws JsonProcessingException, OutOfProjectionBoundsException {
+    void testBteProjection() throws OutOfProjectionBoundsException {
         final String bteProjectionJson = "{\n"
                                      + "        \"scale\": {\n"
                                      + "            \"delegate\": {\n"
@@ -27,7 +22,7 @@ public class ProjectionTest extends TerraMinusMinusTest {
                                      + "            \"y\": 7318261.522857145\n"
                                      + "        }\n"
                                      + "    }";
-        GeographicProjection projection = TerraConstants.JSON_MAPPER.readValue(bteProjectionJson, GeographicProjection.class);
+        GeographicProjection projection = GeographicProjection.parse(bteProjectionJson);
 
         double[] geos = {
                 2.350987d, 48.856667d,
