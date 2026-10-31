@@ -1,4 +1,4 @@
-package net.buildtheearth.terraminusminus.util.http;
+package net.buildtheearth.terracore.http;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,7 +7,6 @@ import java.net.URLConnection;
 import java.util.concurrent.CompletableFuture;
 
 import io.netty.buffer.ByteBuf;
-import net.buildtheearth.terraminusminus.TerraMinusMinusTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
@@ -15,9 +14,9 @@ import org.junit.jupiter.api.Timeout;
 import static java.util.concurrent.TimeUnit.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class HttpTest extends TerraMinusMinusTest {
+public class HttpTest {
 	
-	private static final String CI_USER_AGENT = "Terra-- CI";
+	private static final String CI_USER_AGENT = "Terracore CI";
 	
 	private static final String[] TEST_URLS = {
 			"https://duckduckgo.com/robots.txt"

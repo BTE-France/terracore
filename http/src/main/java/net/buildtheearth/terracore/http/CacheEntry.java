@@ -1,4 +1,4 @@
-package net.buildtheearth.terraminusminus.util.http;
+package net.buildtheearth.terracore.http;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.http.FullHttpResponse;
@@ -20,7 +20,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static net.buildtheearth.terraminusminus.util.http.Http.*;
+import static net.buildtheearth.terracore.http.Http.*;
 
 /**
  * @author DaPorkchop_

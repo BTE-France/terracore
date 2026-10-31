@@ -1,4 +1,4 @@
-package net.buildtheearth.terraminusminus.util.http;
+package net.buildtheearth.terracore.http;
 
 import com.google.common.base.Preconditions;
 import io.netty.bootstrap.Bootstrap;
@@ -68,26 +68,26 @@ import static net.daporkchop.lib.common.util.PValidation.*;
 public class Http {
 
     public static HttpConfig CONFIG = new HttpConfig();
-    public static final String LIB_NAME = "terraminusminus";
+    public static final String LIB_NAME = "terracore";
     public static final String LIB_VERSION;
 
     static final Logger LOGGER = LogManager.getLogger(Http.class);
 
     static {
         String libVersion = "unknown";
-        try (InputStream inputStream = Http.class.getResourceAsStream("terraminusminus.properties")) {
+        try (InputStream inputStream = Http.class.getResourceAsStream("terracore.properties")) {
             if (inputStream == null) {
-                throw new IOException("Terraminusminus properties file not found");
+                throw new IOException("Terracore HTTP properties file not found");
             }
             Properties properties = new Properties();
             properties.load(inputStream);
             String version = properties.getProperty("version");
             if (isNullOrEmpty(version)) {
-                throw new IOException("version property is missing from terraminusminus.properties (or is empty)");
+                throw new IOException("version property is missing from terracore.properties (or is empty)");
             }
             libVersion = version;
         } catch (IOException e) {
-            LOGGER.error("Failed to load Terraminusminus properties file, version will be unknown");
+            LOGGER.error("Failed to load Terracore HTTP properties file, version will be unknown");
             LOGGER.catching(e);
         }
         LIB_VERSION = libVersion;

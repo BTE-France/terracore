@@ -3,4 +3,4 @@
  *
  * @author DaPorkchop_
  */
-package net.buildtheearth.terraminusminus.util.http;
+package net.buildtheearth.terracore.http;

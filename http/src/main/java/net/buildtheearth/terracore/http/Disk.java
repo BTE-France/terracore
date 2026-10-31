@@ -1,4 +1,4 @@
-package net.buildtheearth.terraminusminus.util.http;
+package net.buildtheearth.terracore.http;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
@@ -33,7 +33,7 @@ import java.util.concurrent.atomic.LongAdder;
 import java.util.stream.Stream;
 
 import static net.daporkchop.lib.common.util.PValidation.*;
-import static net.buildtheearth.terraminusminus.util.http.Http.*;
+import static net.buildtheearth.terracore.http.Http.*;
 
 /**
  * Handles disk I/O operations for {@link Http}.
@@ -42,7 +42,7 @@ import static net.buildtheearth.terraminusminus.util.http.Http.*;
  */
 @UtilityClass
 public class Disk {
-    private final EventLoop DISK_EXECUTOR = new DefaultEventLoop(PThreadFactories.builder().daemon().minPriority().name("terra-- disk I/O thread").build());
+    private final EventLoop DISK_EXECUTOR = new DefaultEventLoop(PThreadFactories.builder().daemon().minPriority().name("terracore disk I/O thread").build());
 
     private Path cacheRoot;
     private Path tmpFile;
@@ -51,7 +51,7 @@ public class Disk {
     private @NotNull Path cacheRoot() {
         if (cacheRoot == null) {
             LOGGER.debug("Setting default cache root");
-            setCacheRoot(new File("./terraminusminus/cache"));
+            setCacheRoot(new File("./terracore/cache"));
         }
         return cacheRoot;
     }
@@ -66,23 +66,20 @@ public class Disk {
     private @NotNull Path configRoot() {
         if (configRoot == null) {
             LOGGER.debug("Setting default config root");
-            setConfigRoot(new File("./terraminusminus/config"));
+            setConfigRoot(new File("./terracore/config"));
         }
         return configRoot;
     }
 
     /**
-     * Set the directory where Terra-- should store its HTTP cache files.
+     * Set the directory where Terracore should store its HTTP cache files.
      * <br>
      * The cache root can only be set once.
      * As a consequence, calling this methode multiple times will result in an {@link IllegalStateException} being thrown.
      * <br>
      * If this is not manually called before using any method that makes use of the cache,
-     * the cache root will be automatically set to <code>$CWD/terraminusminus/cache</code>,
+     * the cache root will be automatically set to <code>$CWD/terracore/cache</code>,
      * and further attempts to call this method will result in an {@link IllegalStateException} being thrown.
-     * <br>
-     * This method and its implementation are unique to Terra--,
-     * as Terra++ is hardcoded to use <code>.minecraft/terraplusplus/cache</code>.
      *
      * @param cacheDir the root of the cache
      *
@@ -99,17 +96,14 @@ public class Disk {
     }
 
     /**
-     * Set the directory where Terra-- should look for configuration files like <code>osm.json5</code> or <code>heights.json5</code>.
+     * Set the directory where Terracore should look for configuration files like <code>osm.json5</code> or <code>heights.json5</code>.
      * <br>
      * The config root can only be set once.
      * As a consequence, calling this methode multiple times will result in an {@link IllegalStateException} being thrown.
      * <br>
-     * If this is not manually called before Terra-- needs to load a configuration file,
-     * the config root will be automatically set to <code>$CWD/terraminusminus/config</code>,
+     * If this is not manually called before Terracore needs to load a configuration file,
+     * the config root will be automatically set to <code>$CWD/terracore/config</code>,
      * and further attempts to call this method will result in an {@link IllegalStateException} being thrown.
-     * <br>
-     * This method and its implementation are unique to Terra--,
-     * as Terra++ is hardcoded to use <code>.minecraft/terraplusplus/config</code>.
      *
      * @param configDir the root of the cache
      *

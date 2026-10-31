@@ -1,4 +1,4 @@
-package net.buildtheearth.terraminusminus.util.http;
+package net.buildtheearth.terracore.http;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -37,7 +37,7 @@ import java.util.IdentityHashMap;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import static net.buildtheearth.terraminusminus.util.http.Http.*;
+import static net.buildtheearth.terracore.http.Http.*;
 import static net.daporkchop.lib.common.util.PValidation.*;
 
 /**
@@ -46,7 +46,7 @@ import static net.daporkchop.lib.common.util.PValidation.*;
  * @author DaPorkchop_
  */
 final class HostManager extends Host {
-    private static final AttributeKey<Request> ATTR_REQUEST = AttributeKey.valueOf(Request.class, "terra--");
+    private static final AttributeKey<Request> ATTR_REQUEST = AttributeKey.valueOf(Request.class, "terracore");
 
     private final Deque<Request> pendingRequests = new ArrayDeque<>();
 
