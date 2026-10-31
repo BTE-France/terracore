@@ -9,13 +9,13 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import net.buildtheearth.terracore.geo.TileLocation;
 import net.buildtheearth.terraminusminus.dataset.IScalarDataset;
 import net.buildtheearth.terraminusminus.dataset.TiledDataset;
 import net.buildtheearth.terraminusminus.dataset.TiledHttpDataset;
 import net.buildtheearth.terraminusminus.dataset.BlendMode;
 import net.buildtheearth.terracore.geo.projection.GeographicProjection;
 import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
-import net.buildtheearth.terraminusminus.substitutes.ChunkPos;
 import net.buildtheearth.terraminusminus.util.CornerBoundingBox2d;
 import net.buildtheearth.terraminusminus.util.IntToDoubleBiFunction;
 import net.buildtheearth.terraminusminus.util.bvh.Bounds2d;
@@ -139,14 +139,14 @@ public abstract class DoubleTiledDataset extends TiledHttpDataset<double[]> impl
         }
 
         public CompletableFuture<R> future() {
-            ChunkPos[] tilePositions = this.paddedLocalBounds.toTiles(DoubleTiledDataset.this.resolution);
+            TileLocation[] tilePositions = this.paddedLocalBounds.toTiles(DoubleTiledDataset.this.resolution);
 
             return CompletableFuture.allOf(Arrays.stream(tilePositions)
                     .map(pos -> DoubleTiledDataset.this.getAsync(pos)
                             .thenApply(tile -> { //put tile directly into map when it's loaded
                                 //synchronize because we can't be certain that all of the futures will be completed by the same thread
                                 synchronized (this.loadedTiles) {
-                                    this.loadedTiles.put(BinMath.packXY(pos.x(), pos.z()), tile);
+                                    this.loadedTiles.put(BinMath.packXY(pos.x(), pos.y()), tile);
                                 }
                                 return tile;
                             }))

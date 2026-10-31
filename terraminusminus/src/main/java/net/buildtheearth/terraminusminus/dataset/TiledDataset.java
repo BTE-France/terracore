@@ -3,12 +3,12 @@ package net.buildtheearth.terraminusminus.dataset;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import net.buildtheearth.terracore.geo.TileLocation;
 import net.buildtheearth.terracore.geo.projection.GeographicProjection;
-import net.buildtheearth.terraminusminus.substitutes.ChunkPos;
 
 @RequiredArgsConstructor
 @Getter
-public abstract class TiledDataset<V> extends Dataset<ChunkPos, V> {
+public abstract class TiledDataset<V> extends Dataset<TileLocation, V> {
     @NonNull
     protected final GeographicProjection projection;
     protected final double tileSize;
