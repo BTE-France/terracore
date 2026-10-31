@@ -8,7 +8,6 @@ import io.netty.util.ReferenceCountUtil;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import net.buildtheearth.terraminusminus.TerraConfig;
-import net.buildtheearth.terraminusminus.TerraMinusMinus;
 import net.daporkchop.lib.binary.netty.PUnpooled;
 import net.daporkchop.lib.common.function.io.IOConsumer;
 import net.daporkchop.lib.common.function.io.IOPredicate;
@@ -35,6 +34,7 @@ import java.util.concurrent.atomic.LongAdder;
 import java.util.stream.Stream;
 
 import static net.daporkchop.lib.common.util.PValidation.*;
+import static net.buildtheearth.terraminusminus.util.http.Http.*;
 
 /**
  * Handles disk I/O operations for {@link Http}.
@@ -51,7 +51,7 @@ public class Disk {
 
     private @NotNull Path cacheRoot() {
         if (cacheRoot == null) {
-            TerraMinusMinus.LOGGER.debug("Setting default cache root");
+            LOGGER.debug("Setting default cache root");
             setCacheRoot(new File("./terraminusminus/cache"));
         }
         return cacheRoot;
@@ -66,7 +66,7 @@ public class Disk {
 
     private @NotNull Path configRoot() {
         if (configRoot == null) {
-            TerraMinusMinus.LOGGER.debug("Setting default config root");
+            LOGGER.debug("Setting default config root");
             setConfigRoot(new File("./terraminusminus/config"));
         }
         return configRoot;
@@ -95,7 +95,7 @@ public class Disk {
         PFiles.rm(tmpFile.toFile()); // Delete temp file if it exists
 
         // Periodically prune the cache
-        TerraMinusMinus.LOGGER.info("Starting cache pruning schedule");
+        LOGGER.info("Starting cache pruning schedule");
         DISK_EXECUTOR.scheduleWithFixedDelay((IORunnable) Disk::pruneCache, 1L, 60L, TimeUnit.MINUTES);
     }
 
@@ -200,7 +200,7 @@ public class Disk {
 
     private void pruneCache() throws IOException {
         if (!TerraConfig.reducedConsoleMessages) {
-            TerraMinusMinus.LOGGER.info("running cache cleanup...");
+            LOGGER.info("running cache cleanup...");
         }
 
         LongAdder count = new LongAdder();
@@ -238,11 +238,11 @@ public class Disk {
                     })
                     .forEach((IOConsumer<Path>) Files::delete);
         } catch (Throwable e) {
-            TerraMinusMinus.LOGGER.error("exception occurred during cache cleanup!", e);
+            LOGGER.error("exception occurred during cache cleanup!", e);
         } finally {
             if (!TerraConfig.reducedConsoleMessages) {
                 double mib = Math.round(size.sum() / (1024.0d * 1024.0d) * 10.0d) / 10.0d;
-                TerraMinusMinus.LOGGER.info("cache cleanup complete. deleted {} old files, totalling {} bytes ({} MiB)", count.sum(), size.sum(), mib);
+                LOGGER.info("cache cleanup complete. deleted {} old files, totalling {} bytes ({} MiB)", count.sum(), size.sum(), mib);
             }
         }
     }
