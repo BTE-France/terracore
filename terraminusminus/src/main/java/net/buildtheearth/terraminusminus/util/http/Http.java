@@ -63,13 +63,16 @@ import static net.daporkchop.lib.common.util.PValidation.*;
  */
 @UtilityClass
 public class Http {
+
+    public static HttpConfig CONFIG = new HttpConfig();
+
     protected static final long TIMEOUT = 20L;
 
     protected final EventLoopGroup NETWORK_EVENT_LOOP_GROUP;
 
     static {
         //create a dedicated eventloop with one thread
-        ThreadFactory threadFactory = new DefaultThreadFactory("terra-- HTTP network thread", true, Thread.MIN_PRIORITY);
+        ThreadFactory threadFactory = new DefaultThreadFactory("terracore HTTP network thread", true, Thread.MIN_PRIORITY);
         NETWORK_EVENT_LOOP_GROUP = Epoll.isAvailable()
                 ? new EpollEventLoopGroup(1, threadFactory)
                 : new NioEventLoopGroup(1, threadFactory);
@@ -440,7 +443,7 @@ public class Http {
 
     public void configChanged() {
         Matcher matcher = Pattern.compile("^(\\d+): (.+)$").matcher("");
-        for (String entry : TerraConfig.http.maxConcurrentRequests) {
+        for (String entry : CONFIG.maxConcurrentRequests) {
             if (matcher.reset(entry).matches()) {
                 try {
                     setMaximumConcurrentRequestsTo(matcher.group(2), Integer.parseInt(matcher.group(1)));
@@ -474,13 +477,13 @@ public class Http {
          * If {@code true}, we will attempt to load the URL from the cache before sending the request to the server.
          */
         @Builder.Default
-        public final boolean readFromCache = TerraConfig.http.cache;
+        public final boolean readFromCache = CONFIG.cache;
 
         /**
          * If {@code true}, we will store the received HTTP response body in the cache.
          */
         @Builder.Default
-        public final boolean writeToCache = TerraConfig.http.cache;
+        public final boolean writeToCache = CONFIG.cache;
 
         /**
          * If {@code true}, we will recursively follow HTTP redirects.
@@ -488,4 +491,20 @@ public class Http {
         @Builder.Default
         public final boolean followRedirects = true;
     }
+
+    public static class HttpConfig {
+
+        public String[] maxConcurrentRequests = {
+                "8: https://cloud.daporkchop.net/",
+                "8: https://s3.amazonaws.com/",
+                "1: http://gis-treecover.wri.org/",
+                "1: https://overpass.kumi.systems/",
+                "1: https://lz4.overpass-api.de/"
+        };
+
+        public boolean cache = true;
+
+        public int cacheTTL = 1440;
+    }
+
 }
