@@ -7,7 +7,6 @@ import io.netty.channel.EventLoop;
 import io.netty.util.ReferenceCountUtil;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
-import net.buildtheearth.terraminusminus.TerraConfig;
 import net.daporkchop.lib.binary.netty.PUnpooled;
 import net.daporkchop.lib.common.function.io.IOConsumer;
 import net.daporkchop.lib.common.function.io.IOPredicate;
@@ -199,7 +198,7 @@ public class Disk {
     }
 
     private void pruneCache() throws IOException {
-        if (!TerraConfig.reducedConsoleMessages) {
+        if (!CONFIG.reducedLogging) {
             LOGGER.info("running cache cleanup...");
         }
 
@@ -240,7 +239,7 @@ public class Disk {
         } catch (Throwable e) {
             LOGGER.error("exception occurred during cache cleanup!", e);
         } finally {
-            if (!TerraConfig.reducedConsoleMessages) {
+            if (!CONFIG.reducedLogging) {
                 double mib = Math.round(size.sum() / (1024.0d * 1024.0d) * 10.0d) / 10.0d;
                 LOGGER.info("cache cleanup complete. deleted {} old files, totalling {} bytes ({} MiB)", count.sum(), size.sum(), mib);
             }

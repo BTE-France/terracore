@@ -4,8 +4,6 @@ import net.buildtheearth.terracore.minecraft.Biome;
 
 public class TerraConfig {
 
-	public static boolean reducedConsoleMessages = false;
-
 	public static OSMOpts openstreetmap = new OSMOpts();
 
     public static BiomeOpts biomes = new BiomeOpts();
