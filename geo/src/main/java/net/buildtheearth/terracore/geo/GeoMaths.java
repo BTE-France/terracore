@@ -1,9 +1,15 @@
 package net.buildtheearth.terracore.geo;
 
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 
+import static java.lang.Float.*;
+import static net.buildtheearth.terracore.geo.AngleUnit.*;
 import static net.daporkchop.lib.common.util.PValidation.*;
 
+/**
+ * Miscellaneous mathematical utilities for geographic and spherical calculations.
+ */
 @UtilityClass
 public class GeoMaths {
     /**
@@ -71,12 +77,14 @@ public class GeoMaths {
 
 
     /**
-     * TODO produceZYZRotationMatrix javadoc
+     * Produces the 3x3 rotation matrix for a Z-Y-Z Euler rotation: a rotation by {@code a} about the
+     * z-axis, followed by a rotation by {@code b} about the y-axis, followed by a rotation by {@code c}
+     * about the z-axis.
      *
-     * @param a
-     * @param b
-     * @param c
-     * @return
+     * @param a the first rotation angle about the z-axis, in radians
+     * @param b the rotation angle about the y-axis, in radians
+     * @param c the second rotation angle about the z-axis, in radians
+     * @return the resulting 3x3 rotation matrix
      */
     public double[][] produceZYZRotationMatrix(double a, double b, double c) {
 
@@ -122,17 +130,19 @@ public class GeoMaths {
     }
     
     /**
-     * Converts all values in a double array from degrees to radians
-     * 
+     * Converts all values in a double array from degrees to radians.
+     * The array is converted in place.
+     *
      * @param arr - array to work on
      */
     public void toRadians(double[] arr) {
     	for(int i=0; i<arr.length; i++) arr[i] = Math.toRadians(arr[i]);
     }
-    
+
     /**
-     * Converts all values in a double array from radians to degrees
-     * 
+     * Converts all values in a double array from radians to degrees.
+     * The array is converted in place.
+     *
      * @param arr - array to work on
      */
     public void toDegrees(double[] arr) {
@@ -160,13 +170,56 @@ public class GeoMaths {
     }
     
     
+    /**
+     * Clamps a value to the given inclusive range.
+     *
+     * @param num the value to clamp
+     * @param min the minimum allowed value
+     * @param max the maximum allowed value
+     * @return {@code num} if it lies within [min, max], otherwise the nearest bound
+     */
     public double clamp(double num, double min, double max) {
         if (num < min) return min;
         return num > max ? max : num;
     }
-    
+
+    /**
+     * Linearly interpolates between {@code min} and {@code max}.
+     *
+     * @param a   the interpolation factor: 0 returns {@code min}, 1 returns {@code max}; values outside [0, 1] extrapolate
+     * @param min the value returned when {@code a} is 0
+     * @param max the value returned when {@code a} is 1
+     * @return the interpolated value
+     */
     public double lerp(final double a, final double min, final double max) {
         return min + a * (max - min);
+    }
+
+    /**
+     * Normalizes an azimuth angle to the range of one full turn: [0, 360) degrees or [0, 2&pi;) radians,
+     * expressed in the given unit.
+     *
+     * @param azimuth the azimuth angle, expressed in the given unit
+     * @param unit    the unit {@code azimuth} is expressed in and the result is returned in
+     * @return the equivalent azimuth in the range [0, 360) degrees / [0, 2&pi;) radians, in the given unit
+     * @throws IllegalArgumentException if azimuth is not finite
+     * @throws NullPointerException     if the unit is null
+     */
+    public float normalizeAzimuth(float azimuth, @NonNull AngleUnit unit) {
+        if (!isFinite(azimuth)) {
+            throw new IllegalArgumentException("azimuth must be finite");
+        }
+
+        // Already in range: return the input as-is to avoid any precision loss
+        if (unit == DEGREES && 0f <= azimuth && azimuth < 360f) {
+            return azimuth;
+        } else if (unit == RADIANS && 0f <= azimuth && azimuth < TAU) {
+            return azimuth;
+        }
+
+        float degrees = unit.toDegrees(azimuth);
+        degrees = ((degrees % 360f) + 360f) % 360f;
+        return unit.fromDegrees(degrees);
     }
     
 }
