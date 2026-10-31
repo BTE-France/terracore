@@ -1,4 +1,4 @@
-package net.buildtheearth.terraminusminus.util.http;
+package net.buildtheearth.terracore.http;
 
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;

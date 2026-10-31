@@ -29,7 +29,7 @@ import net.buildtheearth.terracore.geo.CornerBoundingBox2d;
 import net.buildtheearth.terraminusminus.util.IntRange;
 import net.buildtheearth.terracore.geo.bvh.BVH;
 import net.buildtheearth.terracore.geo.bvh.Bounds2d;
-import net.buildtheearth.terraminusminus.util.http.Disk;
+import net.buildtheearth.terracore.http.Disk;
 import net.daporkchop.lib.common.function.io.IOFunction;
 import net.daporkchop.lib.common.function.throwing.EFunction;
 

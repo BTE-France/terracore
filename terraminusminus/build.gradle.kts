@@ -4,6 +4,7 @@ plugins {
 
 dependencies {
     implementation(project(":geo"))
+    implementation(project(":http"))
     implementation(project(":minecraft"))
 
     implementation("org.apache.commons:commons-imaging:1.0.0-alpha5")

@@ -10,7 +10,7 @@ import net.buildtheearth.terracore.minecraft.ChunkPos;
 import net.buildtheearth.terraminusminus.generator.data.TreeCoverBaker;
 import net.buildtheearth.terracore.geo.projection.GeographicProjection;
 import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
-import net.buildtheearth.terraminusminus.util.http.Http;
+import net.buildtheearth.terracore.http.Http;
 
 import javax.swing.JFrame;
 import java.awt.Canvas;

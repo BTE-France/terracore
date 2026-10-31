@@ -15,7 +15,7 @@ import lombok.SneakyThrows;
 import net.buildtheearth.terraminusminus.TerraConstants;
 import net.buildtheearth.terraminusminus.dataset.geojson.Geometry;
 import net.buildtheearth.terraminusminus.dataset.vector.geometry.VectorGeometry;
-import net.buildtheearth.terraminusminus.util.http.Disk;
+import net.buildtheearth.terracore.http.Disk;
 import net.daporkchop.lib.binary.oio.reader.UTF8FileReader;
 
 /**

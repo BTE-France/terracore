@@ -7,7 +7,7 @@ import io.netty.buffer.ByteBuf;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import net.buildtheearth.terraminusminus.util.http.Http;
+import net.buildtheearth.terracore.http.Http;
 
 /**
  * @author DaPorkchop_
