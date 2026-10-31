@@ -11,6 +11,10 @@ import net.buildtheearth.terracore.minecraft.Biome;
 import net.buildtheearth.terraminusminus.dataset.osm.BlockStateParser;
 import net.buildtheearth.terraminusminus.util.BiomeDeserializeMixin;
 
+/**
+ * @deprecated Global state shall be eliminated
+ */
+@Deprecated
 public class TerraConstants {
     public static final Gson GSON = new GsonBuilder()
     		.registerTypeAdapter(BlockState.class, BlockStateParser.INSTANCE)

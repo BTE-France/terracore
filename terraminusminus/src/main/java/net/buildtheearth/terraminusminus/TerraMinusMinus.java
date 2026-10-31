@@ -3,6 +3,10 @@ package net.buildtheearth.terraminusminus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/**
+ * @deprecated Global state shall be eliminated
+ */
+@Deprecated
 public class TerraMinusMinus {
 
     /**
