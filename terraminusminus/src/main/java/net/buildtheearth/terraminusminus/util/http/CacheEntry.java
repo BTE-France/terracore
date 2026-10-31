@@ -7,7 +7,6 @@ import io.netty.handler.codec.http.HttpHeaders;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.With;
-import net.buildtheearth.terraminusminus.TerraConfig;
 
 import java.io.IOException;
 import java.net.URL;
@@ -20,6 +19,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import static net.buildtheearth.terraminusminus.util.http.Http.*;
 
 /**
  * @author DaPorkchop_
@@ -80,7 +81,7 @@ public class CacheEntry {
         this.staleTime = maxAge >= 0L ? this.time + TimeUnit.SECONDS.toMillis(maxAge)
                 : this.etag != null ? this.time : -1L;
 
-        long fallbackExpireTime = this.time + TimeUnit.MINUTES.toMillis(TerraConfig.http.cacheTTL);
+        long fallbackExpireTime = this.time + TimeUnit.MINUTES.toMillis(CONFIG.cacheTTL);
         long expireTime = Math.max(
                 headers.getTimeMillis(HttpHeaderNames.EXPIRES, fallbackExpireTime),
                 maxStale >= 0L ? this.time + TimeUnit.SECONDS.toMillis(maxStale) : -1L);
