@@ -8,9 +8,9 @@ import static net.daporkchop.lib.common.math.PMath.floorI;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import lombok.NonNull;
+import net.buildtheearth.terracore.geo.TileLocation;
 import net.buildtheearth.terracore.geo.projection.GeographicProjection;
 import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
-import net.buildtheearth.terraminusminus.substitutes.ChunkPos;
 import net.buildtheearth.terraminusminus.util.CornerBoundingBox2d;
 
 /**
@@ -70,17 +70,17 @@ public interface Bounds2d {
      * @param size the side length of a tile
      * @return the positions of every tile that intersects this bounding box
      */
-    default ChunkPos[] toTiles(double size) {
+    default TileLocation[] toTiles(double size) {
         double invSize = 1.0d / size;
         int minXi = floorI(this.minX() * invSize);
         int maxXi = ceilI(this.maxX() * invSize);
         int minZi = floorI(this.minZ() * invSize);
         int maxZi = ceilI(this.maxZ() * invSize);
 
-        ChunkPos[] out = new ChunkPos[(maxXi - minXi + 1) * (maxZi - minZi + 1)];
+        TileLocation[] out = new TileLocation[(maxXi - minXi + 1) * (maxZi - minZi + 1)];
         for (int i = 0, x = minXi; x <= maxXi; x++) {
             for (int z = minZi; z <= maxZi; z++) {
-                out[i++] = new ChunkPos(x, z);
+                out[i++] = new TileLocation(x, z);
             }
         }
         return out;

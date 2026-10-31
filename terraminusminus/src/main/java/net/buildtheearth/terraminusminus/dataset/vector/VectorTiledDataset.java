@@ -6,13 +6,13 @@ import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 
 import lombok.NonNull;
+import net.buildtheearth.terracore.geo.TileLocation;
 import net.buildtheearth.terraminusminus.dataset.IDataset;
 import net.buildtheearth.terraminusminus.dataset.IElementDataset;
 import net.buildtheearth.terraminusminus.dataset.TiledDataset;
 import net.buildtheearth.terraminusminus.dataset.vector.geometry.VectorGeometry;
 import net.buildtheearth.terracore.geo.projection.EquirectangularProjection;
 import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
-import net.buildtheearth.terraminusminus.substitutes.ChunkPos;
 import net.buildtheearth.terraminusminus.util.CornerBoundingBox2d;
 import net.buildtheearth.terraminusminus.util.bvh.BVH;
 import net.buildtheearth.terraminusminus.util.bvh.Bounds2d;
@@ -30,8 +30,8 @@ public class VectorTiledDataset extends TiledDataset<BVH<VectorGeometry>> implem
     }
 
     @Override
-    public CompletableFuture<BVH<VectorGeometry>> load(@NonNull ChunkPos key) throws Exception {
-        return this.delegate.getAsync(String.format("tile/%d/%d.json", key.x(), key.z())).thenApply(BVH::of);
+    public CompletableFuture<BVH<VectorGeometry>> load(@NonNull TileLocation key) throws Exception {
+        return this.delegate.getAsync(String.format("tile/%d/%d.json", key.x(), key.y())).thenApply(BVH::of);
     }
 
     @Override
