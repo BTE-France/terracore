@@ -23,7 +23,6 @@ package net.buildtheearth.terraminusminus.dataset.geojson;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import lombok.Getter;
-import net.buildtheearth.terraminusminus.TerraMinusMinus;
 import net.buildtheearth.terraminusminus.dataset.geojson.object.Feature;
 import net.buildtheearth.terraminusminus.dataset.geojson.object.FeatureCollection;
 import net.buildtheearth.terraminusminus.dataset.geojson.object.Reference;
@@ -34,6 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static net.buildtheearth.terraminusminus.dataset.geojson.GeoJson.*;
 import static net.daporkchop.lib.common.util.PValidation.*;
 
 /**
@@ -85,7 +85,7 @@ final class ObjectDeserializer extends AbstractGeoJsonDeserializer<GeoJsonObject
                         while (in.peek() != JsonToken.END_OBJECT) {
                             String name = in.nextName();
                             if (map.putIfAbsent(name, in.nextString()) != null) {
-                                TerraMinusMinus.LOGGER.warn("duplicate GeoJSON property key: {}", name);
+                                LOGGER.warn("duplicate GeoJSON property key: {}", name);
                             }
                         }
                         in.endObject();
