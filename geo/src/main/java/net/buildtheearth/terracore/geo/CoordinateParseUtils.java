@@ -1,4 +1,4 @@
-package net.buildtheearth.terraminusminus.util.geo;
+package net.buildtheearth.terracore.geo;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,7 +12,6 @@ import net.daporkchop.lib.common.util.PArrays;
 
 
 import static net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException.*;
-import static net.buildtheearth.terraminusminus.util.Strings.*;
 
 /**
  * Utilities for assisting in the parsing of latitude and longitude strings into Decimals.
@@ -76,7 +75,7 @@ public final class CoordinateParseUtils {
      * @return the parsed coordinates
      */
     public static LatLng parseVerbatimCoordinates(final String coordinates) {
-        if (isNullOrEmpty(coordinates)) {
+        if (Strings.isNullOrEmpty(coordinates)) {
             return null;
         }
         try {
@@ -196,10 +195,10 @@ public final class CoordinateParseUtils {
 
         // Look for a potential delimiter that only appears once and is not at the start or end of the string
         for (final char delimiter : PART_DELIMITERS) {
-            int count = countMatches(coordinates, String.valueOf(delimiter));
+            int count = Strings.countMatches(coordinates, String.valueOf(delimiter));
             int delimiterIndex;
             if (count == 1 && (delimiterIndex = coordinates.indexOf(delimiter)) > 0 && delimiterIndex < coordinates.length() - 1) {
-                return split(coordinates, delimiter);
+                return Strings.split(coordinates, delimiter);
             }
         }
 

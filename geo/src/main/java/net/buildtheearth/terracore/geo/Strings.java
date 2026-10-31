@@ -1,16 +1,16 @@
-package net.buildtheearth.terraminusminus.util;
+package net.buildtheearth.terracore.geo;
 
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * String related utility functions.
+ * String-related utility functions.
  *
  * @author Smyler
  */
 @UtilityClass
-public class Strings {
+class Strings {
 
     public String[] EMPTY_STRING_ARRAY = new String[0];
 
@@ -32,7 +32,7 @@ public class Strings {
      * @param needle   the substring to search
      * @return the number of occurrences of the substring in the string, or 0 if either is null
      */
-    public static int countMatches(@Nullable CharSequence haystack, @Nullable CharSequence needle) {
+    public int countMatches(@Nullable CharSequence haystack, @Nullable CharSequence needle) {
         if (haystack == null || needle == null) {
             return 0;
         }
@@ -52,13 +52,13 @@ public class Strings {
     }
 
     /**
-     * Counts the number of times a chars appears in a string.
+     * Counts the number of times a character appears in a string.
      *
      * @param haystack the string to search in
      * @param needle   the char to search
      * @return the number of occurrences of the substring in the string, or 0 if the string is null
      */
-    public static int countMatches(@Nullable CharSequence haystack, char needle) {
+    public int countMatches(@Nullable CharSequence haystack, char needle) {
         if (haystack == null) {
             return 0;
         }
@@ -80,7 +80,7 @@ public class Strings {
      * @param delimiter the delimiter to split the string with
      * @return an array where each entry is a section of the origin string that was delimited by the given delimiter
      */
-    public static @NonNull String[] split(@Nullable CharSequence str, char delimiter) {
+    public @NonNull String[] split(@Nullable CharSequence str, char delimiter) {
         if (str == null) {
             return EMPTY_STRING_ARRAY;
         }

@@ -13,7 +13,6 @@ import java.util.regex.Pattern;
 import static java.lang.Integer.*;
 import static java.util.Collections.*;
 import static java.util.stream.Collectors.*;
-import static net.buildtheearth.terraminusminus.util.Strings.split;
 
 public final class BlockStateBuilder {
 
@@ -80,7 +79,7 @@ public final class BlockStateBuilder {
 
         String propertyGroup = matcher.group("properties");
         if (propertyGroup != null && !propertyGroup.isEmpty()) {
-            String[] propertiesParts = split(propertyGroup, ',');
+            String[] propertiesParts = propertyGroup.split(",", -1);
             properties = new String[propertiesParts.length];
             propertyValues = new BlockPropertyValue[propertiesParts.length];
             for (int i = 0; i < propertiesParts.length; i++) {

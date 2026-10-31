@@ -1,4 +1,4 @@
-package net.buildtheearth.terraminusminus.util.geo;
+package net.buildtheearth.terracore.geo;
 
 public class LatLng {
     private final Double lat;

@@ -9,12 +9,12 @@ public class GeoMaths {
     /**
      * Square root of 3
      */
-    public static final double ROOT3 = Math.sqrt(3);
+    public final double ROOT3 = Math.sqrt(3);
 
     /**
      * Two times pi
      */
-    public static final double TAU = 2 * Math.PI;
+    public final double TAU = 2 * Math.PI;
 
 
     /**
@@ -23,7 +23,7 @@ public class GeoMaths {
      * @param geo - geographic coordinates as a double array of length 2, {longitude, latitude}, in degrees
      * @return the corresponding spherical coordinates in radians: {longitude, colatitude}
      */
-    public static double[] geo2Spherical(double[] geo) {
+    public double[] geo2Spherical(double[] geo) {
         double lambda = Math.toRadians(geo[0]);
         double phi = Math.toRadians(90 - geo[1]);
         return new double[]{ lambda, phi };
@@ -36,7 +36,7 @@ public class GeoMaths {
      * @param spherical - spherical coordinates in radians as a double array of length 2: {longitude, colatitude}
      * @return the corresponding geographic coordinates in degrees: {longitude, latitude}
      */
-    public static double[] spherical2Geo(double[] spherical) {
+    public double[] spherical2Geo(double[] spherical) {
         double lon = Math.toDegrees(spherical[0]);
         double lat = 90 - Math.toDegrees(spherical[1]);
         return new double[]{ lon, lat };
@@ -49,7 +49,7 @@ public class GeoMaths {
      * @param spherical - spherical coordinates in radians as a double array of length 2: {longitude, colatitude}
      * @return the corresponding Cartesian coordinates: {x, y, z}
      */
-    public static double[] spherical2Cartesian(double[] spherical) {
+    public double[] spherical2Cartesian(double[] spherical) {
         double sinphi = Math.sin(spherical[1]);
         double x = sinphi * Math.cos(spherical[0]);
         double y = sinphi * Math.sin(spherical[0]);
@@ -60,10 +60,10 @@ public class GeoMaths {
     /**
      * Converts Cartesian coordinates to spherical coordinates on a sphere of radius 1.
      *
-     * @param cartesian - Cartesian coordinates as double array of length 3: {x, y, z}
+     * @param cartesian - Cartesian coordinates as a double array of length 3: {x, y, z}
      * @return the spherical coordinates of the corresponding normalized vector
      */
-    public static double[] cartesian2Spherical(double[] cartesian) {
+    public double[] cartesian2Spherical(double[] cartesian) {
         double lambda = Math.atan2(cartesian[1], cartesian[0]);
         double phi = Math.atan2(Math.sqrt(cartesian[0] * cartesian[0] + cartesian[1] * cartesian[1]), cartesian[2]);
         return new double[]{ lambda, phi };
@@ -78,7 +78,7 @@ public class GeoMaths {
      * @param c
      * @return
      */
-    public static double[][] produceZYZRotationMatrix(double a, double b, double c) {
+    public double[][] produceZYZRotationMatrix(double a, double b, double c) {
 
         double sina = Math.sin(a);
         double cosa = Math.cos(a);
@@ -111,7 +111,7 @@ public class GeoMaths {
      * @param vector - the vector as double array of length n
      * @return the result of the multiplication as an array of double on length n
      */
-    public static double[] matVecProdD(double[][] matrix, double[] vector) {
+    public double[] matVecProdD(double[][] matrix, double[] vector) {
         double[] result = new double[vector.length];
         for (int i = 0; i < result.length; i++) {
             for (int j = 0; j < matrix[i].length; j++) {
@@ -126,7 +126,7 @@ public class GeoMaths {
      * 
      * @param arr - array to work on
      */
-    public static void toRadians(double[] arr) {
+    public void toRadians(double[] arr) {
     	for(int i=0; i<arr.length; i++) arr[i] = Math.toRadians(arr[i]);
     }
     
@@ -135,7 +135,7 @@ public class GeoMaths {
      * 
      * @param arr - array to work on
      */
-    public static void toDegrees(double[] arr) {
+    public void toDegrees(double[] arr) {
     	for(int i=0; i<arr.length; i++) arr[i] = Math.toDegrees(arr[i]);
     }
 
@@ -146,7 +146,7 @@ public class GeoMaths {
      * @param shift the number of bits to shift by
      * @return the shifted value
      */
-    public static int safeDirectionalShift(int val, int shift) {
+    public int safeDirectionalShift(int val, int shift) {
         int res;
         if (shift == 0) {
             res = val;
@@ -160,12 +160,12 @@ public class GeoMaths {
     }
     
     
-    public static double clamp(double num, double min, double max) {
+    public double clamp(double num, double min, double max) {
         if (num < min) return min;
         return num > max ? max : num;
     }
     
-    public static double lerp(final double a, final double min, final double max) {
+    public double lerp(final double a, final double min, final double max) {
         return min + a * (max - min);
     }
     
