@@ -33,9 +33,10 @@ import lombok.Setter;
 import lombok.experimental.UtilityClass;
 import net.buildtheearth.terraminusminus.TerraConfig;
 import net.buildtheearth.terraminusminus.TerraConstants;
-import net.buildtheearth.terraminusminus.TerraMinusMinus;
 import net.daporkchop.lib.common.function.throwing.EFunction;
 import net.daporkchop.lib.common.reference.cache.Cached;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.net.ssl.SSLException;
 import java.net.MalformedURLException;
@@ -65,6 +66,8 @@ import static net.daporkchop.lib.common.util.PValidation.*;
 public class Http {
 
     public static HttpConfig CONFIG = new HttpConfig();
+
+    static final Logger LOGGER = LogManager.getLogger(Http.class);
 
     protected static final long TIMEOUT = 20L;
 
@@ -142,7 +145,7 @@ public class Http {
                 checkState(options.readFromCache, "readFromCache is disabled, so how did we get here?!?");
 
                 if (throwable != null) {
-                    TerraMinusMinus.LOGGER.error("Unable to read cache for " + this.parsed, throwable);
+                    LOGGER.error("Unable to read cache for " + this.parsed, throwable);
                 }
 
                 try {
@@ -153,7 +156,7 @@ public class Http {
                         long now = System.currentTimeMillis();
                         if (cacheEntry.isStale(now)) { //attempt to revalidate response data
                             if (!TerraConfig.reducedConsoleMessages) {
-                                TerraMinusMinus.LOGGER.info("Cache stale: {}", this.parsed);
+                                LOGGER.info("Cache stale: {}", this.parsed);
                             }
 
                             this.cacheEntry = cacheEntry;
@@ -161,22 +164,22 @@ public class Http {
                             cacheEntry.touch(this.nextHeaders = new DefaultHttpHeaders());
                         } else if (cacheEntry.isExpired(now)) { //discard data and pretend it doesn't exist
                             if (!TerraConfig.reducedConsoleMessages) {
-                                TerraMinusMinus.LOGGER.info("Cache expired: {}", this.parsed);
+                                LOGGER.info("Cache expired: {}", this.parsed);
                             }
                         } else { //return cached response value
                             if (!TerraConfig.reducedConsoleMessages) {
-                                TerraMinusMinus.LOGGER.info("Cache hit: {}", this.parsed);
+                                LOGGER.info("Cache hit: {}", this.parsed);
                             }
                             this.handleCacheEntry(cacheEntry, cachedData);
                             return;
                         }
                     } else {
                         if (!TerraConfig.reducedConsoleMessages) {
-                            TerraMinusMinus.LOGGER.info("Cache miss: {}", this.parsed);
+                            LOGGER.info("Cache miss: {}", this.parsed);
                         }
                     }
                 } catch (Exception e) {
-                    TerraMinusMinus.LOGGER.error("Unable to read cache for " + this.parsed, e);
+                    LOGGER.error("Unable to read cache for " + this.parsed, e);
                 } finally {
                     ReferenceCountUtil.release(cachedData);
                 }
@@ -219,12 +222,12 @@ public class Http {
                     if (throwable != null) {
                         if (this.cacheEntry != null) { //fall back to stale cache data
                             if (!TerraConfig.reducedConsoleMessages) {
-                                TerraMinusMinus.LOGGER.warn("Refresh failed, falling back to stale data in cache: {}", this.parsed);
+                                LOGGER.warn("Refresh failed, falling back to stale data in cache: {}", this.parsed);
                             }
                             this.handleCacheEntry(this.cacheEntry, this.cachedData);
                         } else {
                             if (!TerraConfig.reducedConsoleMessages) {
-                                TerraMinusMinus.LOGGER.warn("Request failed: {}", this.parsed);
+                                LOGGER.warn("Request failed: {}", this.parsed);
                             }
                             future.completeExceptionally(throwable);
                         }
@@ -234,7 +237,7 @@ public class Http {
                     CacheEntry cacheEntry = new CacheEntry(response, this.parsed);
 
                     if (!TerraConfig.reducedConsoleMessages) {
-                        TerraMinusMinus.LOGGER.info(this.cacheEntry != null ? cacheEntry.status == CacheEntry.STATUS_NOT_MODIFIED
+                        LOGGER.info(this.cacheEntry != null ? cacheEntry.status == CacheEntry.STATUS_NOT_MODIFIED
                                 ? "Refresh succeeded, data in cache not modified: {}"
                                 : "Refresh succeeded, updating data in cache: {}"
                                 : "Request succeeded: {}", this.parsed);
@@ -286,11 +289,11 @@ public class Http {
                     if (!TerraConfig.reducedConsoleMessages) {
                         future.whenComplete((data, t) -> {
                             if (t != null) {
-                                TerraMinusMinus.LOGGER.error("Failed to read file: " + path, t);
+                                LOGGER.error("Failed to read file: " + path, t);
                             } else if (data != null) {
-                                TerraMinusMinus.LOGGER.info("Read file: {}", path);
+                                LOGGER.info("Read file: {}", path);
                             } else {
-                                TerraMinusMinus.LOGGER.info("File not found: {}", path);
+                                LOGGER.info("File not found: {}", path);
                             }
                         });
                     }
@@ -388,7 +391,7 @@ public class Http {
                     if (this.suppressed != null) {
                         RuntimeException e = new RuntimeException();
                         this.suppressed.forEach(e::addSuppressed);
-                        TerraMinusMinus.LOGGER.error("Some URLs completed exceptionally", e);
+                        LOGGER.error("Some URLs completed exceptionally", e);
                     }
                     this.future.complete(null);
                 } else {
@@ -448,10 +451,10 @@ public class Http {
                 try {
                     setMaximumConcurrentRequestsTo(matcher.group(2), Integer.parseInt(matcher.group(1)));
                 } catch (Exception e) {
-                    TerraMinusMinus.LOGGER.error("Invalid entry: \"" + entry + '"', e);
+                    LOGGER.error("Invalid entry: \"" + entry + '"', e);
                 }
             } else {
-                TerraMinusMinus.LOGGER.warn("Invalid entry: \"{}\"", entry);
+                LOGGER.warn("Invalid entry: \"{}\"", entry);
             }
         }
     }
