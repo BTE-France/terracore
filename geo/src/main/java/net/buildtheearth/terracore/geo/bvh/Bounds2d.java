@@ -1,4 +1,4 @@
-package net.buildtheearth.terraminusminus.util.bvh;
+package net.buildtheearth.terracore.geo.bvh;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
@@ -11,7 +11,7 @@ import lombok.NonNull;
 import net.buildtheearth.terracore.geo.TileLocation;
 import net.buildtheearth.terracore.geo.projection.GeographicProjection;
 import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
-import net.buildtheearth.terraminusminus.util.CornerBoundingBox2d;
+import net.buildtheearth.terracore.geo.CornerBoundingBox2d;
 
 /**
  * An axis-aligned, 2D bounding box using double-precision floating-point coordinates.

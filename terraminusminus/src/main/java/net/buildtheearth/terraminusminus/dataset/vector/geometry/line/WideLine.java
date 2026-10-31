@@ -13,7 +13,7 @@ import net.buildtheearth.terraminusminus.dataset.vector.draw.DrawFunction;
 import net.buildtheearth.terraminusminus.generator.CachedChunkData;
 import net.buildtheearth.terraminusminus.substitutes.ChunkPos;
 import net.buildtheearth.terracore.geo.GeoMaths;
-import net.buildtheearth.terraminusminus.util.bvh.Bounds2d;
+import net.buildtheearth.terracore.geo.bvh.Bounds2d;
 
 /**
  * @author DaPorkchop_

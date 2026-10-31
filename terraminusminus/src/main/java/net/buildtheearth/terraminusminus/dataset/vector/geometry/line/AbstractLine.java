@@ -10,7 +10,7 @@ import net.buildtheearth.terraminusminus.dataset.geojson.geometry.MultiLineStrin
 import net.buildtheearth.terraminusminus.dataset.vector.draw.DrawFunction;
 import net.buildtheearth.terraminusminus.dataset.vector.geometry.AbstractVectorGeometry;
 import net.buildtheearth.terraminusminus.dataset.vector.geometry.Segment;
-import net.buildtheearth.terraminusminus.util.bvh.BVH;
+import net.buildtheearth.terracore.geo.bvh.BVH;
 
 /**
  * @author DaPorkchop_

@@ -14,8 +14,8 @@ import net.buildtheearth.terraminusminus.generator.GeneratorDatasets;
 import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
 import net.buildtheearth.terraminusminus.substitutes.ChunkPos;
 import net.buildtheearth.terraminusminus.substitutes.Biome;
-import net.buildtheearth.terraminusminus.util.CornerBoundingBox2d;
-import net.buildtheearth.terraminusminus.util.bvh.Bounds2d;
+import net.buildtheearth.terracore.geo.CornerBoundingBox2d;
+import net.buildtheearth.terracore.geo.bvh.Bounds2d;
 
 /**
  * Implementation of {@link IEarthBiomeFilter} that emits the same Biome as legacy terra121.

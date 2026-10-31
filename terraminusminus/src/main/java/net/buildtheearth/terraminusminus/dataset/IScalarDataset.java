@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.NonNull;
 import net.buildtheearth.terraminusminus.dataset.scalar.ConfigurableDoubleTiledDataset;
 import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
-import net.buildtheearth.terraminusminus.util.CornerBoundingBox2d;
+import net.buildtheearth.terracore.geo.CornerBoundingBox2d;
 
 /**
  * A dataset consisting of floating-point scalar values.
