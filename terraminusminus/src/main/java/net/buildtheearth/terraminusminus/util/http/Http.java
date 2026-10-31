@@ -32,13 +32,14 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.UtilityClass;
 import net.buildtheearth.terraminusminus.TerraConfig;
-import net.buildtheearth.terraminusminus.TerraConstants;
 import net.daporkchop.lib.common.function.throwing.EFunction;
 import net.daporkchop.lib.common.reference.cache.Cached;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.net.ssl.SSLException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
@@ -46,6 +47,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadFactory;
@@ -54,6 +56,7 @@ import java.util.function.BiConsumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.google.common.base.Strings.*;
 import static net.daporkchop.lib.common.misc.string.PStrings.*;
 import static net.daporkchop.lib.common.util.PValidation.*;
 
@@ -66,8 +69,34 @@ import static net.daporkchop.lib.common.util.PValidation.*;
 public class Http {
 
     public static HttpConfig CONFIG = new HttpConfig();
+    public static final String LIB_NAME = "terraminusminus";
+    public static final String LIB_VERSION;
 
     static final Logger LOGGER = LogManager.getLogger(Http.class);
+
+    static {
+        String libVersion = "unknown";
+        try (InputStream inputStream = Http.class.getResourceAsStream("terraminusminus.properties")) {
+            if (inputStream == null) {
+                throw new IOException("Terraminusminus properties file not found");
+            }
+            Properties properties = new Properties();
+            properties.load(inputStream);
+            String version = properties.getProperty("version");
+            if (isNullOrEmpty(version)) {
+                throw new IOException("version property is missing from terraminusminus.properties (or is empty)");
+            }
+            libVersion = version;
+        } catch (IOException e) {
+            LOGGER.error("Failed to load Terraminusminus properties file, version will be unknown");
+            LOGGER.catching(e);
+        }
+        LIB_VERSION = libVersion;
+    }
+
+    @Getter @Setter
+    private static String userAgent = fastFormat("%s/%s", LIB_NAME, LIB_VERSION);
+
 
     protected static final long TIMEOUT = 20L;
 
@@ -109,9 +138,6 @@ public class Http {
     }
 
     public static final RequestOptions DEFAULT_REQUEST_OPTIONS = RequestOptions.builder().build();
-
-    @Getter @Setter
-    private static String userAgent = fastFormat("%s/%s", TerraConstants.LIB_NAME, TerraConstants.LIB_VERSION);
 
     private HostManager managerFor(@NonNull URL url) {
         return MANAGERS.computeIfAbsent(new Host(url), HostManager::new);
