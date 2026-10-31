@@ -1,0 +1,32 @@
+package net.buildtheearth.terracore.worldgen.generator.data;
+
+import java.util.concurrent.CompletableFuture;
+
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import net.buildtheearth.terracore.minecraft.ChunkPos;
+import net.buildtheearth.terracore.worldgen.generator.CachedChunkData;
+import net.buildtheearth.terracore.worldgen.generator.EarthBiomeProvider;
+import net.buildtheearth.terracore.worldgen.generator.GeneratorDatasets;
+import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
+import net.buildtheearth.terracore.geo.CornerBoundingBox2d;
+import net.buildtheearth.terracore.geo.bvh.Bounds2d;
+
+/**
+ * @author DaPorkchop_
+ */
+@RequiredArgsConstructor
+public class InitialBiomesBaker implements IEarthDataBaker<Void> {
+    @NonNull
+    protected final EarthBiomeProvider biomeProvider;
+
+    @Override
+    public CompletableFuture<Void> requestData(ChunkPos pos, GeneratorDatasets datasets, Bounds2d bounds, CornerBoundingBox2d boundsGeo) throws OutOfProjectionBoundsException {
+        return CompletableFuture.completedFuture(null);
+    }
+
+    @Override
+    public void bake(ChunkPos pos, CachedChunkData.Builder builder, Void unused) {
+        this.biomeProvider.getBiomes(builder.biomes(), pos.getMinBlockX(), pos.getMinBlockZ(), 16, 16);
+    }
+}

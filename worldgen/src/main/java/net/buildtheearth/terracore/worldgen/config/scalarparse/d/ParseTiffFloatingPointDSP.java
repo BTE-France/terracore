@@ -1,0 +1,22 @@
+package net.buildtheearth.terracore.worldgen.config.scalarparse.d;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import net.buildtheearth.terracore.worldgen.TerraMinusMinus;
+
+
+/**
+ * Parses floating point scalar data from TIFF files.
+ *
+ * @deprecated floating point and integer specific TIFF implementations were made irrelevant
+ * by Apache commons imaging supporting them both ina unified way. Use {@link ParseTiffDSP} instead,
+ * this class may be removed in future releases.
+ */
+@JsonDeserialize
+@Deprecated
+public class ParseTiffFloatingPointDSP extends ParseTiffDSP {
+
+    public ParseTiffFloatingPointDSP() {
+        TerraMinusMinus.LOGGER.warn("parse_tiff_fp and ParseTiffFloatingPointDSP are deprecated. Use parse_tiff and ParseTiffDSP instead");
+    }
+
+}
