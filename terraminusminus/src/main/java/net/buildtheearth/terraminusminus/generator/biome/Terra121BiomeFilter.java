@@ -5,6 +5,8 @@ import java.util.concurrent.CompletableFuture;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import net.buildtheearth.terracore.minecraft.Biome;
+import net.buildtheearth.terracore.minecraft.ChunkPos;
 import net.buildtheearth.terraminusminus.TerraConfig;
 import net.buildtheearth.terraminusminus.dataset.IScalarDataset;
 import net.buildtheearth.terraminusminus.generator.ChunkBiomesBuilder;
@@ -12,8 +14,6 @@ import net.buildtheearth.terraminusminus.generator.EarthBiomeProvider;
 import net.buildtheearth.terraminusminus.generator.EarthGeneratorPipelines;
 import net.buildtheearth.terraminusminus.generator.GeneratorDatasets;
 import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
-import net.buildtheearth.terraminusminus.substitutes.ChunkPos;
-import net.buildtheearth.terraminusminus.substitutes.Biome;
 import net.buildtheearth.terracore.geo.CornerBoundingBox2d;
 import net.buildtheearth.terracore.geo.bvh.Bounds2d;
 

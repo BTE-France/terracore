@@ -1,9 +1,9 @@
-package net.buildtheearth.terraminusminus.substitutes;
+package net.buildtheearth.terracore.minecraft;
 
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.With;
-import net.buildtheearth.terraminusminus.substitutes.exceptions.SubstituteParseException;
+import net.buildtheearth.terracore.minecraft.exceptions.SubstituteParseException;
 import org.jetbrains.annotations.NotNull;
 
 import static java.util.Objects.*;

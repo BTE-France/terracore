@@ -8,10 +8,10 @@ import static java.lang.Math.sqrt;
 import static net.daporkchop.lib.common.math.PMath.floorI;
 
 import lombok.NonNull;
+import net.buildtheearth.terracore.minecraft.ChunkPos;
 import net.buildtheearth.terraminusminus.dataset.geojson.geometry.MultiLineString;
 import net.buildtheearth.terraminusminus.dataset.vector.draw.DrawFunction;
 import net.buildtheearth.terraminusminus.generator.CachedChunkData;
-import net.buildtheearth.terraminusminus.substitutes.ChunkPos;
 import net.buildtheearth.terracore.geo.GeoMaths;
 import net.buildtheearth.terracore.geo.bvh.Bounds2d;
 

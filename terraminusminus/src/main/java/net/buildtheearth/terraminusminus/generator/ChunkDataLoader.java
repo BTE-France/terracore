@@ -5,8 +5,8 @@ import java.util.concurrent.CompletableFuture;
 import com.google.common.cache.CacheLoader;
 
 import lombok.NonNull;
+import net.buildtheearth.terracore.minecraft.ChunkPos;
 import net.buildtheearth.terraminusminus.generator.data.IEarthDataBaker;
-import net.buildtheearth.terraminusminus.substitutes.ChunkPos;
 
 /**
  * {@link CacheLoader} implementation for earth generators, which asynchronously aggregates information from multiple datasets and stores it

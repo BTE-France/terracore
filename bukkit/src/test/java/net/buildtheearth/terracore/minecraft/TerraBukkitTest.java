@@ -1,11 +1,9 @@
-package net.buildtheearth.terraminusminus.substitutes;
+package net.buildtheearth.terracore.minecraft;
 
-import net.buildtheearth.terraminusminus.substitutes.exceptions.TranslateToForeignObjectException;
 import org.bukkit.NamespacedKey;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static net.buildtheearth.terraminusminus.substitutes.TerraBukkit.*;
+import static net.buildtheearth.terracore.minecraft.TerraBukkit.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TerraBukkitTest {

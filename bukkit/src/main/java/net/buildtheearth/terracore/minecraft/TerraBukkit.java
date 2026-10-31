@@ -1,8 +1,8 @@
-package net.buildtheearth.terraminusminus.substitutes;
+package net.buildtheearth.terracore.minecraft;
 
 import lombok.experimental.UtilityClass;
-import net.buildtheearth.terraminusminus.substitutes.exceptions.TranslateToForeignObjectException;
-import net.buildtheearth.terraminusminus.substitutes.exceptions.TranslateToSubstituteException;
+import net.buildtheearth.terracore.minecraft.exceptions.TranslateToForeignObjectException;
+import net.buildtheearth.terracore.minecraft.exceptions.TranslateToSubstituteException;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;

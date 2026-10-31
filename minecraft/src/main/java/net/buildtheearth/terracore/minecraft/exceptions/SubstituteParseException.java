@@ -1,4 +1,4 @@
-package net.buildtheearth.terraminusminus.substitutes.exceptions;
+package net.buildtheearth.terracore.minecraft.exceptions;
 
 import lombok.NonNull;
 import org.jetbrains.annotations.NotNull;

@@ -4,6 +4,7 @@ plugins {
 
 dependencies {
     implementation(project(":geo"))
+    implementation(project(":minecraft"))
 
     implementation("org.apache.commons:commons-imaging:1.0.0-alpha5")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.19.2")
