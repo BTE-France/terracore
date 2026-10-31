@@ -1,7 +1,6 @@
-package net.buildtheearth.terraminusminus.util.geo;
+package net.buildtheearth.terracore.geo;
 
 
-import net.buildtheearth.terraminusminus.TerraMinusMinusTest;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -9,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Smyler
  */
-public class CoordinateParseUtilsTest extends TerraMinusMinusTest {
+public class CoordinateParseUtilsTest {
 
     private static final double PRECISION = 1e-7;
 

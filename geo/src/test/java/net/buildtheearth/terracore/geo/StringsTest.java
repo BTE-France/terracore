@@ -1,13 +1,12 @@
-package net.buildtheearth.terraminusminus.util;
+package net.buildtheearth.terracore.geo;
 
-import net.buildtheearth.terraminusminus.TerraMinusMinus;
 import org.junit.jupiter.api.Test;
 
-import static net.buildtheearth.terraminusminus.util.Strings.*;
+import static net.buildtheearth.terracore.geo.Strings.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 
-public class StringsTest extends TerraMinusMinus {
+public class StringsTest {
 
     @Test
     public void canCountMatchesWithStringNeedle() {
