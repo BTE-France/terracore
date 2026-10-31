@@ -4,12 +4,12 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import lombok.NonNull;
+import net.buildtheearth.terracore.geo.TileLocation;
 import net.buildtheearth.terraminusminus.generator.data.TreeCoverBaker;
 import net.buildtheearth.terracore.geo.projection.GeographicProjection;
 import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
 import net.buildtheearth.terraminusminus.substitutes.BlockState;
 import net.buildtheearth.terraminusminus.substitutes.ChunkPos;
-import net.buildtheearth.terraminusminus.util.TilePos;
 import net.buildtheearth.terraminusminus.util.http.Http;
 
 import javax.swing.JFrame;
@@ -34,7 +34,7 @@ import static net.daporkchop.lib.common.util.PorkUtil.*;
 /**
  * @author DaPorkchop_
  */
-public class TerrainPreview extends CacheLoader<TilePos, CompletableFuture<BufferedImage>> {
+public class TerrainPreview extends CacheLoader<TileLocation, CompletableFuture<BufferedImage>> {
     public static final int SIZE_SHIFT = 8;
     public static final int SIZE = 1 << SIZE_SHIFT; //resolution of a tile
 
@@ -241,7 +241,7 @@ public class TerrainPreview extends CacheLoader<TilePos, CompletableFuture<Buffe
         System.gc();
     }
 
-    protected final LoadingCache<TilePos, CompletableFuture<BufferedImage>> cache;
+    protected final LoadingCache<TileLocation, CompletableFuture<BufferedImage>> cache;
     protected final ChunkDataLoader loader;
 
     public TerrainPreview(@NonNull EarthGeneratorSettings settings) {
@@ -254,10 +254,10 @@ public class TerrainPreview extends CacheLoader<TilePos, CompletableFuture<Buffe
     }
 
     public CompletableFuture<BufferedImage> tile(int x, int z, int zoom) {
-        return this.tile(new TilePos(x, z, zoom));
+        return this.tile(new TileLocation(x, z, zoom));
     }
 
-    public CompletableFuture<BufferedImage> tile(@NonNull TilePos pos) {
+    public CompletableFuture<BufferedImage> tile(@NonNull TileLocation pos) {
         return this.cache.getUnchecked(pos);
     }
 
@@ -266,13 +266,13 @@ public class TerrainPreview extends CacheLoader<TilePos, CompletableFuture<Buffe
      */
     @Override
     @Deprecated
-    public CompletableFuture<BufferedImage> load(@NonNull TilePos pos) {
+    public CompletableFuture<BufferedImage> load(@NonNull TileLocation pos) {
         if (pos.zoom() == 0) {
-            return this.baseZoomTile(pos.x(), pos.z());
+            return this.baseZoomTile(pos.x(), pos.y());
         } else if (pos.zoom() > 0) {
-            return this.zoomedOutTile(pos.x(), pos.z(), pos.zoom());
+            return this.zoomedOutTile(pos.x(), pos.y(), pos.zoom());
         } else {
-            return this.zoomedInTile(pos.x(), pos.z(), pos.zoom());
+            return this.zoomedInTile(pos.x(), pos.y(), pos.zoom());
         }
     }
 
