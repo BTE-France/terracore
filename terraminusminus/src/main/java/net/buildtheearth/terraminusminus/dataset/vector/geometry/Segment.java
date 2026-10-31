@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import net.buildtheearth.terracore.geo.bvh.Bounds2d;
-import net.buildtheearth.terraminusminus.util.interval.Interval;
+import net.buildtheearth.terracore.geo.interval.Interval;
 
 /**
  * A simple representation of a line segment as a pair of two sets of coordinates.

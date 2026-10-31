@@ -1,4 +1,4 @@
-package net.buildtheearth.terraminusminus.util.interval;
+package net.buildtheearth.terracore.geo.interval;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
