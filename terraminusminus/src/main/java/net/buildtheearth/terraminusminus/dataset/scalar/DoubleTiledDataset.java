@@ -16,9 +16,9 @@ import net.buildtheearth.terraminusminus.dataset.TiledHttpDataset;
 import net.buildtheearth.terraminusminus.dataset.BlendMode;
 import net.buildtheearth.terracore.geo.projection.GeographicProjection;
 import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
-import net.buildtheearth.terraminusminus.util.CornerBoundingBox2d;
+import net.buildtheearth.terracore.geo.CornerBoundingBox2d;
 import net.buildtheearth.terraminusminus.util.IntToDoubleBiFunction;
-import net.buildtheearth.terraminusminus.util.bvh.Bounds2d;
+import net.buildtheearth.terracore.geo.bvh.Bounds2d;
 import net.daporkchop.lib.common.math.BinMath;
 
 import static net.daporkchop.lib.common.util.PValidation.*;

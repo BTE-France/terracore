@@ -13,9 +13,9 @@ import net.buildtheearth.terraminusminus.dataset.TiledDataset;
 import net.buildtheearth.terraminusminus.dataset.vector.geometry.VectorGeometry;
 import net.buildtheearth.terracore.geo.projection.EquirectangularProjection;
 import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
-import net.buildtheearth.terraminusminus.util.CornerBoundingBox2d;
-import net.buildtheearth.terraminusminus.util.bvh.BVH;
-import net.buildtheearth.terraminusminus.util.bvh.Bounds2d;
+import net.buildtheearth.terracore.geo.CornerBoundingBox2d;
+import net.buildtheearth.terracore.geo.bvh.BVH;
+import net.buildtheearth.terracore.geo.bvh.Bounds2d;
 
 /**
  * @author DaPorkchop_

@@ -2,7 +2,7 @@ package net.buildtheearth.terraminusminus.dataset.vector.geometry;
 
 import lombok.NonNull;
 import net.buildtheearth.terraminusminus.generator.CachedChunkData;
-import net.buildtheearth.terraminusminus.util.bvh.Bounds2d;
+import net.buildtheearth.terracore.geo.bvh.Bounds2d;
 
 /**
  * A generate-able OpenStreetMap element.

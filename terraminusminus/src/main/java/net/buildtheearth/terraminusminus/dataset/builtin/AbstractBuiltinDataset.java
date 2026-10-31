@@ -7,7 +7,7 @@ import java.util.concurrent.CompletableFuture;
 import lombok.NonNull;
 import net.buildtheearth.terraminusminus.dataset.IScalarDataset;
 import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
-import net.buildtheearth.terraminusminus.util.CornerBoundingBox2d;
+import net.buildtheearth.terracore.geo.CornerBoundingBox2d;
 
 /**
  * Abstract implementation of {@link IScalarDataset} for the builtin datasets.

@@ -12,7 +12,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import net.buildtheearth.terraminusminus.dataset.geojson.Geometry;
 import net.buildtheearth.terraminusminus.dataset.osm.JsonParser;
-import net.buildtheearth.terraminusminus.util.bvh.Bounds2d;
+import net.buildtheearth.terracore.geo.bvh.Bounds2d;
 
 /**
  * Combines the results of multiple match conditions using a logical AND operation.

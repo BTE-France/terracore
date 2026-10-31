@@ -1,4 +1,4 @@
-package net.buildtheearth.terraminusminus.util.bvh;
+package net.buildtheearth.terracore.geo.bvh;
 
 import lombok.NonNull;
 
