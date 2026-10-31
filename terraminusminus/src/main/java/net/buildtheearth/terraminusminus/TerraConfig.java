@@ -2,6 +2,10 @@ package net.buildtheearth.terraminusminus;
 
 import net.buildtheearth.terracore.minecraft.Biome;
 
+/**
+ * @deprecated Global state shall be eliminated
+ */
+@Deprecated
 public class TerraConfig {
 
 	public static OSMOpts openstreetmap = new OSMOpts();
