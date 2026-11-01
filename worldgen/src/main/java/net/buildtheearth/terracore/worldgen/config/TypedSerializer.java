@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import net.buildtheearth.terracore.worldgen.TerraConstants;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 
 import java.io.IOException;
 import java.util.Map;
@@ -14,6 +14,9 @@ import java.util.Map;
  * @author DaPorkchop_
  */
 public abstract class TypedSerializer<T> extends JsonSerializer<T> {
+
+    private static final JsonMapper JSON_MAPPER = JsonMapper.builder().build();
+
     @Override
     public void serialize(T value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
         if (value == null) {
@@ -29,7 +32,7 @@ public abstract class TypedSerializer<T> extends JsonSerializer<T> {
         gen.writeStartObject(value);
         gen.writeFieldName(name);
 
-        TerraConstants.JSON_MAPPER.rebuild().addMixIn(value.getClass(), MixIn.class).build().writeValue(gen, value);
+        JSON_MAPPER.rebuild().addMixIn(value.getClass(), MixIn.class).build().writeValue(gen, value);
 
         gen.writeEndObject();
     }
