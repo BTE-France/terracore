@@ -30,5 +30,4 @@ public class TerraConstants {
             .addMixIn(Biome.class, BiomeDeserializeMixin.class)
             .build();
 
-    public static final double[] EMPTY_DOUBLE_ARRAY = new double[0];
 }

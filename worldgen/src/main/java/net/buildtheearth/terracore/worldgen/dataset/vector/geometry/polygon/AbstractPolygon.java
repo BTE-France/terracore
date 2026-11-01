@@ -34,6 +34,8 @@ public abstract class AbstractPolygon extends AbstractVectorGeometry {
     protected final double minZ;
     protected final double maxZ;
 
+    private static final double[] EMPTY_DOUBLE_ARRAY = new double[0];
+
     public AbstractPolygon(@NonNull String id, double layer, @NonNull DrawFunction draw, @NonNull MultiPolygon polygons) {
         super(id, layer, draw);
 
@@ -77,7 +79,7 @@ public abstract class AbstractPolygon extends AbstractVectorGeometry {
             if ((segments.size() & 1) == 0) { //if there's an even count, this was successful
                 int size = segments.size();
                 if (size == 0) {
-                    return TerraConstants.EMPTY_DOUBLE_ARRAY;
+                    return EMPTY_DOUBLE_ARRAY;
                 } else {
                     double[] arr = new double[size];
 
@@ -97,6 +99,6 @@ public abstract class AbstractPolygon extends AbstractVectorGeometry {
         } while (retries++ < 3);
 
         //retried multiple times with different offsets and it still failed, abort...
-        return TerraConstants.EMPTY_DOUBLE_ARRAY;
+        return EMPTY_DOUBLE_ARRAY;
     }
 }
