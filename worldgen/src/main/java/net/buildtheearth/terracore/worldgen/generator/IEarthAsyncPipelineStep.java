@@ -10,7 +10,6 @@ import net.buildtheearth.terracore.minecraft.ChunkPos;
 import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
 import net.buildtheearth.terracore.geo.CornerBoundingBox2d;
 import net.buildtheearth.terracore.geo.bvh.Bounds2d;
-import net.buildtheearth.terracore.worldgen.TerraMinusMinus;
 
 import static net.daporkchop.lib.common.util.PorkUtil.*;
 
@@ -56,7 +55,7 @@ public interface IEarthAsyncPipelineStep<D, V, B extends IEarthAsyncDataBuilder<
                     });
             future.whenComplete((data, t) -> {
                 if (t != null) {
-                    TerraMinusMinus.LOGGER.error("async exception while loading data", t);
+                    GeneratorLogging.LOGGER.error("async exception while loading data", t);
                 }
             });
             return future;
