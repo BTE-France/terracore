@@ -2,7 +2,6 @@ package net.buildtheearth.terracore.worldgen.generator;
 
 import net.buildtheearth.terracore.minecraft.Biome;
 import net.buildtheearth.terracore.minecraft.ChunkPos;
-import net.buildtheearth.terracore.worldgen.TerraMinusMinusTest;
 import net.buildtheearth.terracore.geo.projection.GeographicProjection;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,7 +14,7 @@ import static net.buildtheearth.terracore.worldgen.generator.EarthGeneratorSetti
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Generation with BTE settings")
-public class EarthGeneratorBteTest extends TerraMinusMinusTest {
+public class EarthGeneratorBteTest {
 
     private final EarthGeneratorSettings BTE_SETTINGS = EarthGeneratorSettings.parse(BTE_DEFAULT_SETTINGS);
     private final ChunkDataLoader DATA_LOADER = new ChunkDataLoader(BTE_SETTINGS);

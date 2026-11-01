@@ -1,12 +1,11 @@
 package net.buildtheearth.terracore.worldgen.generator;
 
 
-import net.buildtheearth.terracore.worldgen.TerraMinusMinusTest;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class EarthGeneratorSettingsTest extends TerraMinusMinusTest {
+public class EarthGeneratorSettingsTest {
 
     @Test
     void testDefaults() {
