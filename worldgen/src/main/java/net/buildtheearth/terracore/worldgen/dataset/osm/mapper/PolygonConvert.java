@@ -13,13 +13,13 @@ import com.google.gson.stream.JsonReader;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import net.buildtheearth.terracore.worldgen.TerraConstants;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.Geometry;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.geometry.LineString;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.geometry.MultiLineString;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.geometry.MultiPolygon;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.geometry.Polygon;
 import net.buildtheearth.terracore.worldgen.dataset.osm.JsonParser;
+import net.buildtheearth.terracore.worldgen.dataset.osm.OSMConfig;
 import net.buildtheearth.terracore.worldgen.dataset.vector.geometry.VectorGeometry;
 
 /**
@@ -69,7 +69,7 @@ public interface PolygonConvert extends PolygonMapper {
             @Override
             public Line read(JsonReader in) throws IOException {
                 in.beginObject();
-                LineMapper next = TerraConstants.GSON.fromJson(in, LineMapper.class);
+                LineMapper next = OSMConfig.GSON.fromJson(in, LineMapper.class);
                 in.endObject();
                 return new Line(next);
             }

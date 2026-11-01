@@ -11,7 +11,6 @@ import com.google.gson.stream.JsonToken;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
-import net.buildtheearth.terracore.worldgen.TerraConstants;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.Geometry;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.geometry.LineString;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.geometry.MultiLineString;
@@ -71,12 +70,12 @@ final class Root implements OSMMapper<Geometry> {
                 switch (name) {
                     case "line":
                         in.beginObject();
-                        builder.line(TerraConstants.GSON.fromJson(in, LineMapper.class));
+                        builder.line(OSMConfig.GSON.fromJson(in, LineMapper.class));
                         in.endObject();
                         break;
                     case "polygon":
                         in.beginObject();
-                        builder.polygon(TerraConstants.GSON.fromJson(in, PolygonMapper.class));
+                        builder.polygon(OSMConfig.GSON.fromJson(in, PolygonMapper.class));
                         in.endObject();
                         break;
                     default:

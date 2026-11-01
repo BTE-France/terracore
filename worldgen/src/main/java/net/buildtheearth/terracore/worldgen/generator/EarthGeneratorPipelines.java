@@ -11,7 +11,7 @@ import net.buildtheearth.terracore.worldgen.dataset.builtin.Soil;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.dataset.ParsingGeoJsonDataset;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.dataset.ReferenceResolvingGeoJsonDataset;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.dataset.TiledGeoJsonDataset;
-import net.buildtheearth.terracore.worldgen.dataset.osm.OSMMapper;
+import net.buildtheearth.terracore.worldgen.dataset.osm.OSMConfig;
 import net.buildtheearth.terracore.worldgen.dataset.scalar.MultiScalarDataset;
 import net.buildtheearth.terracore.worldgen.dataset.vector.GeoJsonToVectorDataset;
 import net.buildtheearth.terracore.worldgen.dataset.vector.VectorTiledDataset;
@@ -48,7 +48,7 @@ public class EarthGeneratorPipelines {
 
         ParsingGeoJsonDataset rawOsm = new ParsingGeoJsonDataset(TerraConfig.openstreetmap.servers);
         m.put(KEY_DATASET_OSM_RAW, new TiledGeoJsonDataset(new ReferenceResolvingGeoJsonDataset(rawOsm)));
-        m.put(KEY_DATASET_OSM_PARSED, new VectorTiledDataset(new GeoJsonToVectorDataset(rawOsm, OSMMapper.load(), settings.projection())));
+        m.put(KEY_DATASET_OSM_PARSED, new VectorTiledDataset(new GeoJsonToVectorDataset(rawOsm, OSMConfig.load(), settings.projection())));
 
         m.put(KEY_DATASET_TERRA121_PRECIPITATION, new Climate.Precipitation());
         m.put(KEY_DATASET_TERRA121_SOIL, new Soil());

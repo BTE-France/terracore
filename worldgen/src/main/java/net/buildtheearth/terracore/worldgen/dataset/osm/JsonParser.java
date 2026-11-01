@@ -14,7 +14,6 @@ import com.google.gson.stream.JsonWriter;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import net.buildtheearth.terracore.worldgen.TerraConstants;
 import net.daporkchop.lib.common.function.io.IOBiFunction;
 import net.daporkchop.lib.common.function.io.IOFunction;
 
@@ -41,7 +40,7 @@ public abstract class JsonParser<T> extends TypeAdapter<T> {
 
         in.beginObject();
         while (in.peek() != JsonToken.END_OBJECT) {
-            list.add(TerraConstants.GSON.fromJson(in, type));
+            list.add(OSMConfig.GSON.fromJson(in, type));
         }
         in.endObject();
 
@@ -81,7 +80,7 @@ public abstract class JsonParser<T> extends TypeAdapter<T> {
         public T applyThrowing(String type, JsonReader in) throws IOException {
             Class<? extends T> clazz = this.types.get(type);
             checkArg(clazz != null, "type \"%s\" is not supported by \"%s\"!", type, this.name);
-            return TerraConstants.GSON.fromJson(in, clazz);
+            return OSMConfig.GSON.fromJson(in, clazz);
         }
     }
 
