@@ -10,11 +10,11 @@ import com.google.gson.stream.JsonToken;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import net.buildtheearth.terracore.worldgen.TerraConstants;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.Geometry;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.geometry.MultiLineString;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.geometry.MultiPolygon;
 import net.buildtheearth.terracore.worldgen.dataset.osm.JsonParser;
+import net.buildtheearth.terracore.worldgen.dataset.osm.OSMConfig;
 import net.buildtheearth.terracore.worldgen.dataset.osm.OSMMapper;
 import net.buildtheearth.terracore.worldgen.dataset.osm.match.MatchCondition;
 import net.buildtheearth.terracore.worldgen.dataset.vector.geometry.VectorGeometry;
@@ -55,12 +55,12 @@ abstract class Condition<G extends Geometry, M extends OSMMapper<G>> implements 
                 switch (name) {
                     case "match":
                         in.beginObject();
-                        match = TerraConstants.GSON.fromJson(in, MatchCondition.class);
+                        match = OSMConfig.GSON.fromJson(in, MatchCondition.class);
                         in.endObject();
                         break;
                     case "emit":
                         in.beginObject();
-                        emit = TerraConstants.GSON.fromJson(in, this.mapperClass);
+                        emit = OSMConfig.GSON.fromJson(in, this.mapperClass);
                         in.endObject();
                         break;
                     default:

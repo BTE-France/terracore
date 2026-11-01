@@ -8,8 +8,8 @@ import com.google.gson.stream.JsonReader;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.buildtheearth.terracore.minecraft.BlockState;
-import net.buildtheearth.terracore.worldgen.TerraConstants;
 import net.buildtheearth.terracore.worldgen.dataset.osm.JsonParser;
+import net.buildtheearth.terracore.worldgen.dataset.osm.OSMConfig;
 import net.buildtheearth.terracore.worldgen.generator.CachedChunkData;
 
 /**
@@ -31,7 +31,7 @@ public final class Block implements DrawFunction {
     static class Parser extends JsonParser<Block> {
         @Override
         public Block read(JsonReader in) throws IOException {
-            return new Block(TerraConstants.GSON.fromJson(in, BlockState.class));
+            return new Block(OSMConfig.GSON.fromJson(in, BlockState.class));
         }
     }
 }

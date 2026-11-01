@@ -8,8 +8,8 @@ import com.google.gson.stream.JsonToken;
 
 import lombok.Builder;
 import lombok.NonNull;
-import net.buildtheearth.terracore.worldgen.TerraConstants;
 import net.buildtheearth.terracore.worldgen.dataset.osm.JsonParser;
+import net.buildtheearth.terracore.worldgen.dataset.osm.OSMConfig;
 import net.buildtheearth.terracore.worldgen.generator.CachedChunkData;
 
 /**
@@ -41,7 +41,7 @@ final class WeightAdd implements DrawFunction {
                         break;
                     case "delegate":
                         in.beginObject();
-                        builder.delegate(TerraConstants.GSON.fromJson(in, DrawFunction.class));
+                        builder.delegate(OSMConfig.GSON.fromJson(in, DrawFunction.class));
                         in.endObject();
                         break;
                     default:

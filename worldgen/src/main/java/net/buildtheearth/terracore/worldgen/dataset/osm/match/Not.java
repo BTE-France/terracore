@@ -8,9 +8,9 @@ import com.google.gson.stream.JsonReader;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import net.buildtheearth.terracore.worldgen.TerraConstants;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.Geometry;
 import net.buildtheearth.terracore.worldgen.dataset.osm.JsonParser;
+import net.buildtheearth.terracore.worldgen.dataset.osm.OSMConfig;
 
 /**
  * Inverts the result of a single match condition.
@@ -32,7 +32,7 @@ final class Not implements MatchCondition {
         @Override
         public Not read(JsonReader in) throws IOException {
             in.beginObject();
-            MatchCondition delegate = TerraConstants.GSON.fromJson(in, MatchCondition.class);
+            MatchCondition delegate = OSMConfig.GSON.fromJson(in, MatchCondition.class);
             in.endObject();
             return new Not(delegate);
         }

@@ -11,10 +11,10 @@ import com.google.gson.stream.JsonToken;
 
 import lombok.Builder;
 import lombok.NonNull;
-import net.buildtheearth.terracore.worldgen.TerraConstants;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.Geometry;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.geometry.MultiPolygon;
 import net.buildtheearth.terracore.worldgen.dataset.osm.JsonParser;
+import net.buildtheearth.terracore.worldgen.dataset.osm.OSMConfig;
 import net.buildtheearth.terracore.worldgen.dataset.osm.dvalue.DValue;
 import net.buildtheearth.terracore.worldgen.dataset.vector.draw.DrawFunction;
 import net.buildtheearth.terracore.worldgen.dataset.vector.geometry.VectorGeometry;
@@ -47,12 +47,12 @@ final class PolygonFill implements PolygonMapper {
                 switch (name) {
                     case "draw":
                         in.beginObject();
-                        builder.draw(TerraConstants.GSON.fromJson(in, DrawFunction.class));
+                        builder.draw(OSMConfig.GSON.fromJson(in, DrawFunction.class));
                         in.endObject();
                         break;
                     case "layer":
                         in.beginObject();
-                        builder.layer(TerraConstants.GSON.fromJson(in, DValue.class));
+                        builder.layer(OSMConfig.GSON.fromJson(in, DValue.class));
                         in.endObject();
                         break;
                     default:
