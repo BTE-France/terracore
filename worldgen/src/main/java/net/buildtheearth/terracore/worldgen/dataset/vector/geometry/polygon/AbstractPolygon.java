@@ -12,7 +12,6 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import lombok.Getter;
 import lombok.NonNull;
-import net.buildtheearth.terracore.worldgen.TerraConstants;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.geometry.LineString;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.geometry.MultiPolygon;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.geometry.Point;
