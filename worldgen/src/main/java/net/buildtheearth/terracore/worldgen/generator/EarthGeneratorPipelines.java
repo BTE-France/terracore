@@ -5,7 +5,6 @@ import java.util.Map;
 
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
-import net.buildtheearth.terracore.worldgen.TerraConfig;
 import net.buildtheearth.terracore.worldgen.dataset.builtin.Climate;
 import net.buildtheearth.terracore.worldgen.dataset.builtin.Soil;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.dataset.ParsingGeoJsonDataset;
@@ -41,12 +40,15 @@ public class EarthGeneratorPipelines {
 
     public final String KEY_DATA_TREE_COVER = "tree_cover";
 
+    public static final OSMOpts OSM_OPTIONS = new OSMOpts();
+
+
     public Map<String, Object> datasets(@NonNull EarthGeneratorSettings settings) {
         Map<String, Object> m = new HashMap<>();
 
         m.put(KEY_DATASET_HEIGHTS, new MultiScalarDataset(KEY_DATASET_HEIGHTS, settings.useDefaultHeights()));
 
-        ParsingGeoJsonDataset rawOsm = new ParsingGeoJsonDataset(TerraConfig.openstreetmap.servers);
+        ParsingGeoJsonDataset rawOsm = new ParsingGeoJsonDataset(OSM_OPTIONS.servers);
         m.put(KEY_DATASET_OSM_RAW, new TiledGeoJsonDataset(new ReferenceResolvingGeoJsonDataset(rawOsm)));
         m.put(KEY_DATASET_OSM_PARSED, new VectorTiledDataset(new GeoJsonToVectorDataset(rawOsm, OSMConfig.load(), settings.projection())));
 
@@ -71,4 +73,12 @@ public class EarthGeneratorPipelines {
             new NullIslandBaker()
         };
     }
+
+    public static class OSMOpts {
+        public String[] servers = {
+                "https://cloud.daporkchop.net/gis/osm/0/"
+        };
+    }
+
+
 }
