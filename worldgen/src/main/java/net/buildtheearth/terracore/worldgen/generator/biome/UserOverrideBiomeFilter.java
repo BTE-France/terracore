@@ -3,15 +3,17 @@ package net.buildtheearth.terracore.worldgen.generator.biome;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.json.JsonReadFeature;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.google.common.collect.ImmutableSet;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import net.buildtheearth.terracore.minecraft.Biome;
 import net.buildtheearth.terracore.minecraft.ChunkPos;
-import net.buildtheearth.terracore.worldgen.TerraConstants;
 import net.buildtheearth.terracore.worldgen.generator.ChunkBiomesBuilder;
 import net.buildtheearth.terracore.worldgen.generator.GeneratorDatasets;
 import net.buildtheearth.terracore.geo.projection.GeographicProjection;
@@ -20,6 +22,7 @@ import net.buildtheearth.terracore.geo.CornerBoundingBox2d;
 import net.buildtheearth.terracore.geo.bvh.BVH;
 import net.buildtheearth.terracore.geo.bvh.Bounds2d;
 import net.buildtheearth.terracore.http.Disk;
+import net.buildtheearth.terracore.worldgen.util.BiomeDeserializeMixin;
 import net.daporkchop.lib.common.function.io.IOFunction;
 import net.daporkchop.lib.common.function.throwing.EFunction;
 
@@ -42,6 +45,17 @@ import java.util.stream.Stream;
  * @author DavixDevelop
  */
 public class UserOverrideBiomeFilter implements IEarthBiomeFilter<UserOverrideBiomeFilter.BiomeBoundingBox> {
+
+    private static final JsonMapper JSON_MAPPER = JsonMapper.builder()
+            .configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true)
+            .configure(JsonReadFeature.ALLOW_JAVA_COMMENTS, true)
+            .configure(JsonReadFeature.ALLOW_LEADING_ZEROS_FOR_NUMBERS, true)
+            .configure(JsonReadFeature.ALLOW_LEADING_DECIMAL_POINT_FOR_NUMBERS, true)
+            .configure(JsonReadFeature.ALLOW_NON_NUMERIC_NUMBERS, true)
+            .configure(JsonReadFeature.ALLOW_TRAILING_COMMA, true)
+            .addMixIn(Biome.class, BiomeDeserializeMixin.class)
+            .build();
+
     protected final BVH<BiomeBoundingBox> bvh;
 
     @SneakyThrows(IOException.class)
@@ -57,7 +71,7 @@ public class UserOverrideBiomeFilter implements IEarthBiomeFilter<UserOverrideBi
         }
 
         this.bvh = BVH.of(configSources.stream()
-                .map((IOFunction<URL, BiomeBoundingBox[]>) url -> TerraConstants.JSON_MAPPER.readValue(url, BiomeBoundingBox[].class))
+                .map((IOFunction<URL, BiomeBoundingBox[]>) url -> JSON_MAPPER.readValue(url, BiomeBoundingBox[].class))
                 .flatMap(Arrays::stream)
                 .toArray(BiomeBoundingBox[]::new));
     }
