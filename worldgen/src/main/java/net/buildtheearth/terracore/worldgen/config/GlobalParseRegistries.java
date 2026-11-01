@@ -17,11 +17,8 @@ import net.buildtheearth.terracore.worldgen.config.scalarparse.d.FlipXDSP;
 import net.buildtheearth.terracore.worldgen.config.scalarparse.d.FlipZDSP;
 import net.buildtheearth.terracore.worldgen.config.scalarparse.d.FromIntDSP;
 import net.buildtheearth.terracore.worldgen.config.scalarparse.d.MultiplyDSP;
-import net.buildtheearth.terracore.worldgen.config.scalarparse.d.ParseTiffAutoDSP;
 import net.buildtheearth.terracore.worldgen.config.scalarparse.d.ParseTiffDSP;
-import net.buildtheearth.terracore.worldgen.config.scalarparse.d.ParseTiffFloatingPointDSP;
 import net.buildtheearth.terracore.worldgen.config.scalarparse.d.ParseTerrariumPngDSP;
-import net.buildtheearth.terracore.worldgen.config.scalarparse.d.ParseTiffIntDSP;
 import net.buildtheearth.terracore.worldgen.config.scalarparse.d.SwapAxesDSP;
 import net.buildtheearth.terracore.worldgen.config.scalarparse.i.AddISP;
 import net.buildtheearth.terracore.worldgen.config.scalarparse.i.AndISP;
@@ -70,10 +67,7 @@ public class GlobalParseRegistries {
             entry("swap_axes", SwapAxesDSP.class),
             //parse operators (including deprecated ParseTiffXXXXDSPs)
             entry("parse_png_terrarium", ParseTerrariumPngDSP.class),
-            entry("parse_tiff", ParseTiffDSP.class),
-            entry("parse_tiff_auto", ParseTiffAutoDSP.class),
-            entry("parse_tiff_fp", ParseTiffFloatingPointDSP.class),
-            entry("parse_tiff_int", ParseTiffIntDSP.class)
+            entry("parse_tiff", ParseTiffDSP.class)
     ));
 
     public final BiMap<String, Class<? extends IntScalarParser>> SCALAR_PARSERS_INT = HashBiMap.create(ofEntries(
