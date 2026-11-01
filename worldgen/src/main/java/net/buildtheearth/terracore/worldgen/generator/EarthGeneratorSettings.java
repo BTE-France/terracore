@@ -12,6 +12,9 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.json.JsonReadFeature;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.google.common.base.Strings;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -23,7 +26,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.With;
 import net.buildtheearth.terracore.geo.projection.GeographicProjection;
-import net.buildtheearth.terracore.worldgen.TerraConstants;
 import net.daporkchop.lib.binary.oio.StreamUtil;
 import net.daporkchop.lib.common.reference.ReferenceStrength;
 import net.daporkchop.lib.common.reference.cache.Cached;
@@ -54,6 +56,15 @@ public class EarthGeneratorSettings {
         }
     }
 
+    private static final JsonMapper JSON_MAPPER = JsonMapper.builder()
+            .configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true)
+            .configure(JsonReadFeature.ALLOW_JAVA_COMMENTS, true)
+            .configure(JsonReadFeature.ALLOW_LEADING_ZEROS_FOR_NUMBERS, true)
+            .configure(JsonReadFeature.ALLOW_LEADING_DECIMAL_POINT_FOR_NUMBERS, true)
+            .configure(JsonReadFeature.ALLOW_NON_NUMERIC_NUMBERS, true)
+            .configure(JsonReadFeature.ALLOW_TRAILING_COMMA, true)
+            .build();
+
     /**
      * Parses the given generator settings.
      *
@@ -79,7 +90,7 @@ public class EarthGeneratorSettings {
         if (Strings.isNullOrEmpty(generatorSettings)) {
             generatorSettings = DEFAULT_SETTINGS;
         }
-        return TerraConstants.JSON_MAPPER.readValue(generatorSettings, EarthGeneratorSettings.class);
+        return JSON_MAPPER.readValue(generatorSettings, EarthGeneratorSettings.class);
     }
 
     @NonNull
@@ -111,7 +122,7 @@ public class EarthGeneratorSettings {
     @Override
     public String toString() {
         try {
-            return TerraConstants.JSON_MAPPER.writeValueAsString(this);
+            return JSON_MAPPER.writeValueAsString(this);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
