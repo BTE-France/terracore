@@ -20,5 +20,5 @@ jobs:
       - name: Publish with Gradle
         run: ./gradlew publishAllPublicationsToSmylerReleasesRepository
         env:
-          MAVEN_NAME: ${{ secrets.MAVEN_NAME }}
-          MAVEN_SECRET: ${{ secrets.MAVEN_SECRET }}
+          MAVEN_NAME: ${{ secrets.RELEASES_MAVEN_NAME }}
+          MAVEN_SECRET: ${{ secrets.RELEASES_MAVEN_SECRET }}
