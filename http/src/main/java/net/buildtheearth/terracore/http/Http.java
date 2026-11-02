@@ -68,33 +68,51 @@ import static net.daporkchop.lib.common.util.PValidation.*;
 public class Http {
 
     public static HttpConfig CONFIG = new HttpConfig();
-    public static final String LIB_NAME = "terracore";
+    public static final String LIB_NAME;
     public static final String LIB_VERSION;
+    public static final String LIB_URL;
 
     static final Logger LOGGER = LogManager.getLogger(Http.class);
 
     static {
+        String libName = "unknown";
         String libVersion = "unknown";
+        String libUrl = "unknown";
         try (InputStream inputStream = Http.class.getResourceAsStream("terracore.properties")) {
             if (inputStream == null) {
                 throw new IOException("Terracore HTTP properties file not found");
             }
             Properties properties = new Properties();
             properties.load(inputStream);
+
+            String name = properties.getProperty("name");
+            if (isNullOrEmpty(name)) {
+                throw new IOException("name property is missing from terracore.properties (or is empty)");
+            }
+            libName = name;
+
             String version = properties.getProperty("version");
             if (isNullOrEmpty(version)) {
                 throw new IOException("version property is missing from terracore.properties (or is empty)");
             }
             libVersion = version;
+
+            String url = properties.getProperty("url");
+            if (isNullOrEmpty(url)) {
+                throw new IOException("url property is missing from terracore.properties (or is empty)");
+            }
+            libUrl = url;
         } catch (IOException e) {
             LOGGER.error("Failed to load Terracore HTTP properties file, version will be unknown");
             LOGGER.catching(e);
         }
+        LIB_NAME = libName;
         LIB_VERSION = libVersion;
+        LIB_URL = libUrl;
     }
 
     @Getter @Setter
-    private static String userAgent = fastFormat("%s/%s", LIB_NAME, LIB_VERSION);
+    private static String userAgent = fastFormat("%s/%s; +%s", LIB_NAME, LIB_VERSION, LIB_URL);
 
 
     protected static final long TIMEOUT = 20L;
