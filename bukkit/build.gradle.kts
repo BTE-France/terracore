@@ -16,9 +16,9 @@ dependencies {
 
 publishing {
     publications {
-        create<MavenPublication>("terraminusminus-bukkit") {
+        create<MavenPublication>("terracore-bukkit") {
             groupId = project.group.toString()
-            artifactId = "terraminusminus-bukkit"
+            artifactId = "terracore-bukkit"
             version = project.version.toString()
             from(components["java"])
         }
