@@ -1,7 +1,6 @@
 package net.buildtheearth.terracore.worldgen.generator;
 
-import static java.lang.Math.max;
-import static java.lang.Math.min;
+import static java.lang.Math.*;
 import static net.daporkchop.lib.common.math.PMath.clamp;
 import static net.daporkchop.lib.common.math.PMath.floorI;
 import static net.daporkchop.lib.common.math.PMath.lerp;
@@ -18,7 +17,6 @@ import lombok.Setter;
 import net.buildtheearth.terracore.minecraft.Biome;
 import net.buildtheearth.terracore.minecraft.BlockState;
 import net.buildtheearth.terracore.minecraft.ChunkPos;
-import net.buildtheearth.terracore.worldgen.TerraConfig;
 import net.buildtheearth.terracore.worldgen.util.CustomAttributeContainer;
 import net.buildtheearth.terracore.worldgen.util.ImmutableCompactArray;
 import net.daporkchop.lib.common.reference.ReferenceStrength;
@@ -78,7 +76,7 @@ public class CachedChunkData extends CustomAttributeContainer {
                 case WATERDEPTH_TYPE_WATER: //water - lake/river/pond
                     if (d + WATER_DEPTH_OFFSET >= 0) {
                         this.groundHeight[i] -= d + WATER_DEPTH_OFFSET;
-                        builder.biomes[(i >>> 4) | ((i & 0xF) << 4)] = TerraConfig.biomes.waterInlandBiome;
+                        builder.biomes[(i >>> 4) | ((i & 0xF) << 4)] = EarthGeneratorPipelines.BIOME_OPTIONS.waterInlandBiome;
                     }
                     break;
                 case WATERDEPTH_TYPE_OCEAN:
@@ -89,7 +87,7 @@ public class CachedChunkData extends CustomAttributeContainer {
                     } else {
                         this.surfaceHeight[i] = 0;
                         this.groundHeight[i] = min(this.groundHeight[i], -2);
-                        builder.biomes[(i >>> 4) | ((i & 0xF) << 4)] = TerraConfig.biomes.waterOceanBiome;
+                        builder.biomes[(i >>> 4) | ((i & 0xF) << 4)] = EarthGeneratorPipelines.BIOME_OPTIONS.waterOceanBiome;
                     }
                     break;
                 default:

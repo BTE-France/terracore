@@ -5,6 +5,7 @@ import java.util.Map;
 
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
+import net.buildtheearth.terracore.minecraft.Biome;
 import net.buildtheearth.terracore.worldgen.dataset.builtin.Climate;
 import net.buildtheearth.terracore.worldgen.dataset.builtin.Soil;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.dataset.ParsingGeoJsonDataset;
@@ -41,6 +42,8 @@ public class EarthGeneratorPipelines {
     public final String KEY_DATA_TREE_COVER = "tree_cover";
 
     public static final OSMOpts OSM_OPTIONS = new OSMOpts();
+
+    public static BiomeOpts BIOME_OPTIONS = new BiomeOpts();
 
 
     public Map<String, Object> datasets(@NonNull EarthGeneratorSettings settings) {
@@ -80,5 +83,12 @@ public class EarthGeneratorPipelines {
         };
     }
 
+    public static class BiomeOpts {
+        public Biome defaultBiome = Biome.parse("ocean");
+        public Biome waterInlandBiome = Biome.parse("river");
+        public Biome waterOceanBiome = Biome.parse("deep_ocean");
+        public Biome nullIslandInnerBiome = Biome.parse("forest");
+        public Biome nullIslandOuterBiome = Biome.parse("plains");
+    }
 
 }
