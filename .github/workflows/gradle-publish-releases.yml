@@ -1,9 +1,13 @@
-name: Publish snapshot build
+name: Publish release builds
 on:
-  - push
+  push:
+    tags:
+      - '*'
 jobs:
   publish:
     runs-on: ubuntu-latest
+    env:
+      TMM_RELEASE: true
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK
@@ -14,7 +18,7 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Publish with Gradle
-        run: ./gradlew publishAllPublicationsToSmylerSnapshotsRepository
+        run: ./gradlew publishAllPublicationsToSmylerReleasesRepository
         env:
           MAVEN_NAME: ${{ secrets.MAVEN_NAME }}
           MAVEN_SECRET: ${{ secrets.MAVEN_SECRET }}
