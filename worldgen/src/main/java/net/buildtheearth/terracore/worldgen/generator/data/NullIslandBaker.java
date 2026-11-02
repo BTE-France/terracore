@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 
 import net.buildtheearth.terracore.minecraft.ChunkPos;
-import net.buildtheearth.terracore.worldgen.TerraConfig;
 import net.buildtheearth.terracore.worldgen.generator.CachedChunkData;
 import net.buildtheearth.terracore.worldgen.generator.EarthGeneratorPipelines;
 import net.buildtheearth.terracore.worldgen.generator.GeneratorDatasets;
@@ -36,9 +35,9 @@ public class NullIslandBaker implements IEarthDataBaker<Void> {
             }
 
             if (((pos.x() ^ (pos.x() >> 31)) | (pos.z() ^ (pos.z() >> 31))) == 0) {
-                Arrays.fill(builder.biomes(), TerraConfig.biomes.nullIslandInnerBiome);
+                Arrays.fill(builder.biomes(), EarthGeneratorPipelines.BIOME_OPTIONS.nullIslandInnerBiome);
             } else {
-                Arrays.fill(builder.biomes(), TerraConfig.biomes.nullIslandOuterBiome);
+                Arrays.fill(builder.biomes(), EarthGeneratorPipelines.BIOME_OPTIONS.nullIslandOuterBiome);
             }
 
             Arrays.fill(builder.waterDepth(), (byte) CachedChunkData.WATERDEPTH_DEFAULT);

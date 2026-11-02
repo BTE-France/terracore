@@ -7,7 +7,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.buildtheearth.terracore.minecraft.Biome;
 import net.buildtheearth.terracore.minecraft.ChunkPos;
-import net.buildtheearth.terracore.worldgen.TerraConfig;
 import net.buildtheearth.terracore.worldgen.dataset.IScalarDataset;
 import net.buildtheearth.terracore.worldgen.generator.ChunkBiomesBuilder;
 import net.buildtheearth.terracore.worldgen.generator.EarthBiomeProvider;
@@ -54,7 +53,7 @@ public class Terra121BiomeFilter implements IEarthBiomeFilter<Terra121BiomeFilte
         Biome[] biome = builder.state();
 
         if (data == null) {
-            Arrays.fill(biome, TerraConfig.biomes.defaultBiome);
+            Arrays.fill(biome, EarthGeneratorPipelines.BIOME_OPTIONS.defaultBiome);
             return;
         }
 
