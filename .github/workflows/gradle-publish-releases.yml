@@ -9,7 +9,7 @@ jobs:
     env:
       TMM_RELEASE: true
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Set up JDK
         uses: actions/setup-java@v6
         with:
