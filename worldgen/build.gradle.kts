@@ -20,17 +20,6 @@ dependencies {
     implementation("org.apache.logging.log4j:log4j-core:2.25.1")
 }
 
-tasks.processResources {
-    inputs.property("version", project.version)
-
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE
-
-    // Replace stuff in terraminusminus.properties, nothing else
-    filesMatching("**/terraminusminus.properties") {
-        expand(mapOf("version" to project.version))
-    }
-}
-
 publishing {
     publications {
         create<MavenPublication>("terracore-worldgen") {

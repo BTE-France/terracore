@@ -14,6 +14,15 @@ dependencies {
     implementation("org.apache.logging.log4j:log4j-core:2.25.1")
 }
 
+tasks.processResources {
+    // Inject the version into terracore.properties so the HTTP client can use it in its user agent
+    inputs.property("version", project.version)
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    filesMatching("/net/buildtheearth/terracore/http/terracore.properties") {
+        expand(mapOf("version" to project.version))
+    }
+}
+
 publishing {
     publications {
         create<MavenPublication>("terracore-http") {
