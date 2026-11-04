@@ -3,10 +3,10 @@ plugins {
 }
 
 dependencies {
-    implementation("net.daporkchop.lib:binary:0.5.7-SNAPSHOT")  {
+    implementation(libs.daporkchop.binary) {
         exclude(group = "io.netty")
     }
-    implementation("com.google.guava:guava:33.4.8-jre")
+    implementation(libs.guava)
 }
 
 publishing {
