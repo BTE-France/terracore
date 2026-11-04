@@ -3,11 +3,9 @@ plugins {
 }
 
 dependencies {
-    implementation(libs.jackson.databind)
     implementation(libs.daporkchop.binary) {
         exclude(group = "io.netty")
     }
-    implementation(libs.gson)
     implementation(libs.guava)
     implementation(libs.netty.all)
     implementation(libs.bundles.log4j)
