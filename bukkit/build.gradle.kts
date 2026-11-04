@@ -8,10 +8,10 @@ repositories {
 
 dependencies {
     api(project(":minecraft"))
-    compileOnly("org.spigotmc:spigot-api:1.21.4-R0.1-SNAPSHOT")
+    compileOnly(libs.spigot.api)
 
     testImplementation(project(":minecraft"))
-    testImplementation("org.spigotmc:spigot-api:1.21.4-R0.1-SNAPSHOT")
+    testImplementation(libs.spigot.api)
 }
 
 publishing {
