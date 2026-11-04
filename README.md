@@ -1,69 +1,63 @@
 <div align="center">
-    <h1>TerraMinusMinus</h1>
-    <img alt="GitHub License" src="https://img.shields.io/github/license/SmylerMC/terraminusminus?style=flat-square">
-    <img alt="GitHub Workflow Status" src="https://img.shields.io/github/actions/workflow/status/SmylerMC/terraminusminus/test.yml?style=flat-square">
+    <h1>Terracore</h1>
+    <img alt="GitHub License" src="https://img.shields.io/github/license/BTE-France/terracore?style=flat-square">
+    <img alt="GitHub Workflow Status" src="https://img.shields.io/github/actions/workflow/status/BTE-France/terracore/gradle-check.yml?style=flat-square">
 </div>
 
 
 
 ## What is it?
 
-Terra-- is a fork of Terra++ intended to strip down dependencies to Minecraft and Forge so it can be used safely in as dependency for other projects (this is not a mod).
+Terracore is a collection of Java libraries to assist in developing mods,
+plugins or really anything that relates to Minecraft worlds generated from real life geographic data.
 
-In particular, it is ships the map projection code as well as the world generation engine and its HTTP client.
+Its main use case is the BuildTheEarth project.
 
-## How to use it in your project?
+It is a hard fork of [Terra++](https://github.com/BuildTheEarth/terraplusplus)
+and [Terra--](https://github.com/SmylerMC/terraminusminus).
 
-Terra-- is available at [maven.smyler.net](https://maven.smyler.net/releases).
-You need to add that repository in your `pom.xml` or `build.gradle` build files,
-and then declare 
-Just add the required maven repositories to your `build.gradle`, and declare Terraminusminus as a dependency.
+## Libraries
 
-I.e.:
+- `terracore-geo` implements geographic and geometric processing primitives, including an implementation of the BTE projection.
+- `terracore-http` implements an HTTP client specifically tailored to Terracore's use case (focused around efficient GET requests with caching)
+- `terracore-minecraft` implements a data-model that can represent Minecraft concepts like block states
+- `terracore-worldgen` implements the full dataset processing pipeline and world generation engine, and depends on the previous three
+- `terracore-bukkit` implements helpers to convert between the `terracore-minecraft` data model and the Bukkit API
+
+All libraries live under the `net.buildtheearth.terracore` maven group.
+
+## Using Terracore
+
+Simply add [Smyler's repository](https://maven.smyler.net/releases) to your build system and depend your dependencies on the Terracore libraries you need.
+
+For example, with Gradle for a Bukkit plugin that uses Terracore to implement world generation, you would want:
+
 ```groovy
+// Smyler's repository has the Terracore builds
 repositories {
-
-    // Smyler's repository has the Terraminusminus builds
     maven {
-        name = "Smyler Snapshots"
-        url = "https://maven.smyler.net/snapshots/"
+        name = "Smyler Releases"
+        url = "https://maven.smyler.net/releases/"
     }
-    
+
     // Classic JCenter repository that has most of what we need
     jcenter()
-    
 }
 
 dependencies {
 
-    // Include this repository as a dependency.
+    // Declare your dependencies on the Terracore libraries you need.
     // master-SNAPSHOT indicates to use the last commit built from master,
-    // you can replace this with  a reference to another branch 
-    compile 'net.buildtheart.terraminusminus:terraminusminus-core:master-SNAPSHOT'
+    // you can replace this with  a reference to another branch, or to a tag.
+    compile 'net.buildthearth.terracore:terracore-worldgen:master-SNAPSHOT'
+    compile 'net.buildthearth.terracore:terracore-bukkit:master-SNAPSHOT'
 
-    // Alternatively, if you want to include compatibility code to make Terra-- work with other projects,
-    // you can include the relevant module (or multiple of them).
-    // The terraminusminus-core module will be included as a transitive dependency.
-    // For example, to include Bukkit API compatibility code:
-    compile 'net.buildtheart.terraminusminus:terraminusminus-bukkit:master-SNAPSHOT'
-    
     // Your other dependencies would go down there...
 }
 ```
 
 ### Versioning
 
-Terra-- versions are split into two parts, the first of which represents the semver-compliant Terra-- API version and the second the Minecraft content compatibility version.
+Terracore uses [semantic versioning](https://semver.org/) for releases.
+Development branches get -SNAPHOT version in [Smyler's snapshot maven repository](https://maven.smyler.net/#/snapshots/net/buildtheearth/terracore).
 
-For example, version `2.0.0-1.21.4` implements version `2.0.0` of the Terra-- API and aims to be compatible with Minecraft `1.21.4`.
-
-The Minecraft compatibility version influences the content of the default data files (e.g. [`osm.json5`](terraminusminus/src/main/resources/net/buildtheearth/terraminusminus/dataset/osm/osm.json5)),
-as well as the versions of dependencies Terra-- has in common with Minecraft (e.g. Gson).
-
-
-Snapshot builds are available at [maven.smyler.net](https://maven.smyler.net/#/snapshots/net/buildtheearth/terraminusminus).
-
-## APIs:
-
-- Tree cover data: [treecover2000 v1.7](https://earthenginepartners.appspot.com/science-2013-global-forest/download_v1.7.html) hosted by [@DaPorkchop_](https://github.com/DaMatrix)
-- Building+Road+Water data: [OpenStreetMap](https://www.openstreetmap.org/) under the [Open Database License](https://www.openstreetmap.org/copyright). It is downloaded in real-time using [TerraPlusPlusOSMTileGen](https://github.com/DaMatrix/TerraPlusPlusOSMTileGen) hosted by [@DaPorkchop_](https://github.com/DaMatrix). (© OpenStreetMap contributors)
