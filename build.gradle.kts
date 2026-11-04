@@ -1,3 +1,3 @@
 plugins {
-    id("io.freefair.git-version")
+    alias(libs.plugins.freefair.git.version)
 }

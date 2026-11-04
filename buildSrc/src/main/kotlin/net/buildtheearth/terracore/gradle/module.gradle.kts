@@ -1,11 +1,16 @@
 package net.buildtheearth.terracore.gradle
 
+import org.gradle.api.artifacts.VersionCatalogsExtension
+
 plugins {
     id("java-library")
     id("eclipse")
     id("maven-publish")
     id("io.freefair.lombok")
 }
+
+// Precompiled script plugins don't get type-safe catalog accessors, so look the catalog up at runtime
+val libs = the<VersionCatalogsExtension>().named("libs")
 
 group = "net.buildtheearth.terracore"
 
@@ -23,12 +28,12 @@ repositories {
 
 dependencies {
     // Annotations
-    compileOnly("org.jetbrains:annotations:26.0.2")
+    compileOnly(libs.findLibrary("annotations").get())
 
     // Tests
-    testImplementation(platform("org.junit:junit-bom:5.13.4"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation(platform(libs.findLibrary("junit-bom").get()))
+    testImplementation(libs.findLibrary("junit-jupiter").get())
+    testRuntimeOnly(libs.findLibrary("junit-platform-launcher").get())
 }
 
 tasks.named<Test>("test") {
