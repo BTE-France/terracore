@@ -3,9 +3,9 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":geo"))
-    implementation(project(":http"))
-    implementation(project(":minecraft"))
+    api(project(":geo"))
+    api(project(":http"))
+    api(project(":minecraft"))
 
     implementation(libs.commons.imaging)
     implementation(libs.jackson.databind)
