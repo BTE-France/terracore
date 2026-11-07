@@ -17,9 +17,6 @@ import static org.apache.commons.imaging.formats.tiff.constants.TiffTagConstants
 
 /**
  * Parses integer or floating-point scalar data from single-channel TIFF images, to double arrays.
- * <br>
- * This API has diverged from Terraplusplus, which has implementation specific to integers and floating-point images
- * as a workaround for Apache commons imaging not initially supporting integer images.
  *
  * @author DaPorkchop_
  * @author Smyler
@@ -64,7 +61,7 @@ public class ParseTiffDSP implements DoubleScalarParser {
             return false;
         }
 
-        TiffRasterData data = directory.getRasterData(null);
+        AbstractTiffRasterData data = directory.getRasterData(null);
         int w = data.getWidth();
         int h = data.getHeight();
         checkArg(w == resolution && h == resolution, "invalid image resolution: %dx%d (expected: %dx%3$d)", w, h, resolution);
