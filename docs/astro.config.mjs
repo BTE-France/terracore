@@ -17,10 +17,9 @@ export default defineConfig({
             ],
 			sidebar: [
 				{
-					label: 'Guides',
+					label: 'Getting started',
 					items: [
-						// Each item here is one entry in the navigation menu.
-						{ label: 'Example Guide', slug: 'guides/example' },
+                        { autogenerate: { directory: 'start' } },
 					],
 				},
 			],
