@@ -18,10 +18,6 @@ export default defineConfig({
                         { autogenerate: { directory: 'start' } },
 					],
 				},
-				{
-					label: 'Reference',
-					items: [{ autogenerate: { directory: 'reference' } }],
-				},
 			],
 		}),
 	],
