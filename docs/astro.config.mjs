@@ -22,6 +22,12 @@ export default defineConfig({
                         { autogenerate: { directory: 'start' } },
 					],
 				},
+                {
+                    label: 'Geo module',
+                    items: [
+                        { autogenerate: { directory: 'geo' } },
+                    ],
+                },
 			],
 		}),
         mermaid(),
