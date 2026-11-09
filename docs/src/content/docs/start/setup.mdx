@@ -1,0 +1,175 @@
+---
+title: Adding Terracore to your project
+description: How to configure your build system to be ready to use Terracore
+sidebar:
+    order: 0
+---
+
+import { Steps, Tabs, TabItem } from '@astrojs/starlight/components';
+
+## Terracore and its modules
+
+Terracore is a *modular* library, split into multiple modules so you can choose which one you want to depend on, depending on your use case.
+
+It currently has 4 main modules:
+- `terracore-geo` offers geography and geometry processing primitives. For example, it is in this module that the code for the BTE projection lives.
+- `terracore-http` offers an HTTP client tailored for efficient `GET` requests and caching, that can be used to download geographic datasets.
+- `terracore-minecraft` offers object-oriented abstractions over Minecraft concepts like
+  *[Biomes](https://minecraft.wiki/w/Biome)*, *[Blocks](https://minecraft.wiki/w/Block)* or *[Identifiers](https://minecraft.wiki/w/Identifier)*.
+  The implementations in Terracore are rather simple and usually have one to one mappings with implementations from
+  modding or plugin APIs, but Terracore has its own so it doesn't need Minecraft to do its work.
+- `terracore-worldgen` uses all of the above modules to implement the actual dataset processing and world generation engine.
+  If you are here to build a world generation plugin or mod, this is what you want.
+
+Terracore also has compatibility modules that help integrate it with other APIs:
+- `terracore-bukkit` offers functions to efficiently convert objects from `terracore-minecraft` to objects from the [Bukkit API](https://jd.bukkit.org/).
+
+:::note
+The word *module* used above only refers to the modular approach used in Terracore,
+and not to the module system introduced in Java 9.
+Terracore does not use Java modules.
+:::
+
+## Configuring your build system
+
+Considering you already have a working Java project, you need to do two things to add Terracore to your classpath.
+
+<Steps>
+1. Add the `maven.smyler.net` [Maven](https://maven.apache.org/) repository.
+   It is where the Terracore artifacts are published.
+    <Tabs syncKey="build-tool">
+        <TabItem label="Gradle (Kotlin DSL)" icon="seti:gradle">
+            ```kotlin
+            // build.gradle.kts
+            repositories {
+              maven {
+                // This repository will provide Terracore
+                name = "Smyler snaphots"
+                url = uri("https://maven.smyler.net/snapshots/")
+              }
+              mavenCentral()  // And this will provide its transitive dependencies (Guava, Jackon, etc..)
+            }
+            ```
+        </TabItem>
+        <TabItem label="Gradle (Groovy DSL)" icon="seti:gradle">
+            ```groovy
+            // build.gradle
+            repositories {
+              maven {
+                // This repository will provide Terracore
+                name = 'Smyler snapshots'
+                url = uri('https://maven.smyler.net/snapshots/')
+              }
+              mavenCentral()  // And this will provide its transitive dependencies (Guava, Jackson, etc..)
+            }
+            ```
+        </TabItem>
+        <TabItem label="Maven" icon="seti:maven">
+            ```xml
+            <!-- pom.xml -->
+            <repositories>
+                <repository>
+                    <id>smyler-snapshots</id>
+                    <name>Smyler snapshots</name>
+                    <url>https://maven.smyler.net/snapshots/</url>
+                </repository>
+            </repositories>
+            ```
+
+        </TabItem>
+    </Tabs>
+2. Then, declare the Terracore modules you need as dependencies.
+    <Tabs syncKey="build-tool">
+        <TabItem label="Gradle (Kotlin DSL)" icon="seti:gradle">
+          ```kotlin
+          // build.gradle.kts
+          dependencies {
+            /*
+              Add your dependencies on Terracore here in the following format:
+              implementation("net.buildtheearth.terracore:<module name>:<version>")
+
+              For example:
+            */
+            implementation("net.buildtheearth.terracore:terracore-worldgen:master-SNAPSHOT")
+            implementation("net.buildtheearth.terracore:terracore-bukkit:master-SNAPSHOT")
+          }
+          ```
+        </TabItem>
+        <TabItem label="Gradle (Groovy DSL)" icon="seti:gradle">
+          ```groovy
+          // build.gradle
+          dependencies {
+            /*
+              Add your dependencies on Terracore here in the following format:
+              implementation 'net.buildtheearth.terracore:<module name>:<version>'
+
+              For example:
+            */
+            implementation 'net.buildtheearth.terracore:terracore-worldgen:master-SNAPSHOT'
+            implementation 'net.buildtheearth.terracore:terracore-bukkit:master-SNAPSHOT'
+          }
+          ```
+        </TabItem>
+        <TabItem label="Maven" icon="seti:maven">
+            ```xml
+            <!-- pom.xml -->
+            <dependencies>
+              <!--
+                Add your dependencies on Terracore here in the following format:
+                <dependency>
+                  <groupId>net.buildtheearth.terracore</groupId>
+                  <artifactId>module name</artifactId>
+                  <version>version</version>
+                </dependency>
+
+                For example:
+              -->
+              <dependency>
+                <groupId>net.buildtheearth.terracore</groupId>
+                <artifactId>terracore-worldgen</artifactId>
+                <version>master-SNAPSHOT</version>
+              </dependency>
+              <dependency>
+                <groupId>net.buildtheearth.terracore</groupId>
+                <artifactId>terracore-bukkit</artifactId>
+                <version>master-SNAPSHOT</version>
+              </dependency>
+            </dependencies>
+            ```
+        </TabItem>
+    </Tabs>
+    :::tip
+    `terracore-worldgen` has API-level dependencies on the other three main modules,
+    so you don't need to explicitly declare them as dependencies when you already declare it.
+    :::
+
+</Steps>
+
+:::caution
+**Terracore is in early development, there are no release builds yet, only development snapshots of Git branches.**
+The configuration code above consequently gives instructions on how to set up the snapshot repository at https://maven.smyler.net/snapshots,
+but release build will be published to https://maven.smyler.net/releases when available.
+:::
+
+## Available versions
+
+:::note
+The list of published artifacts with their versions can always be found by visiting https://maven.smyler.net.
+:::
+
+Terracore will eventually follow [semantic versioning](https://semver.org/):
+- all version numbers are of the form `X.Y.Z`, where
+  - `X` is the major version number,
+  - `Y` is the minor version number,
+  - `Z` is the patch or bugfix version number;
+- two versions with the same major and minor version numbers have fully compatible APIs,
+  you can change from one to another without changing your code,
+  but the one with the higher patch number is likely to have bug fixes the other do not;
+- two versions with the same major version numbers but different minor numbers are backward compatible,
+  meaning it is safe to upgrade from the lower version number to the higher, but not the opposite,
+  as the newer version may have new features or APIs;
+- two version with different major version numbers are not compatible,
+  you are likely to need to change some code to go from one to another.
+
+
+
