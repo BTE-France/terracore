@@ -1,5 +1,13 @@
 name: Deploy docs to GitHub Pages
 
+env:
+    SITE_VERSIONS: |-
+        [
+            { "name": "docs/init-starlight", "base": "/", "ref": "docs/init-starlight" },
+            { "name": "testing/multi-docs", "base": "testing/multi-docs", "ref": "testing/multi-docs" }
+        ]
+    SITE_URL: https://terracore.btefrance.fr
+
 on:
     push:
         branches:
@@ -12,16 +20,82 @@ permissions:
     pages: write
     id-token: write
 
+concurrency:
+    group: docs-pages
+    cancel-in-progress: true
+
 jobs:
     build:
         runs-on: ubuntu-latest
         steps:
+            - name: Install jq
+              run: |
+                  sudo apt-get update
+                  sudo apt-get install jq
             - name: Checkout your repository using git
               uses: actions/checkout@v7
-            - name: Install, build, and upload your site
-              uses: withastro/action@v6
               with:
-                  path: docs/
+                  fetch-depth: '0'
+            - name: Set up Node.js
+              uses: actions/setup-node@v7
+              with:
+                  node-version: 26
+                  cache: npm
+                  cache-dependency-path: docs/package-lock.json
+            - name: Build every version into one combined dist/
+              run: |
+                  set -euo pipefail
+                  
+                  REPO_ROOT="$(pwd)"
+                  mkdir -p "$REPO_ROOT/dist"
+                  
+                  mapfile -t ENTRIES < <(jq -c '.[]' <<< "$SITE_VERSIONS")
+                  for i in "${!ENTRIES[@]}"
+                  do
+                    entry="${ENTRIES[$i]}"
+                    name="$(jq -r '.name' <<< "$entry")"
+                    base="$(jq -r '.base' <<< "$entry")"
+                    ref="$(jq -r '.ref // .name' <<< "$entry")"
+
+                    echo "=== Building version $name (ref: $ref, base: $base) ==="
+                  
+                    if git rev-parse --verify --quiet "refs/remotes/origin/$ref^{commit}" > /dev/null 2>&1
+                    then
+                      commit="origin/$ref"
+                    elif commit="$(git rev-parse --verify --quiet "$ref^{commit}" 2> /dev/null)"
+                    then
+                      : # tag or commit SHA
+                    else
+                      echo "::error::Cannot resolve git ref '$ref' for version '$name'"
+                      exit 1
+                    fi
+                  
+                    git worktree add --detach "/tmp/wt-$i" "$commit"
+                    pushd "/tmp/wt-$i/docs"
+                  
+                    npm ci --no-audit --no-fund
+                  
+                    base_path="$(sed -e 's|^/||' -e 's|/$||' <<< "$base")"
+                    if [[ -z "$base_path" ]]
+                    then
+                      OUT="$REPO_ROOT/dist"
+                    else
+                      OUT="$REPO_ROOT/dist/$base_path"
+                    fi
+                    
+                    SITE_BASE="$base" \
+                      npx astro build --outDir "$OUT"
+                  
+                    popd
+                    git worktree remove --force "/tmp/wt-$i"
+                  done
+                  echo "Combined dist contents:"
+                  find "$REPO_ROOT/dist" -name index.html | sort
+
+            - name: Upload Pages artifact
+              uses: actions/upload-pages-artifact@v3
+              with:
+                  path: dist
 
     deploy:
         needs: build
