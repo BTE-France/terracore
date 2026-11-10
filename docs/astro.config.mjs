@@ -8,6 +8,10 @@ export default defineConfig({
     base: '/',
 	integrations: [
 		starlight({
+            components: {
+                // Override the default `ThemeSelect` component to inject the version selector dropdown before it
+                ThemeSelect: './src/components/ThemeSelect.astro',
+            },
 			title: 'Terracore documentation',
             logo: {
                 src: './src/assets/terracore.svg',

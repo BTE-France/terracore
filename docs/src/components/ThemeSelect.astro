@@ -1,0 +1,57 @@
+---
+import Default from '@astrojs/starlight/components/ThemeSelect.astro';
+import Select from '@astrojs/starlight/components/Select.astro';
+
+const versionsJson = import.meta.env.SITE_VERSIONS;
+const versions: { name: string; base: string; ref?: string }[] | null = versionsJson
+    ? JSON.parse(versionsJson)
+    : null;
+
+const normalizeBase = (base: string) => base.replace(/\/+$/, '') || '/';
+const toBaseUrl = (base: string) => {
+    const withLeading = base.startsWith('/') ? base : `/${base}`;
+    return withLeading.endsWith('/') ? withLeading : `${withLeading}/`;
+};
+
+const current = versions?.find(
+    (v) => normalizeBase(v.base) === normalizeBase(import.meta.env.BASE_URL),
+) ?? versions?.[0];
+const currentVersion = current?.name;
+
+// Path of the current page relative to the current version's root, so the
+// switcher can keep the user on the same page in the target version.
+const currentBase = current ? toBaseUrl(current.base) : '/';
+const slug = Astro.url.pathname.startsWith(currentBase)
+    ? Astro.url.pathname.slice(currentBase.length)
+    : '';
+const hrefFor = (base: string) => `${toBaseUrl(base)}${slug}`;
+---
+
+
+{ versions && (
+    <terracore-version-select>
+        <Select
+                icon="code-branch"
+                label="Documentation version"
+                options={ versions.map(v => (
+                        { label: v.name, value: hrefFor(v.base), selected: v.name == currentVersion, }
+                ))}
+                width="7em"
+        />
+    </terracore-version-select>
+    <script>
+        class TerracoreVersionSelect extends HTMLElement {
+            constructor() {
+                super();
+                this.querySelector('select')?.addEventListener('change', (e) => {
+                    if (e.currentTarget instanceof HTMLSelectElement && e.currentTarget.value) {
+                        window.location.href = e.currentTarget.value;
+                    }
+                });
+            }
+        }
+        customElements.define('terracore-version-select', TerracoreVersionSelect);
+    </script>
+)}
+
+<Default {...Astro.props} />
