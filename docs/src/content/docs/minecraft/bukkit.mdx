@@ -1,0 +1,21 @@
+---
+title: Minecraft module integrations
+description: Description of integrations of the Minecraft module with other APIs
+sidebar:
+    order: 1
+---
+
+Additional modules can bring additional classes to the Minecraft module
+to help integrate Terracore with modding or plugin APIs.
+These integrations take advantage of internal fields to reduce the conversion overhead.
+
+## Bukkit
+
+The `terracore-bukkit` module brings a `TerraBukkit` utility class with static methods to help convert
+between Terracore objects and Bukkit API objects.
+
+For example, to convert a Terracore `Identitfier` to a Bukkit `NamespacedKey`:
+```java
+var terracoreIdentifier = Identifier.parse("minecraft:stone");
+var bukkitNamespacedKey = TerraBukkit.toBukkitNamespacedKey(terracoreIdentifier);
+```
