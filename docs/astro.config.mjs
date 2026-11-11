@@ -28,6 +28,12 @@ export default defineConfig({
                         { autogenerate: { directory: 'geo' } },
                     ],
                 },
+                {
+                    label: 'HTTP module',
+                    items: [
+                        { autogenerate: { directory: 'http' } },
+                    ],
+                },
 			],
 		}),
         mermaid(),
