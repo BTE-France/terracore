@@ -52,6 +52,12 @@ export default defineConfig({
                         { autogenerate: { directory: 'worldgen' } },
                     ],
                 },
+                {
+                    label: 'Contributing to Terracore',
+                    items: [
+                        { autogenerate: { directory: 'contributing' } },
+                    ],
+                },
 			],
 		}),
         mermaid(),

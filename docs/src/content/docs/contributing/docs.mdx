@@ -1,0 +1,104 @@
+---
+title: Writing documentation
+description: Help for writing Terracore documentation
+---
+
+import { FileTree, Steps } from '@astrojs/starlight/components';
+
+Terracore's documentation is written with [Starlight](https://starlight.astro.build/),
+a documentation framework based on [Astro](https://astro.build/).
+Documentation pages are authored in [MDX](https://mdxjs.com/) or [Markdown](https://fr.wikipedia.org/wiki/Markdown).
+
+:::note
+The documentation on this page is hyper-focused on getting you started writing documentation for Terracore.
+For complete documentation on MDX, Starlight, Astro or their plugins, checkout their respective websites.
+:::
+
+## Documentation structure
+
+All of Terracore's documentation lives in its Git repository's `docs/` subdirectory.
+
+<FileTree>
+    - bukkit/
+    - **docs**    Root of the documentation
+      - public/   Public assets (not processed by Astro)
+      - src
+        - assets/  Public assets (processed by Astro)
+        - components/  Custom Astro components
+        - content
+          - **docs**  Where the real content of the site lives
+            - contributing
+              - **docs.mdx**  The very page you are reading
+              - ...
+            - geo/  Pages for the geo module
+            - http/  Pages for the HTTP module
+            - minecraft/  Pages for the minecraft module
+            - start/  Help to get started using Terracore
+            - worldgen/  Pages for the worldgen module
+            - **index.mdx**  Welcome page of the site
+        - content.config.ts
+      - astro.config.mjs
+      - package.json
+      - package-lock.json
+      - README.md
+      - tsconfig.json
+      - ...
+    - geo/
+    - gradle/
+    - http/
+    - minecraft/
+    - worldgen/
+    - build.gradle.kts
+    - LICENSE.md
+    - README.md
+    - settings.gradle.kts
+    - ...
+</FileTree>
+
+:::note
+Astro has a [dedicated page](https://starlight.astro.build/guides/project-structure/)
+on project structure.
+:::
+
+## Running the development server
+
+:::tip
+The following instructions assume you start from 0, feel free to skip steps if you already have things setup.
+:::
+
+<Steps>
+    1. Make sure you have [NodeJS](https://nodejs.org) and [Git](https://git-scm.com/) installed and working on your computer.
+    2. Make sure you have a local copy of the repository and move to the `docs/` subdirectory.
+       ```bash
+       git clone git@github.com:BTE-France/terracore.git
+       cd terracore/docs
+       ```
+    3. Install the Node packages needed to run the server.
+       ```bash
+       npm install
+       ```
+    4. Run the dev server and open the displayed URL in your browser.
+       You can now edit the Terracore documentation and see your changes in your browser.
+       ```bash
+       npm run dev
+       ```
+
+       :::tip
+       Previous steps only need to be ran once, jump straight to this one when returning to an existing project.
+       :::
+</Steps>
+
+## Writing
+
+Simply [start the development server](#running-the-development-server) and start modifying the files [in the `content/` directory](#documentation-structure).
+
+Reading the following to Starlight documentation pages to learn about the available syntax:
+- [Authoring content in Markdown](https://starlight.astro.build/guides/authoring-content/)
+- [Using components](https://starlight.astro.build/components/using-components/), and everything under the "Components" section
+
+
+## Configuring versions of the documentation published on GitHub pages
+
+The documentation is published over at https://terracore.btefrance.fr via a GitHub Actions workflow.
+It can bundle different versions of the docs and publish them all together.
+Edit the `SITE_VERSIONS` variable in the `docs-deploy.yml` workflow file to control which versions are included.
