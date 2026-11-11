@@ -6,7 +6,7 @@ env:
             { "name": "docs/init-starlight", "base": "/", "ref": "docs/init-starlight" },
             { "name": "testing/multi-docs", "base": "testing/multi-docs", "ref": "testing/multi-docs" }
         ]
-    SITE_URL: http://terracore.btefrance.fr
+    SITE_URL: https://terracore.btefrance.fr
 
 on:
     push:

@@ -4,8 +4,8 @@ import starlight from '@astrojs/starlight';
 
 // https://astro.build/config
 export default defineConfig({
-    site: 'https://terracore.btefrance.fr',
-    base: '/',
+    site: process.env.SITE_URL ?? 'https://terracore.btefrance.fr',
+    base: process.env.SITE_BASE ?? '/',
 	integrations: [
 		starlight({
             components: {
