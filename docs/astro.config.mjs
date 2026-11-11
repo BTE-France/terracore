@@ -40,6 +40,12 @@ export default defineConfig({
                         { autogenerate: { directory: 'minecraft' } },
                     ],
                 },
+                {
+                    label: 'World generation module',
+                    items: [
+                        { autogenerate: { directory: 'worldgen' } },
+                    ],
+                },
 			],
 		}),
         mermaid(),
