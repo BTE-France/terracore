@@ -24,40 +24,7 @@ and [Terra--](https://github.com/SmylerMC/terraminusminus).
 - `terracore-worldgen` implements the full dataset processing pipeline and world generation engine, and depends on the previous three
 - `terracore-bukkit` implements helpers to convert between the `terracore-minecraft` data model and the Bukkit API
 
-All libraries live under the `net.buildtheearth.terracore` maven group.
 
 ## Using Terracore
 
-Simply add [Smyler's repository](https://maven.smyler.net/releases) to your build system and depend your dependencies on the Terracore libraries you need.
-
-For example, with Gradle for a Bukkit plugin that uses Terracore to implement world generation, you would want:
-
-```groovy
-// Smyler's repository has the Terracore builds
-repositories {
-    maven {
-        name = "Smyler Releases"
-        url = "https://maven.smyler.net/releases/"
-    }
-
-    // Classic JCenter repository that has most of what we need
-    jcenter()
-}
-
-dependencies {
-
-    // Declare your dependencies on the Terracore libraries you need.
-    // master-SNAPSHOT indicates to use the last commit built from master,
-    // you can replace this with  a reference to another branch, or to a tag.
-    compile 'net.buildthearth.terracore:terracore-worldgen:master-SNAPSHOT'
-    compile 'net.buildthearth.terracore:terracore-bukkit:master-SNAPSHOT'
-
-    // Your other dependencies would go down there...
-}
-```
-
-### Versioning
-
-Terracore uses [semantic versioning](https://semver.org/) for releases.
-Development branches get -SNAPHOT version in [Smyler's snapshot maven repository](https://maven.smyler.net/#/snapshots/net/buildtheearth/terracore).
-
+Get started with Terracore by reading [the documentation](https://terracore.btefrance.fr).
