@@ -1,0 +1,97 @@
+---
+title: World generation pipeline
+description: Description of the world generation pipeline
+sidebar:
+    order: 0
+---
+
+The world generation module provides the world generation pipeline.
+
+The pipeline is composed of `IEarthDataBacker` implementations that can fetch data from datasets,
+project it into the world's coordinate system, and write processed data onto `CachedChunkData` instances.
+
+The datasets can be embedded into the JARs if small enough, but are mostly fetched in small pieces (tiles)
+from remote sources via Terracore's HTTP client or read from disk.
+They can be raster datasets of integers or double floating points, or vector dataset (collections of geometric shapes),
+and may be loaded from many file types (PNG, TIFF, GeoJSON, etc.).
+
+The default pipeline is the following:
+
+```mermaid
+flowchart LR
+    hdb1[(Raster tile set)]
+    hdb2[(Raster tile set)]
+    hdb3[(Raster tile set)]
+    tdb1[(Raster tile set)]
+    osmdb[(GeoJson tile set)]
+    climateGz[(climate.gz)]
+    soilGz[(soil.gz)]
+
+    subgraph HeightsBacker
+        direction TB
+        heightsJson["heights.json"]@{shape: card}
+        hcdtc1[[ConfigurableDoubleTiledDataset]]
+        hcdtc2[[ConfigurableDoubleTiledDataset]]
+        hcdtc3[[ConfigurableDoubleTiledDataset]]
+        hmsd[[MultiScalarDataset]]
+        hcdtc1 --> hmsd
+        hcdtc2 --> hmsd
+        hcdtc3 --> hmsd
+        heightsJson --> hmsd
+    end
+    hdb1 --> hcdtc1
+    hdb2 --> hcdtc2
+    hdb3 --> hcdtc3
+
+    subgraph TreeCoverBacker
+        direction TB
+        treesJson["tree_cover.json"]@{shape: card}
+        tcdtc1[[ConfigurableDoubleTiledDataset]]
+        tmsd[[MultiScalarDataset]]
+        tcdtc1 --> tmsd
+        treesJson --> tmsd
+    end
+    tdb1 --> tcdtc1
+
+    subgraph OSMBacker
+        direction TB
+        osmJson["osm.json5"]@{shape: card}
+        pgjd[[ParsingGeoJsonDataset]]
+        gjvtd[[GeoJsonToVectorDataset]]
+        vtd[[VectorTiledDataset]]
+        pgjd --> gjvtd
+        gjvtd --> vtd
+    end
+    osmdb --> pgjd
+
+    subgraph InitialBiomesBacker
+        direction TB
+        bp[[EarthBiomeProvider]]
+        bf[[Terra121BiomeFilter]]
+        precipitation[[Climate.Precipitation]]
+        temperature[[Climate.Temperature]]
+        soil[[Soil]]
+        precipitation --> bf
+        temperature --> bf
+        soil --> bf
+        bf --> bp
+    end
+    climateGz --> precipitation
+    climateGz --> temperature
+    soilGz --> soil
+
+    subgraph CachedChunkData
+        surfaceMap[Surface height map]
+        groundMap[Ground height map]
+        treecoverMap[Tree cover map]
+        blockMap[Surface block map]
+        biomeMap[Biome map]
+    end
+
+
+    HeightsBacker --> CachedChunkData
+    TreeCoverBacker --> CachedChunkData
+    OSMBacker --> CachedChunkData
+    InitialBiomesBacker --> CachedChunkData
+    island[[NullIslandBacker]] --> CachedChunkData
+```
