@@ -34,6 +34,12 @@ export default defineConfig({
                         { autogenerate: { directory: 'http' } },
                     ],
                 },
+                {
+                    label: 'Minecraft module',
+                    items: [
+                        { autogenerate: { directory: 'minecraft' } },
+                    ],
+                },
 			],
 		}),
         mermaid(),
