@@ -7,7 +7,7 @@ const versions: { name: string; base: string; ref?: string }[] | null = versions
     ? JSON.parse(versionsJson)
     : null;
 
-const normalizeBase = (base: string) => base.replace(/\/+$/, '') || '/';
+const normalizeBase = (base: string) => base.replace(/^\/+|\/+$/g, '') || '/';
 const toBaseUrl = (base: string) => {
     const withLeading = base.startsWith('/') ? base : `/${base}`;
     return withLeading.endsWith('/') ? withLeading : `${withLeading}/`;
