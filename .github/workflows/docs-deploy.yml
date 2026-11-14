@@ -3,8 +3,7 @@ name: Deploy docs to GitHub Pages
 env:
     SITE_VERSIONS: |-
         [
-            { "name": "docs/init-starlight", "base": "/", "ref": "docs/init-starlight" },
-            { "name": "testing/multi-docs", "base": "testing/multi-docs", "ref": "testing/multi-docs" }
+            { "name": "master", "base": "/", "ref": "master" },
         ]
     SITE_URL: https://terracore.btefrance.fr
 
@@ -12,7 +11,6 @@ on:
     push:
         branches:
             - master
-            - docs/*
     workflow_dispatch:
 
 permissions:
