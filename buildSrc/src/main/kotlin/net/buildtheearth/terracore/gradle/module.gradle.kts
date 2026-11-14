@@ -7,6 +7,7 @@ plugins {
     id("eclipse")
     id("maven-publish")
     id("io.freefair.lombok")
+    id("com.diffplug.spotless")
 }
 
 // Precompiled script plugins don't get type-safe catalog accessors, so look the catalog up at runtime
@@ -24,6 +25,12 @@ java {
 repositories {
     mavenCentral()
     maven("https://maven.daporkchop.net/") // Required for leveldb
+}
+
+spotless {
+    java {
+        palantirJavaFormat()
+    }
 }
 
 dependencies {
