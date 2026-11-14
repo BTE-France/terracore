@@ -8,4 +8,5 @@ repositories {
 
 dependencies {
     implementation(libs.freefair.lombok.plugin)
+    implementation(libs.spotless.plugin)
 }

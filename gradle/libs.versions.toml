@@ -11,6 +11,8 @@ log4j = "2.26.1"
 spigot = "26.3-R0.1-SNAPSHOT"
 commons-imaging = "1.0.0-alpha6"
 fastutil = "8.5.19"
+spotless = "8.11.0"
+palantir-format = "2.102.0"
 
 [libraries]
 annotations = { module = "org.jetbrains:annotations", version.ref = "jetbrains-annotations" }
@@ -27,8 +29,9 @@ log4j-core = { module = "org.apache.logging.log4j:log4j-core", version.ref = "lo
 spigot-api = { module = "org.spigotmc:spigot-api", version.ref = "spigot" }
 commons-imaging = { module = "org.apache.commons:commons-imaging", version.ref = "commons-imaging" }
 fastutil = { module = "it.unimi.dsi:fastutil", version.ref = "fastutil" }
-# Plugin marker used to put the Lombok plugin on the buildSrc classpath for the convention plugin
+# Plugin markers used to put the plugins on the buildSrc classpath for the convention plugin
 freefair-lombok-plugin = { module = "io.freefair.lombok:io.freefair.lombok.gradle.plugin", version.ref = "freefair" }
+spotless-plugin = { module = "com.diffplug.spotless:com.diffplug.spotless.gradle.plugin", version.ref = "spotless" }
 
 [bundles]
 log4j = ["log4j-api", "log4j-core"]
