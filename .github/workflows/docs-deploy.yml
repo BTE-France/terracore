@@ -3,7 +3,7 @@ name: Deploy docs to GitHub Pages
 env:
     SITE_VERSIONS: |-
         [
-            { "name": "master", "base": "/", "ref": "master" },
+            { "name": "master", "base": "/", "ref": "master" }
         ]
     SITE_URL: https://terracore.btefrance.fr
 
