@@ -19,11 +19,14 @@ final class BiomeImplementation implements Biome {
 
     Object bukkitBiome = null;
 
+    /*
+     * A cache, to maintain object identity since there should be a final limited amount of biomes.
+     * Capacity and maximum size has been chosen to fit all default Minecraft biomes by default (65 of them in 1.21.4),
+     * and allow growth up to an amount that should fit all biomes even on modded while remaining a good safeguard.
+     */
     private static final LoadingCache<@NotNull Identifier, @NotNull Biome> cache = CacheBuilder.newBuilder()
-            .initialCapacity(100) // Minecraft 1.21.4 has 65 biomes
-            .maximumSize(
-                    4096) // This should be high enough to accommodate almost any realistic scenario while remaining a
-            // good safeguard
+            .initialCapacity(100)
+            .maximumSize(4096)
             .build(CacheLoader.from(BiomeImplementation::new));
 
     static Biome get(Identifier identifier) {

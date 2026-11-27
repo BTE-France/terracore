@@ -138,8 +138,12 @@ public final class Identifier implements Comparable<Identifier> {
 
     @Override
     public boolean equals(Object other) {
-        if (this == other) return true;
-        if (!(other instanceof Identifier)) return false;
+        if (this == other) {
+            return true;
+        }
+        if (!(other instanceof Identifier)) {
+            return false;
+        }
         Identifier otherName = (Identifier) other;
         return this.namespace.equals(otherName.namespace) && this.path.equals(otherName.path);
     }
