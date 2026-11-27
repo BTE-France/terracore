@@ -33,24 +33,28 @@ public final class BlockStateBuilder {
     }
 
     public BlockStateBuilder setProperty(String property, String value) {
-        if (property == null || property.isEmpty())
+        if (property == null || property.isEmpty()) {
             throw new IllegalArgumentException("Property name cannot be null or empty.");
-        if (value == null || value.isEmpty())
+        }
+        if (value == null || value.isEmpty()) {
             throw new IllegalArgumentException("Property value cannot be null or empty.");
+        }
         this.properties.put(property, new StringPropertyValue(value));
         return this;
     }
 
     public BlockStateBuilder setProperty(String property, int value) {
-        if (property == null || property.isEmpty())
+        if (property == null || property.isEmpty()) {
             throw new IllegalArgumentException("Property name cannot be null or empty.");
+        }
         this.properties.put(property, new IntPropertyValue(value));
         return this;
     }
 
     public BlockStateBuilder setProperty(String property, boolean value) {
-        if (property == null || property.isEmpty())
+        if (property == null || property.isEmpty()) {
             throw new IllegalArgumentException("Property name cannot be null or empty.");
+        }
         this.properties.put(property, new BoolPropertyValue(value));
         return this;
     }
@@ -123,7 +127,9 @@ public final class BlockStateBuilder {
     }
 
     public BlockState build() {
-        if (this.block == null) throw new IllegalStateException("Trying to build a block state, but no block is set!");
+        if (this.block == null) {
+            throw new IllegalStateException("Trying to build a block state, but no block is set!");
+        }
         BlockStateImplementation state = new BlockStateImplementation(this.block, unmodifiableMap(this.properties));
         this.reset();
         return state;
@@ -214,12 +220,18 @@ public final class BlockStateBuilder {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
 
             BlockStateImplementation that = (BlockStateImplementation) o;
 
-            if (!block.equals(that.block)) return false;
+            if (!block.equals(that.block)) {
+                return false;
+            }
             return properties.equals(that.properties);
         }
 
@@ -245,7 +257,9 @@ public final class BlockStateBuilder {
 
         @Override
         public boolean equals(Object o) {
-            if (o == null || getClass() != o.getClass()) return false;
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             StringPropertyValue that = (StringPropertyValue) o;
             return Objects.equals(this.value, that.value);
         }
@@ -280,7 +294,9 @@ public final class BlockStateBuilder {
 
         @Override
         public boolean equals(Object o) {
-            if (o == null || getClass() != o.getClass()) return false;
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             IntPropertyValue that = (IntPropertyValue) o;
             return this.value == that.value;
         }
@@ -315,7 +331,9 @@ public final class BlockStateBuilder {
 
         @Override
         public boolean equals(Object o) {
-            if (o == null || getClass() != o.getClass()) return false;
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             BoolPropertyValue that = (BoolPropertyValue) o;
             return this.value == that.value;
         }
