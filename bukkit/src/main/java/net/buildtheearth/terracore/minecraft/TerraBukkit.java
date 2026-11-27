@@ -1,5 +1,8 @@
 package net.buildtheearth.terracore.minecraft;
 
+import static java.lang.Double.*;
+import static org.bukkit.Location.*;
+
 import lombok.experimental.UtilityClass;
 import net.buildtheearth.terracore.minecraft.exceptions.TranslateToForeignObjectException;
 import net.buildtheearth.terracore.minecraft.exceptions.TranslateToSubstituteException;
@@ -10,10 +13,6 @@ import org.bukkit.Registry;
 import org.bukkit.block.data.BlockData;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
-
-import static java.lang.Double.*;
-import static org.bukkit.Location.*;
-
 
 /**
  * Compatibility methods to translate between Terra-- internal Minecraft objects into Bukkit API objects.
@@ -86,11 +85,13 @@ public final class TerraBukkit {
      * @throws TranslateToSubstituteException if one of the {@link Location location}'s x, y or z components is not a finite double
      */
     @Contract("!null -> !null; null -> null")
-    public static @Nullable BlockPos fromBukkitLocation(@Nullable Location location) throws TranslateToSubstituteException {
+    public static @Nullable BlockPos fromBukkitLocation(@Nullable Location location)
+            throws TranslateToSubstituteException {
         if (location == null) return null;
         double x = location.getX(), y = location.getY(), z = location.getZ();
         if (!isFinite(x) || !isFinite(y) || !isFinite(z)) {
-            throw new TranslateToSubstituteException(location, BlockPos.class, "one of the x, y, or z components is not finite");
+            throw new TranslateToSubstituteException(
+                    location, BlockPos.class, "one of the x, y, or z components is not finite");
         }
         return new BlockPos(locToBlock(x), locToBlock(y), locToBlock(z));
     }
@@ -109,7 +110,8 @@ public final class TerraBukkit {
      * (e.g. it is from newer Minecraft versions and the block does not yet exist in the Bukkit server version).
      */
     @Contract("!null -> !null; null -> null")
-    public static @Nullable BlockData toBukkitBlockData(@Nullable BlockState state) throws TranslateToForeignObjectException {
+    public static @Nullable BlockData toBukkitBlockData(@Nullable BlockState state)
+            throws TranslateToForeignObjectException {
         if (state == null) return null;
         BlockStateBuilder.BlockStateImplementation implementation = null;
         if (state instanceof BlockStateBuilder.BlockStateImplementation) {
@@ -119,20 +121,16 @@ public final class TerraBukkit {
         }
         Material material = Material.matchMaterial(state.getBlock().toString());
         if (material == null) {
-            throw new TranslateToForeignObjectException(
-                    state, BlockData.class, "material is unknown to server"
-            );
+            throw new TranslateToForeignObjectException(state, BlockData.class, "material is unknown to server");
         }
         BlockData data;
         try {
             data = material.createBlockData(BlockStateBuilder.BlockStateImplementation.formatProperties(state));
         } catch (IllegalArgumentException e) {
             throw new TranslateToForeignObjectException(
-                    state, BlockData.class, "server reported block state properties as invalid"
-            );
+                    state, BlockData.class, "server reported block state properties as invalid");
         }
-        if (implementation != null)
-            implementation.bukkitBlockData = data;
+        if (implementation != null) implementation.bukkitBlockData = data;
         return data;
     }
 
@@ -149,7 +147,7 @@ public final class TerraBukkit {
     public static @Nullable BlockState fromBukkitBlockData(@Nullable BlockData data) {
         if (data == null) return null;
         String serializedData = data.getAsString();
-        return BlockState.parse(serializedData);  // The parse here should never fail
+        return BlockState.parse(serializedData); // The parse here should never fail
     }
 
     /**
@@ -178,8 +176,7 @@ public final class TerraBukkit {
         org.bukkit.block.Biome bukkitBiome = Registry.BIOME.get(toBukkitNamespacedKey(biome.identifier()));
         if (bukkitBiome == null) {
             throw new TranslateToForeignObjectException(
-                    biome, org.bukkit.block.Biome.class, "biome is unknown to server"
-            );
+                    biome, org.bukkit.block.Biome.class, "biome is unknown to server");
         }
         if (implementation != null) {
             implementation.bukkitBiome = bukkitBiome;
@@ -201,5 +198,4 @@ public final class TerraBukkit {
         if (biome == null) return null;
         return Biome.byId(fromBukkitNamespacedKey(biome.getKey()));
     }
-
 }

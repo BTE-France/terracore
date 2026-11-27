@@ -1,10 +1,10 @@
 package net.buildtheearth.terracore.minecraft;
 
-import org.bukkit.NamespacedKey;
-import org.junit.jupiter.api.Test;
-
 import static net.buildtheearth.terracore.minecraft.TerraBukkit.*;
 import static org.junit.jupiter.api.Assertions.*;
+
+import org.bukkit.NamespacedKey;
+import org.junit.jupiter.api.Test;
 
 public class TerraBukkitTest {
 
@@ -31,5 +31,4 @@ public class TerraBukkitTest {
         assertNotNull(expected);
         assertEquals(expected.toString(), actual.toString());
     }
-
 }
