@@ -1,20 +1,13 @@
 package net.buildtheearth.terracore.http;
 
+import static net.buildtheearth.terracore.http.Http.*;
+import static net.daporkchop.lib.common.util.PValidation.*;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.DefaultEventLoop;
 import io.netty.channel.EventLoop;
 import io.netty.util.ReferenceCountUtil;
-import lombok.NonNull;
-import lombok.experimental.UtilityClass;
-import net.daporkchop.lib.binary.netty.PUnpooled;
-import net.daporkchop.lib.common.function.io.IOConsumer;
-import net.daporkchop.lib.common.function.io.IOPredicate;
-import net.daporkchop.lib.common.function.io.IORunnable;
-import net.daporkchop.lib.common.misc.file.PFiles;
-import net.daporkchop.lib.common.misc.threadfactory.PThreadFactories;
-import org.jetbrains.annotations.NotNull;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -31,9 +24,15 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.stream.Stream;
-
-import static net.daporkchop.lib.common.util.PValidation.*;
-import static net.buildtheearth.terracore.http.Http.*;
+import lombok.NonNull;
+import lombok.experimental.UtilityClass;
+import net.daporkchop.lib.binary.netty.PUnpooled;
+import net.daporkchop.lib.common.function.io.IOConsumer;
+import net.daporkchop.lib.common.function.io.IOPredicate;
+import net.daporkchop.lib.common.function.io.IORunnable;
+import net.daporkchop.lib.common.misc.file.PFiles;
+import net.daporkchop.lib.common.misc.threadfactory.PThreadFactories;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Handles disk I/O operations for {@link Http}.
@@ -42,7 +41,11 @@ import static net.buildtheearth.terracore.http.Http.*;
  */
 @UtilityClass
 public class Disk {
-    private final EventLoop DISK_EXECUTOR = new DefaultEventLoop(PThreadFactories.builder().daemon().minPriority().name("terracore disk I/O thread").build());
+    private final EventLoop DISK_EXECUTOR = new DefaultEventLoop(PThreadFactories.builder()
+            .daemon()
+            .minPriority()
+            .name("terracore disk I/O thread")
+            .build());
 
     private Path cacheRoot;
     private Path tmpFile;
@@ -120,26 +123,27 @@ public class Disk {
      * @return a {@link CompletableFuture} which will be notified when the file has been read
      */
     public CompletableFuture<ByteBuf> read(@NonNull Path file) {
-        return CompletableFuture.supplyAsync(() -> {
-            try {
-                if (!Files.exists(file)) { //file doesn't exist
-                    return null;
-                }
+        return CompletableFuture.supplyAsync(
+                () -> {
+                    try {
+                        if (!Files.exists(file)) { // file doesn't exist
+                            return null;
+                        }
 
-                ByteBuf buf = null;
-                try (FileChannel channel = FileChannel.open(file, StandardOpenOption.READ)) {
-                    int size = toInt(channel.size(), "file size");
-                    buf = ByteBufAllocator.DEFAULT.ioBuffer(size, size);
-                    for (int i = 0; i < size; i += buf.writeBytes(channel, i, size - i)) {
+                        ByteBuf buf = null;
+                        try (FileChannel channel = FileChannel.open(file, StandardOpenOption.READ)) {
+                            int size = toInt(channel.size(), "file size");
+                            buf = ByteBufAllocator.DEFAULT.ioBuffer(size, size);
+                            for (int i = 0; i < size; i += buf.writeBytes(channel, i, size - i)) {}
+                            return buf.retain();
+                        } finally {
+                            ReferenceCountUtil.release(buf);
+                        }
+                    } catch (IOException e) {
+                        throw new UncheckedIOException("unable to read file: " + file, e);
                     }
-                    return buf.retain();
-                } finally {
-                    ReferenceCountUtil.release(buf);
-                }
-            } catch (IOException e) {
-                throw new UncheckedIOException("unable to read file: " + file, e);
-            }
-        }, DISK_EXECUTOR);
+                },
+                DISK_EXECUTOR);
     }
 
     /**
@@ -151,7 +155,11 @@ public class Disk {
     public void write(@NonNull Path file, @NonNull ByteBuf data) {
         DISK_EXECUTOR.submit(() -> {
             try {
-                try (FileChannel channel = FileChannel.open(tmpFile(), StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)) {
+                try (FileChannel channel = FileChannel.open(
+                        tmpFile(),
+                        StandardOpenOption.WRITE,
+                        StandardOpenOption.CREATE,
+                        StandardOpenOption.TRUNCATE_EXISTING)) {
                     while (data.isReadable()) {
                         data.readBytes(channel, data.readableBytes());
                     }
@@ -175,7 +183,9 @@ public class Disk {
      */
     public Path cacheFileFor(@NonNull String url) {
         try {
-            return cacheRoot().resolve(Hex.encodeHexString(MessageDigest.getInstance("SHA-256").digest(url.getBytes(StandardCharsets.UTF_8))));
+            return cacheRoot()
+                    .resolve(Hex.encodeHexString(
+                            MessageDigest.getInstance("SHA-256").digest(url.getBytes(StandardCharsets.UTF_8))));
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("SHA-256 not supported", e);
         }
@@ -207,19 +217,21 @@ public class Disk {
                         try (FileChannel channel = FileChannel.open(p, StandardOpenOption.READ)) {
                             long chSize = channel.size();
                             try {
-                                ByteBuf buf = PUnpooled.wrap(channel.map(FileChannel.MapMode.READ_ONLY, 0L, chSize), toInt(chSize), true);
+                                ByteBuf buf = PUnpooled.wrap(
+                                        channel.map(FileChannel.MapMode.READ_ONLY, 0L, chSize), toInt(chSize), true);
                                 try {
-                                    if (buf.readByte() == CacheEntry.CACHE_VERSION && !new CacheEntry(buf).isExpired(now)) { //file isn't expired, skip it
+                                    if (buf.readByte() == CacheEntry.CACHE_VERSION
+                                            && !new CacheEntry(buf).isExpired(now)) { // file isn't expired, skip it
                                         return false;
                                     }
                                 } finally {
                                     buf.release();
                                 }
                             } catch (Throwable ignored) {
-                                //no-op
+                                // no-op
                             }
 
-                            //delete file
+                            // delete file
                             count.increment();
                             size.add(chSize);
                             return true;
@@ -235,7 +247,11 @@ public class Disk {
         } finally {
             if (!CONFIG.reducedLogging) {
                 double mib = Math.round(size.sum() / (1024.0d * 1024.0d) * 10.0d) / 10.0d;
-                LOGGER.info("cache cleanup complete. deleted {} old files, totalling {} bytes ({} MiB)", count.sum(), size.sum(), mib);
+                LOGGER.info(
+                        "cache cleanup complete. deleted {} old files, totalling {} bytes ({} MiB)",
+                        count.sum(),
+                        size.sum(),
+                        mib);
             }
         }
     }

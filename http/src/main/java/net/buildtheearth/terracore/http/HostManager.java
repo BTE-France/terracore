@@ -1,5 +1,8 @@
 package net.buildtheearth.terracore.http;
 
+import static net.buildtheearth.terracore.http.Http.*;
+import static net.daporkchop.lib.common.util.PValidation.*;
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -25,20 +28,16 @@ import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
 import io.netty.util.AttributeKey;
 import io.netty.util.ReferenceCountUtil;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
-import net.daporkchop.lib.common.util.PorkUtil;
-
 import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.IdentityHashMap;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-
-import static net.buildtheearth.terracore.http.Http.*;
-import static net.daporkchop.lib.common.util.PValidation.*;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
+import net.daporkchop.lib.common.util.PorkUtil;
 
 /**
  * Manages request queueing, connection keepalives and potential HTTP/2 upgrades for a single remote host.
@@ -63,7 +62,8 @@ final class HostManager extends Host {
         super(host);
 
         this.eventLoop = NETWORK_EVENT_LOOP_GROUP.next();
-        this.bootstrap = DEFAULT_BOOTSTRAP.clone()
+        this.bootstrap = DEFAULT_BOOTSTRAP
+                .clone()
                 .group(this.eventLoop)
                 .handler(new Initializer(new Handler()))
                 .remoteAddress(this.host, this.port)
@@ -77,11 +77,12 @@ final class HostManager extends Host {
      * @param callback a {@link Callback} that will be notified once the request is completed
      */
     public void submit(@NonNull String path, @NonNull Callback callback, @NonNull HttpHeaders headers) {
-        this.eventLoop.submit(() -> { //force execution on network thread
-            this.pendingRequests.add(new Request(path, callback, headers)); //add to request queue
+        this.eventLoop.submit(
+                () -> { // force execution on network thread
+                    this.pendingRequests.add(new Request(path, callback, headers)); // add to request queue
 
-            this.tryWorkOffQueue();
-        });
+                    this.tryWorkOffQueue();
+                });
     }
 
     /**
@@ -94,20 +95,25 @@ final class HostManager extends Host {
     }
 
     private void tryWorkOffQueue() {
-        for (Request request; this.activeRequests < this.maxConcurrentRequests && (request = this.pendingRequests.peek()) != null && this.trySendRequest0(request); ) {
+        for (Request request;
+                this.activeRequests < this.maxConcurrentRequests
+                        && (request = this.pendingRequests.peek()) != null
+                        && this.trySendRequest0(request); ) {
             checkState(this.pendingRequests.poll() == request, "unable to remove request from queue!");
         }
     }
 
     private boolean trySendRequest0(@NonNull Request request) {
-        if (request.callback.isCancelled()) { //future is already completed (probably due to cancellation), pretend that we handled it
+        if (request.callback
+                .isCancelled()) { // future is already completed (probably due to cancellation), pretend that we handled
+            // it
             return true;
         }
 
         for (Channel channel : this.channels) {
-            if (channel.attr(ATTR_REQUEST).compareAndSet(null, request)) { //the channel is currently inactive
+            if (channel.attr(ATTR_REQUEST).compareAndSet(null, request)) { // the channel is currently inactive
                 channel.pipeline().addFirst("read_timeout", new ReadTimeoutHandler(TIMEOUT, TimeUnit.SECONDS));
-                channel.writeAndFlush(request.toNetty()); //send request
+                channel.writeAndFlush(request.toNetty()); // send request
                 this.activeRequests++;
                 return true;
             }
@@ -118,8 +124,9 @@ final class HostManager extends Host {
     }
 
     private void considerOpeningAnotherConnection() {
-        if (this.channelFuture == null) { //channelFuture is null, so there is no currently opening channel
-            (this.channelFuture = this.bootstrap.connect()).addListener((ChannelFutureListener) this::handleChannelOpened);
+        if (this.channelFuture == null) { // channelFuture is null, so there is no currently opening channel
+            (this.channelFuture = this.bootstrap.connect())
+                    .addListener((ChannelFutureListener) this::handleChannelOpened);
         }
     }
 
@@ -128,7 +135,7 @@ final class HostManager extends Host {
         this.channelFuture = null;
 
         if (!channelFuture.isSuccess()) {
-            //TODO: fail pending requests only if no other connections are open
+            // TODO: fail pending requests only if no other connections are open
             this.pendingRequests.forEach(r -> r.callback.handle(null, channelFuture.cause()));
             this.pendingRequests.clear();
             return;
@@ -143,19 +150,21 @@ final class HostManager extends Host {
 
     private void handleChannelClosed(@NonNull ChannelFuture channelFuture) {
         Channel channel = channelFuture.channel();
-        //if the channel is still stored as an active connection, it was closed for some other reason than the
+        // if the channel is still stored as an active connection, it was closed for some other reason than the
         // server sending a "Connection: close" header, so let's double-check the channel state
         if (this.channels.remove(channel)) {
             Request request = channel.attr(ATTR_REQUEST).getAndSet(null);
             if (request != null) {
-                //the channel still has a request associated with it! the channel was a keepalive channel,
+                // the channel still has a request associated with it! the channel was a keepalive channel,
                 // and the server closed it at the same time as we sent the request. let's re-submit the request
                 // so that it can be issued again on a new channel
 
-                this.pendingRequests.addFirst(request); //add to front of queue so that it doesn't have to wait through the entire queue again
+                this.pendingRequests.addFirst(
+                        request); // add to front of queue so that it doesn't have to wait through the entire queue
+                // again
             }
 
-            //working off the queue may open a new channel to replace this one if there are more pending requests
+            // working off the queue may open a new channel to replace this one if there are more pending requests
             this.tryWorkOffQueue();
         }
     }
@@ -167,17 +176,17 @@ final class HostManager extends Host {
                 throw new IllegalArgumentException(PorkUtil.className(msg));
             }
             FullHttpResponse response = (FullHttpResponse) msg;
-            if (response.status().codeClass() == HttpStatusClass.INFORMATIONAL) { //do nothing
+            if (response.status().codeClass() == HttpStatusClass.INFORMATIONAL) { // do nothing
                 return;
             }
 
             request = channel.attr(ATTR_REQUEST).getAndSet(null);
             checkState(request != null, "received response on inactive channel?!?");
 
-            this.activeRequests--; //decrement active requests counter to enable another request to be made
+            this.activeRequests--; // decrement active requests counter to enable another request to be made
 
-            if (!HttpUtil.isKeepAlive(response)) { //response isn't keep-alive, close connection
-                //remove connection from active connections now to prevent it from
+            if (!HttpUtil.isKeepAlive(response)) { // response isn't keep-alive, close connection
+                // remove connection from active connections now to prevent it from
                 // being re-used if the close operation isn't completed before this method ends
                 this.channels.remove(channel);
                 channel.close();
@@ -191,7 +200,7 @@ final class HostManager extends Host {
         } finally {
             ReferenceCountUtil.release(msg);
 
-            this.tryWorkOffQueue(); //if this request is completed, another slot must have been freed up
+            this.tryWorkOffQueue(); // if this request is completed, another slot must have been freed up
         }
     }
 
@@ -225,13 +234,16 @@ final class HostManager extends Host {
     private final class Request {
         @NonNull
         protected final String path;
+
         @NonNull
         protected final Callback callback;
+
         @NonNull
         protected final HttpHeaders headers;
 
         public HttpRequest toNetty() {
-            DefaultFullHttpRequest request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, this.path);
+            DefaultFullHttpRequest request =
+                    new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, this.path);
             request.headers()
                     .set(this.headers)
                     .set(HttpHeaderNames.HOST, HostManager.this.authority)
@@ -256,14 +268,16 @@ final class HostManager extends Host {
             ch.pipeline().addLast(new WriteTimeoutHandler(TIMEOUT, TimeUnit.SECONDS));
 
             if (HostManager.this.ssl) {
-                ch.pipeline().addLast(Http.SSL_CONTEXT.newHandler(ch.alloc(), HostManager.this.host, HostManager.this.port));
+                ch.pipeline()
+                        .addLast(Http.SSL_CONTEXT.newHandler(ch.alloc(), HostManager.this.host, HostManager.this.port));
             }
 
-            ch.pipeline().addLast(
-                    new HttpClientCodec(),
-                    new HttpContentDecompressor(),
-                    new HttpObjectAggregator(Http.MAX_CONTENT_LENGTH),
-                    this.httpHandler);
+            ch.pipeline()
+                    .addLast(
+                            new HttpClientCodec(),
+                            new HttpContentDecompressor(),
+                            new HttpObjectAggregator(Http.MAX_CONTENT_LENGTH),
+                            this.httpHandler);
         }
     }
 
@@ -276,14 +290,16 @@ final class HostManager extends Host {
     private final class Handler extends ChannelInboundHandlerAdapter {
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-            ctx.pipeline().remove("read_timeout"); //remove read timeout listener to prevent a fake timeout if the connection is idle
+            ctx.pipeline()
+                    .remove("read_timeout"); // remove read timeout listener to prevent a fake timeout if the connection
+            // is idle
             HostManager.this.handleResponse(ctx.channel(), msg);
         }
 
         @Override
         public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
             Request request = ctx.channel().attr(ATTR_REQUEST).getAndSet(null);
-            if (request != null) { //inform request that it failed
+            if (request != null) { // inform request that it failed
                 request.callback.handle(null, cause);
                 HostManager.this.activeRequests--;
             }

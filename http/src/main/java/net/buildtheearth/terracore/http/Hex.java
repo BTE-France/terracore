@@ -5,7 +5,7 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 class Hex {
 
-    char[] DIGITS_LOWER = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
+    char[] DIGITS_LOWER = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
     String encodeHexString(byte[] bytes) {
         char[] hex = new char[bytes.length * 2];
@@ -15,5 +15,4 @@ class Hex {
         }
         return new String(hex);
     }
-
 }

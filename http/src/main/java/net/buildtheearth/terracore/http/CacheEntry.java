@@ -1,13 +1,11 @@
 package net.buildtheearth.terracore.http;
 
+import static net.buildtheearth.terracore.http.Http.*;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaders;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.With;
-
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -19,8 +17,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import static net.buildtheearth.terracore.http.Http.*;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.With;
 
 /**
  * @author DaPorkchop_
@@ -52,7 +51,9 @@ public class CacheEntry {
         this.time = headers.getTimeMillis(HttpHeaderNames.DATE, System.currentTimeMillis());
 
         Map<String, String> map = headers.getAll(HttpHeaderNames.CACHE_CONTROL).stream()
-                .map(s -> s.split(",")).flatMap(Arrays::stream).map(String::trim)
+                .map(s -> s.split(","))
+                .flatMap(Arrays::stream)
+                .map(String::trim)
                 .map(Pattern.compile("^(.*?)=(.*?)$")::matcher)
                 .filter(Matcher::find)
                 .collect(Collectors.toMap(m -> m.group(1), m -> m.group(2)));
@@ -78,8 +79,8 @@ public class CacheEntry {
 
         this.etag = headers.get(HttpHeaderNames.ETAG, null);
 
-        this.staleTime = maxAge >= 0L ? this.time + TimeUnit.SECONDS.toMillis(maxAge)
-                : this.etag != null ? this.time : -1L;
+        this.staleTime =
+                maxAge >= 0L ? this.time + TimeUnit.SECONDS.toMillis(maxAge) : this.etag != null ? this.time : -1L;
 
         long fallbackExpireTime = this.time + TimeUnit.MINUTES.toMillis(CONFIG.cacheTTL);
         long expireTime = Math.max(
@@ -93,7 +94,7 @@ public class CacheEntry {
                 this.status = STATUS_SUCCESS;
                 break;
             case REDIRECTION:
-                if (response.status().code() == 304) { //304 Not Modified
+                if (response.status().code() == 304) { // 304 Not Modified
                     this.status = STATUS_NOT_MODIFIED;
                 } else {
                     this.status = STATUS_REDIRECT;
@@ -101,11 +102,11 @@ public class CacheEntry {
                 }
                 break;
             case CLIENT_ERROR:
-                if (response.status().code() == 404) { //404 Not Found
+                if (response.status().code() == 404) { // 404 Not Found
                     this.status = STATUS_NOT_FOUND;
                     break;
                 }
-            default: //failure
+            default: // failure
                 throw new UnknownHttpStatusException(response.status(), parsed);
         }
         this.location = location;
@@ -119,9 +120,12 @@ public class CacheEntry {
         this.expireTime = buf.readLong();
 
         int len = buf.readInt();
-        this.etag = len >= 0 ? buf.readCharSequence(len, StandardCharsets.US_ASCII).toString() : null;
+        this.etag =
+                len >= 0 ? buf.readCharSequence(len, StandardCharsets.US_ASCII).toString() : null;
 
-        this.location = this.status == STATUS_REDIRECT ? buf.readCharSequence(buf.readInt(), StandardCharsets.UTF_8).toString() : null;
+        this.location = this.status == STATUS_REDIRECT
+                ? buf.readCharSequence(buf.readInt(), StandardCharsets.UTF_8).toString()
+                : null;
 
         this.noCache = false;
     }
@@ -138,7 +142,9 @@ public class CacheEntry {
         if (this.etag != null) {
             headers.set(HttpHeaderNames.IF_NONE_MATCH, this.etag);
         } else if (this.staleTime >= 0L) {
-            headers.set(HttpHeaderNames.IF_MODIFIED_SINCE, DateTimeFormatter.RFC_1123_DATE_TIME.format(Instant.ofEpochMilli(this.time)));
+            headers.set(
+                    HttpHeaderNames.IF_MODIFIED_SINCE,
+                    DateTimeFormatter.RFC_1123_DATE_TIME.format(Instant.ofEpochMilli(this.time)));
         }
     }
 
