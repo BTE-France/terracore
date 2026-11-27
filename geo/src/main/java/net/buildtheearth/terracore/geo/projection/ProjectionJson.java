@@ -121,7 +121,10 @@ class ProjectionJson {
         }
     }
 
+    /*
+     * We need this here to avoid a bug in forge Gradle.
+     * See https://forums.minecraftforge.net/topic/40670-build-terminates-at-extractrangemapreplacedmain/
+     */
     @JsonSerialize
-    private class MixIn {} // Have this here to avoid a bug in forge Gradle
-    // (https://forums.minecraftforge.net/topic/40670-build-terminates-at-extractrangemapreplacedmain/)
+    private class MixIn {}
 }

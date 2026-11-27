@@ -16,13 +16,13 @@ public class BTEDymaxionProjection extends ConformalDynmaxionProjection {
     protected static final double THETA = Math.toRadians(-150);
     protected static final double SIN_THETA = Math.sin(THETA);
     protected static final double COS_THETA = Math.cos(THETA);
-    protected static final double BERING_X = -0.3420420960118339; // -0.3282152608138795;
-    protected static final double BERING_Y = -0.322211064085279; // -0.3281491467713469;
-    protected static final double ARCTIC_Y = -0.2; // -0.3281491467713469;
+    protected static final double BERING_X = -0.3420420960118339;
+    protected static final double BERING_Y = -0.322211064085279;
+    protected static final double ARCTIC_Y = -0.2;
     protected static final double ARCTIC_M = (ARCTIC_Y - GeoMaths.ROOT3 * ARC / 4) / (BERING_X - -0.5 * ARC);
     protected static final double ARCTIC_B = ARCTIC_Y - ARCTIC_M * BERING_X;
-    protected static final double ALEUTIAN_Y = -0.5000446805492526; // -0.5127463765943157;
-    protected static final double ALEUTIAN_XL = -0.5149231279757507; // -0.4957832938238718;
+    protected static final double ALEUTIAN_Y = -0.5000446805492526;
+    protected static final double ALEUTIAN_XL = -0.5149231279757507;
     protected static final double ALEUTIAN_XR = -0.45;
     protected static final double ALEUTIAN_M = (BERING_Y - ALEUTIAN_Y) / (BERING_X - ALEUTIAN_XR);
     protected static final double ALEUTIAN_B = BERING_Y - ALEUTIAN_M * BERING_X;
@@ -90,7 +90,7 @@ public class BTEDymaxionProjection extends ConformalDynmaxionProjection {
 
     protected boolean isEurasianPart(double x, double y) {
 
-        // catch vast majority of cases in not near boundary
+        // catch the vast majority of cases in not near boundary
         if (x > 0) {
             return false;
         }
@@ -103,7 +103,7 @@ public class BTEDymaxionProjection extends ConformalDynmaxionProjection {
             return x < 0;
         }
 
-        if (y < ALEUTIAN_Y) // below bering sea
+        if (y < ALEUTIAN_Y) // below Bering sea
         {
             return y < (ALEUTIAN_Y + ALEUTIAN_XL) - x;
         }
@@ -122,8 +122,8 @@ public class BTEDymaxionProjection extends ConformalDynmaxionProjection {
 
     @Override
     public double[] bounds() {
-        return new double[] {-1.5 * ARC * GeoMaths.ROOT3, -1.5 * ARC, 3 * ARC, GeoMaths.ROOT3 * ARC
-        }; // TODO: 3*ARC is prly to high
+        // TODO: 3*ARC is prly to high
+        return new double[] {-1.5 * ARC * GeoMaths.ROOT3, -1.5 * ARC, 3 * ARC, GeoMaths.ROOT3 * ARC};
     }
 
     @Override
