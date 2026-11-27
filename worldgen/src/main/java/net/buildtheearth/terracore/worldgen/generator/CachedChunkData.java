@@ -5,12 +5,10 @@ import static net.daporkchop.lib.common.math.PMath.clamp;
 import static net.daporkchop.lib.common.math.PMath.floorI;
 import static net.daporkchop.lib.common.math.PMath.lerp;
 
+import com.google.common.collect.ImmutableMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.util.Arrays;
 import java.util.Map;
-
-import com.google.common.collect.ImmutableMap;
-
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -46,7 +44,7 @@ public class CachedChunkData extends CustomAttributeContainer {
     }
 
     private static int extractActualDepth(int waterDepth) {
-        //discard upper 2 bits from least significant byte and then sign-extend everything back down
+        // discard upper 2 bits from least significant byte and then sign-extend everything back down
         return ((waterDepth & 0x3F) - 32) << 26 >> 26;
     }
 
@@ -70,13 +68,14 @@ public class CachedChunkData extends CustomAttributeContainer {
             int d = extractActualDepth(waterDepth);
 
             switch (waterDepth & WATERDEPTH_TYPE_MASK) {
-                case WATERDEPTH_TYPE_DEFAULT: //no water
-                    //do nothing
+                case WATERDEPTH_TYPE_DEFAULT: // no water
+                    // do nothing
                     break;
-                case WATERDEPTH_TYPE_WATER: //water - lake/river/pond
+                case WATERDEPTH_TYPE_WATER: // water - lake/river/pond
                     if (d + WATER_DEPTH_OFFSET >= 0) {
                         this.groundHeight[i] -= d + WATER_DEPTH_OFFSET;
-                        builder.biomes[(i >>> 4) | ((i & 0xF) << 4)] = EarthGeneratorPipelines.BIOME_OPTIONS.waterInlandBiome;
+                        builder.biomes[(i >>> 4) | ((i & 0xF) << 4)] =
+                                EarthGeneratorPipelines.BIOME_OPTIONS.waterInlandBiome;
                     }
                     break;
                 case WATERDEPTH_TYPE_OCEAN:
@@ -87,7 +86,8 @@ public class CachedChunkData extends CustomAttributeContainer {
                     } else {
                         this.surfaceHeight[i] = 0;
                         this.groundHeight[i] = min(this.groundHeight[i], -2);
-                        builder.biomes[(i >>> 4) | ((i & 0xF) << 4)] = EarthGeneratorPipelines.BIOME_OPTIONS.waterOceanBiome;
+                        builder.biomes[(i >>> 4) | ((i & 0xF) << 4)] =
+                                EarthGeneratorPipelines.BIOME_OPTIONS.waterOceanBiome;
                     }
                     break;
                 default:
@@ -169,7 +169,8 @@ public class CachedChunkData extends CustomAttributeContainer {
      */
     @Getter
     @Setter
-    public static final class Builder extends CustomAttributeContainer implements IEarthAsyncDataBuilder<CachedChunkData> {
+    public static final class Builder extends CustomAttributeContainer
+            implements IEarthAsyncDataBuilder<CachedChunkData> {
         private final int[] surfaceHeight = new int[16 * 16];
         private final byte[] waterDepth = new byte[16 * 16];
 

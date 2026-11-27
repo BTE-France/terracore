@@ -1,13 +1,11 @@
 package net.buildtheearth.terracore.worldgen.generator;
 
-import java.util.List;
-import java.util.Random;
-import java.util.concurrent.CompletableFuture;
-
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-
+import java.util.List;
+import java.util.Random;
+import java.util.concurrent.CompletableFuture;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.buildtheearth.terracore.minecraft.Biome;
@@ -22,9 +20,7 @@ public class EarthBiomeProvider {
     protected final LoadingCache<ChunkPos, CompletableFuture<ImmutableCompactArray<Biome>>> cache;
 
     public EarthBiomeProvider(@NonNull EarthGeneratorSettings settings) {
-        this.cache = CacheBuilder.newBuilder()
-                .weakValues()
-                .build(new ChunkDataLoader(settings));
+        this.cache = CacheBuilder.newBuilder().weakValues().build(new ChunkDataLoader(settings));
     }
 
     /**
@@ -33,9 +29,7 @@ public class EarthBiomeProvider {
      * @param filters Biome filters which get executed for each chunk
      */
     public EarthBiomeProvider(@NonNull GeneratorDatasets datasets, @NonNull IEarthBiomeFilter<?>[] filters) {
-        this.cache = CacheBuilder.newBuilder()
-                .weakValues()
-                .build(new ChunkDataLoader(datasets, filters));
+        this.cache = CacheBuilder.newBuilder().weakValues().build(new ChunkDataLoader(datasets, filters));
     }
 
     /**
@@ -73,12 +67,13 @@ public class EarthBiomeProvider {
             arr = new Biome[width * height];
         }
 
-        //stupidly inefficient solution, but nobody will ever use this so i'm not about to optimize it
+        // stupidly inefficient solution, but nobody will ever use this so i'm not about to optimize it
         for (int zz = 0; zz < height; zz++) {
             for (int xx = 0; xx < width; xx++) {
                 int blockX = (x + xx) << 2;
                 int blockZ = (z + zz) << 2;
-                arr[zz * 16 + xx] = this.getBiomesForChunk(new ChunkPos(blockX >> 4, blockZ >> 4)).get((blockX & 0xF) * 16 + (blockZ & 0xF));
+                arr[zz * 16 + xx] = this.getBiomesForChunk(new ChunkPos(blockX >> 4, blockZ >> 4))
+                        .get((blockX & 0xF) * 16 + (blockZ & 0xF));
             }
         }
         return arr;
@@ -104,16 +99,17 @@ public class EarthBiomeProvider {
         if (((x | z) & 0xF) == 0 && width == 16 && length == 16) {
             ImmutableCompactArray<Biome> array = this.getBiomesForChunk(new ChunkPos(x >> 4, z >> 4));
             for (int zz = 0; zz < 16; zz++) {
-                for (int xx = 0; xx < 16; xx++) { //reverse coordinate order
+                for (int xx = 0; xx < 16; xx++) { // reverse coordinate order
                     arr[zz * 16 + xx] = array.get(xx * 16 + zz);
                 }
             }
-        } else { //stupidly inefficient solution, but nobody will ever use this so i'm not about to optimize it
+        } else { // stupidly inefficient solution, but nobody will ever use this so i'm not about to optimize it
             for (int zz = 0; zz < length; zz++) {
                 for (int xx = 0; xx < width; xx++) {
                     int blockX = x + xx;
                     int blockZ = z + zz;
-                    arr[zz * 16 + xx] = this.getBiomesForChunk(new ChunkPos(blockX >> 4, blockZ >> 4)).get((blockX & 0xF) * 16 + (blockZ & 0xF));
+                    arr[zz * 16 + xx] = this.getBiomesForChunk(new ChunkPos(blockX >> 4, blockZ >> 4))
+                            .get((blockX & 0xF) * 16 + (blockZ & 0xF));
                 }
             }
         }

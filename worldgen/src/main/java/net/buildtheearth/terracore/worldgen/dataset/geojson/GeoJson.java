@@ -1,9 +1,8 @@
 package net.buildtheearth.terracore.worldgen.dataset.geojson;
 
-import java.io.Reader;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import java.io.Reader;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.apache.logging.log4j.LogManager;
@@ -17,7 +16,6 @@ public class GeoJson {
 
     static final Logger LOGGER = LogManager.getLogger(GeoJson.class);
     static final Gson GSON = new GsonBuilder().create();
-
 
     /**
      * Parses a single GeoJSON object from the given {@link Reader}.

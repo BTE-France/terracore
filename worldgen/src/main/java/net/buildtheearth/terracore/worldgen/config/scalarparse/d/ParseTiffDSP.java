@@ -1,19 +1,18 @@
 package net.buildtheearth.terracore.worldgen.config.scalarparse.d;
 
+import static net.daporkchop.lib.common.util.PValidation.checkArg;
+import static org.apache.commons.imaging.formats.tiff.constants.TiffTagConstants.*;
+
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
+import java.io.IOException;
 import lombok.NonNull;
 import org.apache.commons.imaging.FormatCompliance;
 import org.apache.commons.imaging.ImagingException;
 import org.apache.commons.imaging.bytesource.ByteSource;
 import org.apache.commons.imaging.formats.tiff.*;
 import org.apache.commons.imaging.formats.tiff.constants.GdalLibraryTagConstants;
-
-import java.io.IOException;
-
-import static net.daporkchop.lib.common.util.PValidation.checkArg;
-import static org.apache.commons.imaging.formats.tiff.constants.TiffTagConstants.*;
 
 /**
  * Parses integer or floating-point scalar data from single-channel TIFF images, to double arrays.
@@ -35,9 +34,10 @@ public class ParseTiffDSP implements DoubleScalarParser {
         return dst;
     }
 
-    protected void postProcess(int resolution, @NonNull TiffDirectory directory, double @NonNull [] dst) throws IOException {
+    protected void postProcess(int resolution, @NonNull TiffDirectory directory, double @NonNull [] dst)
+            throws IOException {
         TiffField nodataField = directory.findField(GdalLibraryTagConstants.EXIF_TAG_GDAL_NO_DATA);
-        if (nodataField != null) { //nodata value is set, replace all nodata values
+        if (nodataField != null) { // nodata value is set, replace all nodata values
             double nodata = Double.parseDouble(nodataField.getStringValue());
             for (int i = 0; i < dst.length; i++) {
                 if (dst[i] == nodata) {
@@ -47,7 +47,8 @@ public class ParseTiffDSP implements DoubleScalarParser {
         }
     }
 
-    protected TiffDirectory parse(int resolution, @NonNull TiffContents contents, double @NonNull [] dst) throws IOException {
+    protected TiffDirectory parse(int resolution, @NonNull TiffContents contents, double @NonNull [] dst)
+            throws IOException {
         for (TiffDirectory directory : contents.directories) {
             if (this.parse(resolution, directory, dst)) {
                 return directory;
@@ -56,7 +57,8 @@ public class ParseTiffDSP implements DoubleScalarParser {
         throw new IllegalArgumentException("no supported TIFF directories could be found!");
     }
 
-    protected boolean parse(int resolution, @NonNull TiffDirectory directory, double @NonNull [] dst) throws IOException {
+    protected boolean parse(int resolution, @NonNull TiffDirectory directory, double @NonNull [] dst)
+            throws IOException {
         if (!this.isSupportedFormat(directory)) {
             return false;
         }
@@ -64,9 +66,14 @@ public class ParseTiffDSP implements DoubleScalarParser {
         AbstractTiffRasterData data = directory.getRasterData(null);
         int w = data.getWidth();
         int h = data.getHeight();
-        checkArg(w == resolution && h == resolution, "invalid image resolution: %dx%d (expected: %dx%3$d)", w, h, resolution);
+        checkArg(
+                w == resolution && h == resolution,
+                "invalid image resolution: %dx%d (expected: %dx%3$d)",
+                w,
+                h,
+                resolution);
 
-        //extend floats to doubles
+        // extend floats to doubles
         float[] src = data.getData();
         checkArg(src.length == dst.length, "data length invalid?!?");
         for (int i = 0; i < resolution * resolution; i++) {
@@ -88,13 +95,13 @@ public class ParseTiffDSP implements DoubleScalarParser {
         switch (directory.getFieldValue(TIFF_TAG_PHOTOMETRIC_INTERPRETATION)) {
             case PHOTOMETRIC_INTERPRETATION_VALUE_WHITE_IS_ZERO:
             case PHOTOMETRIC_INTERPRETATION_VALUE_BLACK_IS_ZERO:
-                break; //grayscale
+                break; // grayscale
             default:
-                return false; //colored formats aren't supported lol
+                return false; // colored formats aren't supported lol
         }
         short[] bitsPerSample = directory.getFieldValue(TIFF_TAG_BITS_PER_SAMPLE, true);
         if (bitsPerSample.length != 1) {
-            return false; //more than one channel
+            return false; // more than one channel
         }
         switch (directory.findField(TIFF_TAG_SAMPLE_FORMAT, true).getIntValue()) {
             case SAMPLE_FORMAT_VALUE_UNSIGNED_INTEGER:
@@ -106,5 +113,4 @@ public class ParseTiffDSP implements DoubleScalarParser {
         }
         return true;
     }
-
 }

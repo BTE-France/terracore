@@ -7,11 +7,11 @@ import static java.lang.Math.min;
 import static net.daporkchop.lib.common.math.PMath.floorI;
 
 import lombok.NonNull;
+import net.buildtheearth.terracore.geo.bvh.Bounds2d;
 import net.buildtheearth.terracore.minecraft.ChunkPos;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.geometry.MultiLineString;
 import net.buildtheearth.terracore.worldgen.dataset.vector.draw.DrawFunction;
 import net.buildtheearth.terracore.worldgen.generator.CachedChunkData;
-import net.buildtheearth.terracore.geo.bvh.Bounds2d;
 
 /**
  * @author DaPorkchop_
@@ -22,7 +22,8 @@ public final class NarrowLine extends AbstractLine {
     }
 
     @Override
-    public void apply(@NonNull CachedChunkData.Builder builder, final int chunkX, final int chunkZ, @NonNull Bounds2d bounds) {
+    public void apply(
+            @NonNull CachedChunkData.Builder builder, final int chunkX, final int chunkZ, @NonNull Bounds2d bounds) {
         int minChunkBlockX = ChunkPos.cubeToMinBlock(chunkX);
         int minChunkBlockZ = ChunkPos.cubeToMinBlock(chunkZ);
         this.segments.forEachIntersecting(bounds, s -> {
@@ -31,7 +32,7 @@ public final class NarrowLine extends AbstractLine {
             double z0 = s.z0();
             double z1 = s.z1();
 
-            //slope must not be infinity, slight inaccuracy shouldn't even be noticible unless you go looking for it
+            // slope must not be infinity, slight inaccuracy shouldn't even be noticible unless you go looking for it
             double dif = x1 - x0;
             double slope = (z1 - z0) / ((abs(dif) < 0.01d ? x1 + copySign(0.01d, dif) : x1) - x0);
             double offset = z0 - slope * x0;

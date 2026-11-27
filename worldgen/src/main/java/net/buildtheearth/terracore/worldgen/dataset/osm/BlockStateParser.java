@@ -1,10 +1,8 @@
 package net.buildtheearth.terracore.worldgen.dataset.osm;
 
-import java.io.IOException;
-
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
-
+import java.io.IOException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import net.buildtheearth.terracore.minecraft.BlockState;
@@ -23,7 +21,7 @@ public final class BlockStateParser extends JsonParser<BlockState> {
 
     @Override
     public BlockState read(JsonReader in) throws IOException {
-        BlockStateBuilder builder  = BlockStateBuilder.get();
+        BlockStateBuilder builder = BlockStateBuilder.get();
         in.beginObject();
         while (in.peek() != JsonToken.END_OBJECT) {
             String name = in.nextName();
@@ -58,5 +56,4 @@ public final class BlockStateParser extends JsonParser<BlockState> {
         in.endObject();
         return builder.build();
     }
-
 }

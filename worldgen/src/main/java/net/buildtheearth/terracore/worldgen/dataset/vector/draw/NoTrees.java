@@ -1,10 +1,8 @@
 package net.buildtheearth.terracore.worldgen.dataset.vector.draw;
 
-import java.io.IOException;
-
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.stream.JsonReader;
-
+import java.io.IOException;
 import lombok.NonNull;
 import net.buildtheearth.terracore.worldgen.dataset.osm.JsonParser;
 import net.buildtheearth.terracore.worldgen.generator.CachedChunkData;
@@ -21,7 +19,7 @@ final class NoTrees implements DrawFunction {
     public void drawOnto(@NonNull CachedChunkData.Builder data, int x, int z, int weight) {
         byte[] treeCover = data.getCustom(EarthGeneratorPipelines.KEY_DATA_TREE_COVER, null);
         if (treeCover != null) {
-            treeCover[x * 16 + z] = (byte) 0; //set chance to 0
+            treeCover[x * 16 + z] = (byte) 0; // set chance to 0
         }
     }
 

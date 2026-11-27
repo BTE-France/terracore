@@ -1,15 +1,14 @@
 package net.buildtheearth.terracore.worldgen.dataset.binary;
 
+import static net.daporkchop.lib.common.util.PValidation.*;
+
 import it.unimi.dsi.fastutil.bytes.ByteArrayList;
 import it.unimi.dsi.fastutil.bytes.ByteList;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
+import java.util.Arrays;
 import lombok.Getter;
 import lombok.NonNull;
-
-import java.util.Arrays;
-
-import static net.daporkchop.lib.common.util.PValidation.*;
 
 /**
  * A run-length-encoded byte array with random access.
@@ -23,6 +22,7 @@ public class RLEByteArray {
 
     protected final int[] index;
     protected final byte[] data;
+
     @Getter
     protected final int size;
 

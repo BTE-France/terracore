@@ -1,11 +1,9 @@
 package net.buildtheearth.terracore.worldgen.dataset.vector.draw;
 
-import java.io.IOException;
-
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
-
+import java.io.IOException;
 import lombok.Builder;
 import lombok.NonNull;
 import net.buildtheearth.terracore.worldgen.dataset.osm.JsonParser;
@@ -21,8 +19,10 @@ import net.daporkchop.lib.common.math.PMath;
 final class WeightClamp implements DrawFunction {
     @NonNull
     protected final DrawFunction delegate;
+
     @Builder.Default
     protected final int min = Integer.MIN_VALUE;
+
     @Builder.Default
     protected final int max = Integer.MAX_VALUE;
 

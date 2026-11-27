@@ -9,23 +9,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.google.common.collect.ImmutableSet;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.SneakyThrows;
-import net.buildtheearth.terracore.minecraft.Biome;
-import net.buildtheearth.terracore.minecraft.ChunkPos;
-import net.buildtheearth.terracore.worldgen.generator.ChunkBiomesBuilder;
-import net.buildtheearth.terracore.worldgen.generator.GeneratorDatasets;
-import net.buildtheearth.terracore.geo.projection.GeographicProjection;
-import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
-import net.buildtheearth.terracore.geo.CornerBoundingBox2d;
-import net.buildtheearth.terracore.geo.bvh.BVH;
-import net.buildtheearth.terracore.geo.bvh.Bounds2d;
-import net.buildtheearth.terracore.http.Disk;
-import net.buildtheearth.terracore.worldgen.util.BiomeDeserializeMixin;
-import net.daporkchop.lib.common.function.io.IOFunction;
-import net.daporkchop.lib.common.function.throwing.EFunction;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
@@ -38,6 +21,22 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.SneakyThrows;
+import net.buildtheearth.terracore.geo.CornerBoundingBox2d;
+import net.buildtheearth.terracore.geo.bvh.BVH;
+import net.buildtheearth.terracore.geo.bvh.Bounds2d;
+import net.buildtheearth.terracore.geo.projection.GeographicProjection;
+import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
+import net.buildtheearth.terracore.http.Disk;
+import net.buildtheearth.terracore.minecraft.Biome;
+import net.buildtheearth.terracore.minecraft.ChunkPos;
+import net.buildtheearth.terracore.worldgen.generator.ChunkBiomesBuilder;
+import net.buildtheearth.terracore.worldgen.generator.GeneratorDatasets;
+import net.buildtheearth.terracore.worldgen.util.BiomeDeserializeMixin;
+import net.daporkchop.lib.common.function.io.IOFunction;
+import net.daporkchop.lib.common.function.throwing.EFunction;
 
 /**
  * Based on <a href="https://raw.githubusercontent.com/BuildTheEarth/terraplusplus/refs/heads/master/src/main/java/net/buildtheearth/terraplusplus/generator/biome/UserOverrideBiomeFilter.java">UserOverrideBiomeFilter.java @author DaPorkchop_</a>
@@ -66,7 +65,8 @@ public class UserOverrideBiomeFilter implements IEarthBiomeFilter<UserOverrideBi
         try (Stream<Path> stream = Files.list(Files.createDirectories(Disk.configFile("biome_overrides")))) {
             stream.filter(Files::isRegularFile)
                     .filter(p -> p.getFileName().toString().matches(".*\\.json5?$"))
-                    .map(Path::toUri).map((EFunction<URI, URL>) URI::toURL)
+                    .map(Path::toUri)
+                    .map((EFunction<URI, URL>) URI::toURL)
                     .forEach(configSources::add);
         }
 
@@ -77,7 +77,9 @@ public class UserOverrideBiomeFilter implements IEarthBiomeFilter<UserOverrideBi
     }
 
     @Override
-    public CompletableFuture<BiomeBoundingBox> requestData(ChunkPos pos, GeneratorDatasets datasets, Bounds2d bounds, CornerBoundingBox2d boundsGeo) throws OutOfProjectionBoundsException {
+    public CompletableFuture<BiomeBoundingBox> requestData(
+            ChunkPos pos, GeneratorDatasets datasets, Bounds2d bounds, CornerBoundingBox2d boundsGeo)
+            throws OutOfProjectionBoundsException {
         return CompletableFuture.supplyAsync(() -> this.bvh.getAllIntersecting(boundsGeo).stream()
                 .max(Comparator.naturalOrder())
                 .orElse(null));
@@ -85,11 +87,11 @@ public class UserOverrideBiomeFilter implements IEarthBiomeFilter<UserOverrideBi
 
     @Override
     public void bake(ChunkPos pos, ChunkBiomesBuilder builder, BiomeBoundingBox bbox) {
-        if (bbox == null) { //out of bounds, or no override at this position
+        if (bbox == null) { // out of bounds, or no override at this position
             return;
         }
 
-        if (bbox.replace == null) { //all biomes are overridden
+        if (bbox.replace == null) { // all biomes are overridden
             Arrays.fill(builder.state(), bbox.biome);
         } else {
             for (int x = 0; x < 16; x++) {
@@ -114,7 +116,7 @@ public class UserOverrideBiomeFilter implements IEarthBiomeFilter<UserOverrideBi
         protected final double minZ;
         protected final double maxZ;
 
-        @Getter(onMethod_ = { @JsonGetter })
+        @Getter(onMethod_ = {@JsonGetter})
         protected final double priority;
 
         @JsonCreator

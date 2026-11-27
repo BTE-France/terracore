@@ -2,12 +2,11 @@ package net.buildtheearth.terracore.worldgen.util;
 
 import static java.lang.Math.max;
 
+import it.unimi.dsi.fastutil.objects.Reference2IntMap;
+import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import it.unimi.dsi.fastutil.objects.Reference2IntMap;
-import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap;
 import lombok.NonNull;
 import net.buildtheearth.terracore.minecraft.BlockState;
 import net.daporkchop.lib.binary.bit.BitArray;
@@ -28,7 +27,7 @@ public final class ImmutableCompactArray<T> {
         int idCounter = 0;
 
         for (T value : data) {
-            if (!valueIds.containsKey(value)) { //add value to palette
+            if (!valueIds.containsKey(value)) { // add value to palette
                 valueIds.put(value, idCounter++);
                 paletteBuilder.add(value);
             }
@@ -37,7 +36,7 @@ public final class ImmutableCompactArray<T> {
         this.palette = paletteBuilder.toArray(Arrays.copyOf(data, paletteBuilder.size()));
         this.data = new PaddedBitArray(max(32 - Integer.numberOfLeadingZeros(idCounter - 1), 1), data.length);
 
-        for (int i = 0; i < data.length; i++) { //set values
+        for (int i = 0; i < data.length; i++) { // set values
             this.data.set(i, valueIds.getInt(data[i]));
         }
     }

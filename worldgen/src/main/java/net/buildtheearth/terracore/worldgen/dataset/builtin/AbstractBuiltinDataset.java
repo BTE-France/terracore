@@ -3,11 +3,10 @@ package net.buildtheearth.terracore.worldgen.dataset.builtin;
 import static net.daporkchop.lib.common.util.PValidation.notNegative;
 
 import java.util.concurrent.CompletableFuture;
-
 import lombok.NonNull;
-import net.buildtheearth.terracore.worldgen.dataset.IScalarDataset;
-import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
 import net.buildtheearth.terracore.geo.CornerBoundingBox2d;
+import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
+import net.buildtheearth.terracore.worldgen.dataset.IScalarDataset;
 
 /**
  * Abstract implementation of {@link IScalarDataset} for the builtin datasets.
@@ -30,8 +29,10 @@ public abstract class AbstractBuiltinDataset implements IScalarDataset {
     }
 
     @Override
-    public CompletableFuture<double[]> getAsync(@NonNull CornerBoundingBox2d bounds, int sizeX, int sizeZ) throws OutOfProjectionBoundsException {
-        if (notNegative(sizeX, "sizeX") == 0 | notNegative(sizeZ, "sizeZ") == 0) { //no input points -> no output points, ez
+    public CompletableFuture<double[]> getAsync(@NonNull CornerBoundingBox2d bounds, int sizeX, int sizeZ)
+            throws OutOfProjectionBoundsException {
+        if (notNegative(sizeX, "sizeX") == 0
+                | notNegative(sizeZ, "sizeZ") == 0) { // no input points -> no output points, ez
             return CompletableFuture.completedFuture(new double[0]);
         }
 
@@ -49,10 +50,10 @@ public abstract class AbstractBuiltinDataset implements IScalarDataset {
             for (int i = 0, x = 0; x < sizeX; x++, fx += stepX) {
                 double fz = 0.0d;
                 for (int z = 0; z < sizeZ; z++, fz += stepZ) {
-                    //compute coordinates of point
+                    // compute coordinates of point
                     point = bounds.point(point, fx, fz);
 
-                    //sample value at point
+                    // sample value at point
                     out[i++] = this.get((point[0] + 180.0d) * scaleX, (90.0d - point[1]) * scaleY);
                 }
             }

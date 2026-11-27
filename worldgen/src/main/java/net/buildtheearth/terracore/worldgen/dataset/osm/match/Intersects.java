@@ -1,18 +1,16 @@
 package net.buildtheearth.terracore.worldgen.dataset.osm.match;
 
-import java.io.IOException;
-import java.util.Map;
-
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
-
+import java.io.IOException;
+import java.util.Map;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
+import net.buildtheearth.terracore.geo.bvh.Bounds2d;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.Geometry;
 import net.buildtheearth.terracore.worldgen.dataset.osm.JsonParser;
-import net.buildtheearth.terracore.geo.bvh.Bounds2d;
 
 /**
  * Combines the results of multiple match conditions using a logical AND operation.
@@ -29,7 +27,11 @@ final class Intersects implements MatchCondition, Bounds2d {
     protected final double maxZ;
 
     @Override
-    public boolean test(String id, @NonNull Map<String, String> tags, @NonNull Geometry originalGeometry, @NonNull Geometry projectedGeometry) {
+    public boolean test(
+            String id,
+            @NonNull Map<String, String> tags,
+            @NonNull Geometry originalGeometry,
+            @NonNull Geometry projectedGeometry) {
         Bounds2d bounds = originalGeometry.bounds();
         return bounds != null && this.intersects(bounds);
     }

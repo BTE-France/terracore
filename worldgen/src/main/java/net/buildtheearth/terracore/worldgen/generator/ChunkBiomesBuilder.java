@@ -1,7 +1,6 @@
 package net.buildtheearth.terracore.worldgen.generator;
 
 import java.util.Arrays;
-
 import lombok.Getter;
 import net.buildtheearth.terracore.minecraft.Biome;
 import net.buildtheearth.terracore.worldgen.util.ImmutableCompactArray;
@@ -15,7 +14,8 @@ import net.daporkchop.lib.common.reference.cache.Cached;
  */
 @Getter
 public class ChunkBiomesBuilder implements IEarthAsyncDataBuilder<ImmutableCompactArray<Biome>> {
-    private static final Cached<ChunkBiomesBuilder> BUILDER_CACHE = Cached.threadLocal(ChunkBiomesBuilder::new, ReferenceStrength.SOFT);
+    private static final Cached<ChunkBiomesBuilder> BUILDER_CACHE =
+            Cached.threadLocal(ChunkBiomesBuilder::new, ReferenceStrength.SOFT);
 
     public static ChunkBiomesBuilder get() {
         return BUILDER_CACHE.get().reset();

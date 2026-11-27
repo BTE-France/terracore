@@ -22,7 +22,7 @@ public final class Segment implements Bounds2d, Interval {
     protected final double x1;
     protected final double z1;
 
-    //bounds2d
+    // bounds2d
 
     @Override
     public double minX() {
@@ -44,7 +44,7 @@ public final class Segment implements Bounds2d, Interval {
         return Math.max(this.z0, this.z1);
     }
 
-    //interval
+    // interval
 
     @Override
     public double min() {

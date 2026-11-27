@@ -1,12 +1,12 @@
 package net.buildtheearth.terracore.worldgen.util;
 
+import static net.daporkchop.lib.common.util.PValidation.*;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-
-import static net.daporkchop.lib.common.util.PValidation.*;
 
 /**
  * A simple closed range between two integers.

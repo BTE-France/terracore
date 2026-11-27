@@ -1,11 +1,11 @@
 package net.buildtheearth.terracore.worldgen.dataset;
 
+import static net.daporkchop.lib.common.math.PMath.*;
+
 import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import net.buildtheearth.terracore.worldgen.util.IntToDoubleBiFunction;
-
-import static net.daporkchop.lib.common.math.PMath.*;
 
 /**
  * @author DaPorkchop_
@@ -15,14 +15,14 @@ public enum BlendMode {
     NEAR(0.0d, 0) {
         @Override
         public double get(double scaledX, double scaledZ, @NonNull IntToDoubleBiFunction sampler) {
-            //very simple - just round down
+            // very simple - just round down
             return sampler.apply(floorI(scaledX), floorI(scaledZ));
         }
     },
     LINEAR(0.0d, 2) {
         @Override
         public double get(double scaledX, double scaledZ, @NonNull IntToDoubleBiFunction sampler) {
-            //get the corners surrounding this block
+            // get the corners surrounding this block
             int sampleX = floorI(scaledX);
             int sampleZ = floorI(scaledZ);
 
@@ -37,9 +37,9 @@ public enum BlendMode {
             return lerp(lerp(v00, v01, fz), lerp(v10, v11, fz), fx);
         }
     },
-    @JsonAlias("SMOOTH") //old name
+    @JsonAlias("SMOOTH") // old name
     CUBIC(-0.5d, 3) {
-        //TODO: this is very broken and causes tons of artifacts
+        // TODO: this is very broken and causes tons of artifacts
 
         /**
          * Lerping produces visible square patches.
@@ -52,7 +52,18 @@ public enum BlendMode {
          *
          * @author K.jpg
          */
-        double compute(double fx, double fy, double v00, double v01, double v02, double v10, double v11, double v12, double v20, double v21, double v22) {
+        double compute(
+                double fx,
+                double fy,
+                double v00,
+                double v01,
+                double v02,
+                double v10,
+                double v11,
+                double v12,
+                double v20,
+                double v21,
+                double v22) {
             // Smooth fade curve. Using this directly in a lerp wouldn't work well for steep slopes.
             // But using it here with gradient ramps does a better job.
             double xFade = fx * fx * (3.0d - 2.0d * fx);
@@ -93,7 +104,7 @@ public enum BlendMode {
             double x = scaledX - 0.5d;
             double z = scaledZ - 0.5d;
 
-            //get the corners surrounding this block
+            // get the corners surrounding this block
             int sampleX = floorI(x);
             int sampleZ = floorI(z);
 
@@ -110,11 +121,20 @@ public enum BlendMode {
             double v21 = sampler.apply(sampleX + 2, sampleZ + 1);
             double v22 = sampler.apply(sampleX + 2, sampleZ + 2);
 
-            //Compute smooth 9-point interpolation on this block
+            // Compute smooth 9-point interpolation on this block
             double result = this.compute(fx, fz, v00, v01, v02, v10, v11, v12, v20, v21, v22);
 
-            if (result > 0.0d && v00 <= 0.0d && v10 <= 0.0d && v20 <= 0.0d && v21 <= 0.0d && v11 <= 0.0d && v01 <= 0.0d && v02 <= 0.0d && v12 <= 0.0d && v22 <= 0.0d) {
-                return 0.0d; //anti ocean ridges
+            if (result > 0.0d
+                    && v00 <= 0.0d
+                    && v10 <= 0.0d
+                    && v20 <= 0.0d
+                    && v21 <= 0.0d
+                    && v11 <= 0.0d
+                    && v01 <= 0.0d
+                    && v02 <= 0.0d
+                    && v12 <= 0.0d
+                    && v22 <= 0.0d) {
+                return 0.0d; // anti ocean ridges
             }
 
             return result;

@@ -3,13 +3,11 @@ package net.buildtheearth.terracore.worldgen.dataset.osm.dvalue;
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
-
+import java.io.IOException;
+import java.util.Map;
 import lombok.Builder;
 import lombok.NonNull;
 import net.buildtheearth.terracore.worldgen.dataset.osm.JsonParser;
-
-import java.io.IOException;
-import java.util.Map;
 
 /**
  * Returns a single, constant value.
@@ -21,6 +19,7 @@ import java.util.Map;
 final class Tag implements DValue {
     @NonNull
     protected final String key;
+
     protected final double fallback;
 
     @Override

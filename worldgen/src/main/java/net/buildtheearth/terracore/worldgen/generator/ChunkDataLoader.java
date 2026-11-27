@@ -1,9 +1,7 @@
 package net.buildtheearth.terracore.worldgen.generator;
 
-import java.util.concurrent.CompletableFuture;
-
 import com.google.common.cache.CacheLoader;
-
+import java.util.concurrent.CompletableFuture;
 import lombok.NonNull;
 import net.buildtheearth.terracore.minecraft.ChunkPos;
 import net.buildtheearth.terracore.worldgen.generator.data.IEarthDataBaker;
@@ -15,13 +13,13 @@ import net.buildtheearth.terracore.worldgen.generator.data.IEarthDataBaker;
  * @author DaPorkchop_
  */
 public class ChunkDataLoader extends CacheLoader<ChunkPos, CompletableFuture<CachedChunkData>> {
-	protected final GeneratorDatasets datasets;
-	protected final IEarthDataBaker<?>[] bakers;
+    protected final GeneratorDatasets datasets;
+    protected final IEarthDataBaker<?>[] bakers;
 
-	public ChunkDataLoader(@NonNull EarthGeneratorSettings settings) {
-		this.datasets = settings.datasets();
-		this.bakers = EarthGeneratorPipelines.dataBakers(settings);
-	}
+    public ChunkDataLoader(@NonNull EarthGeneratorSettings settings) {
+        this.datasets = settings.datasets();
+        this.bakers = EarthGeneratorPipelines.dataBakers(settings);
+    }
 
     /**
      * Construct a new ChunkDataLoader manually with custom generator datasets and data bakers
@@ -33,9 +31,8 @@ public class ChunkDataLoader extends CacheLoader<ChunkPos, CompletableFuture<Cac
         this.bakers = bakers;
     }
 
-	@Override
-	public CompletableFuture<CachedChunkData> load(@NonNull ChunkPos pos) {
-		return IEarthAsyncPipelineStep.getFuture(pos, this.datasets, this.bakers, CachedChunkData::builder);
-	}
-
+    @Override
+    public CompletableFuture<CachedChunkData> load(@NonNull ChunkPos pos) {
+        return IEarthAsyncPipelineStep.getFuture(pos, this.datasets, this.bakers, CachedChunkData::builder);
+    }
 }

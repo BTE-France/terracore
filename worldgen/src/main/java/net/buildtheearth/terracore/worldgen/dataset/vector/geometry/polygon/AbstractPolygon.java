@@ -9,9 +9,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-
 import lombok.Getter;
 import lombok.NonNull;
+import net.buildtheearth.terracore.geo.interval.IntervalTree;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.geometry.LineString;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.geometry.MultiPolygon;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.geometry.Point;
@@ -19,7 +19,6 @@ import net.buildtheearth.terracore.worldgen.dataset.geojson.geometry.Polygon;
 import net.buildtheearth.terracore.worldgen.dataset.vector.draw.DrawFunction;
 import net.buildtheearth.terracore.worldgen.dataset.vector.geometry.AbstractVectorGeometry;
 import net.buildtheearth.terracore.worldgen.dataset.vector.geometry.Segment;
-import net.buildtheearth.terracore.geo.interval.IntervalTree;
 
 /**
  * @author DaPorkchop_
@@ -35,10 +34,11 @@ public abstract class AbstractPolygon extends AbstractVectorGeometry {
 
     private static final double[] EMPTY_DOUBLE_ARRAY = new double[0];
 
-    public AbstractPolygon(@NonNull String id, double layer, @NonNull DrawFunction draw, @NonNull MultiPolygon polygons) {
+    public AbstractPolygon(
+            @NonNull String id, double layer, @NonNull DrawFunction draw, @NonNull MultiPolygon polygons) {
         super(id, layer, draw);
 
-        //compute bounds and convert multipolygon to line segments
+        // compute bounds and convert multipolygon to line segments
         double minX = Double.POSITIVE_INFINITY;
         double maxX = Double.NEGATIVE_INFINITY;
         double minZ = Double.POSITIVE_INFINITY;
@@ -75,7 +75,7 @@ public abstract class AbstractPolygon extends AbstractVectorGeometry {
         do {
             double center = pos + offset;
             List<Segment> segments = this.segments.getAllIntersecting(center);
-            if ((segments.size() & 1) == 0) { //if there's an even count, this was successful
+            if ((segments.size() & 1) == 0) { // if there's an even count, this was successful
                 int size = segments.size();
                 if (size == 0) {
                     return EMPTY_DOUBLE_ARRAY;
@@ -92,12 +92,13 @@ public abstract class AbstractPolygon extends AbstractVectorGeometry {
                 }
             }
 
-            //retry with another random offset
-            //this happens because sometimes segments are exactly aligned to the sample grid, in which case everything breaks
+            // retry with another random offset
+            // this happens because sometimes segments are exactly aligned to the sample grid, in which case everything
+            // breaks
             offset = 0.45d + ThreadLocalRandom.current().nextDouble() * 0.1d;
         } while (retries++ < 3);
 
-        //retried multiple times with different offsets and it still failed, abort...
+        // retried multiple times with different offsets and it still failed, abort...
         return EMPTY_DOUBLE_ARRAY;
     }
 }

@@ -1,7 +1,6 @@
 package net.buildtheearth.terracore.worldgen.dataset.osm.mapper;
 
 import com.google.gson.annotations.JsonAdapter;
-
 import net.buildtheearth.terracore.worldgen.dataset.geojson.geometry.MultiPolygon;
 import net.buildtheearth.terracore.worldgen.dataset.osm.OSMMapper;
 
@@ -10,5 +9,4 @@ import net.buildtheearth.terracore.worldgen.dataset.osm.OSMMapper;
  */
 @JsonAdapter(PolygonParser.class)
 @FunctionalInterface
-public interface PolygonMapper extends OSMMapper<MultiPolygon> {
-}
+public interface PolygonMapper extends OSMMapper<MultiPolygon> {}

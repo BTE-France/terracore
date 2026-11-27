@@ -2,11 +2,10 @@ package net.buildtheearth.terracore.worldgen.dataset.osm.dvalue;
 
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.stream.JsonReader;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-
 import java.io.IOException;
 import java.util.Map;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 /**
  * @author DaPorkchop_
@@ -15,10 +14,11 @@ import java.util.Map;
 abstract class BiOp implements DValue {
     @NonNull
     protected final DValue first;
+
     @NonNull
     protected final DValue second;
 
-    static abstract class Parser extends DValueParser {
+    abstract static class Parser extends DValueParser {
         @Override
         public DValue read(JsonReader in) throws IOException {
             in.beginObject();

@@ -2,19 +2,17 @@ package net.buildtheearth.terracore.worldgen.dataset.osm.mapper;
 
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.stream.JsonReader;
-
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+import lombok.NonNull;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.Geometry;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.geometry.MultiLineString;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.geometry.MultiPolygon;
 import net.buildtheearth.terracore.worldgen.dataset.osm.JsonParser;
 import net.buildtheearth.terracore.worldgen.dataset.osm.OSMMapper;
 import net.buildtheearth.terracore.worldgen.dataset.vector.geometry.VectorGeometry;
-import lombok.NonNull;
-
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
 
 /**
  * Returns a non-null, empty list.
@@ -23,11 +21,15 @@ import java.util.Map;
  */
 abstract class Nothing<G extends Geometry, M extends OSMMapper<G>> implements OSMMapper<G> {
     @Override
-    public Collection<VectorGeometry> apply(String id, @NonNull Map<String, String> tags, @NonNull Geometry originalGeometry, @NonNull G projectedGeometry) {
+    public Collection<VectorGeometry> apply(
+            String id,
+            @NonNull Map<String, String> tags,
+            @NonNull Geometry originalGeometry,
+            @NonNull G projectedGeometry) {
         return Collections.emptyList();
     }
 
-    static abstract class Parser<G extends Geometry, M extends OSMMapper<G>> extends JsonParser<M> {
+    abstract static class Parser<G extends Geometry, M extends OSMMapper<G>> extends JsonParser<M> {
         @Override
         public M read(JsonReader in) throws IOException {
             in.beginObject();

@@ -1,10 +1,8 @@
 package net.buildtheearth.terracore.worldgen.dataset.vector.draw;
 
-import java.io.IOException;
-
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.stream.JsonReader;
-
+import java.io.IOException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.buildtheearth.terracore.minecraft.BlockState;

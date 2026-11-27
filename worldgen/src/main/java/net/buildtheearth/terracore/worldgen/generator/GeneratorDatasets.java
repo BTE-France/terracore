@@ -1,11 +1,10 @@
 package net.buildtheearth.terracore.worldgen.generator;
 
+import java.util.Map;
 import lombok.Getter;
 import lombok.NonNull;
 import net.buildtheearth.terracore.geo.projection.GeographicProjection;
 import net.buildtheearth.terracore.worldgen.util.CustomAttributeContainer;
-
-import java.util.Map;
 
 /**
  * Wrapper class which contains all of the datasets used for generation.

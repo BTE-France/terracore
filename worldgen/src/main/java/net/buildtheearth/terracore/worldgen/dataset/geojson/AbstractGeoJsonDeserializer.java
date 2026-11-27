@@ -1,10 +1,15 @@
 package net.buildtheearth.terracore.worldgen.dataset.geojson;
 
+import static net.daporkchop.lib.common.util.PValidation.*;
+
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
-
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.geometry.GeometryCollection;
@@ -14,13 +19,6 @@ import net.buildtheearth.terracore.worldgen.dataset.geojson.geometry.MultiPoint;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.geometry.MultiPolygon;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.geometry.Point;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.geometry.Polygon;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static net.daporkchop.lib.common.util.PValidation.*;
 
 /**
  * @author DaPorkchop_
@@ -52,8 +50,9 @@ abstract class AbstractGeoJsonDeserializer<T extends GeoJsonObject> extends Type
     protected final Geometry readGeometry(String type, JsonReader in) throws IOException {
         String fieldName = in.nextName();
 
-        if ("GeometryCollection".equals(type)) { //special handling for GeometryCollection
-            checkState("geometries".equals(fieldName), "unexpected field \"%s\" in GeometryCollection object", fieldName);
+        if ("GeometryCollection".equals(type)) { // special handling for GeometryCollection
+            checkState(
+                    "geometries".equals(fieldName), "unexpected field \"%s\" in GeometryCollection object", fieldName);
             List<Geometry> geometries = new ArrayList<>();
             in.beginArray();
             while (in.peek() != JsonToken.END_ARRAY) {
@@ -84,7 +83,7 @@ abstract class AbstractGeoJsonDeserializer<T extends GeoJsonObject> extends Type
     protected Point readPoint(JsonReader in) throws IOException {
         in.beginArray();
         Point point = new Point(in.nextDouble(), in.nextDouble());
-        if (in.peek() == JsonToken.NUMBER) { //optional elevation
+        if (in.peek() == JsonToken.NUMBER) { // optional elevation
             in.nextDouble();
         }
         in.endArray();

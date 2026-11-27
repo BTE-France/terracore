@@ -1,65 +1,74 @@
 package net.buildtheearth.terracore.worldgen.generator;
 
+import static net.daporkchop.lib.common.util.PorkUtil.*;
+
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.function.Supplier;
-
-import net.buildtheearth.terracore.minecraft.ChunkPos;
-import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
 import net.buildtheearth.terracore.geo.CornerBoundingBox2d;
 import net.buildtheearth.terracore.geo.bvh.Bounds2d;
-
-import static net.daporkchop.lib.common.util.PorkUtil.*;
+import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
+import net.buildtheearth.terracore.minecraft.ChunkPos;
 
 /**
  * @author DaPorkchop_
  */
 public interface IEarthAsyncPipelineStep<D, V, B extends IEarthAsyncDataBuilder<V>> {
-    static <V, B extends IEarthAsyncDataBuilder<V>> CompletableFuture<V> getFuture(ChunkPos pos, GeneratorDatasets datasets, IEarthAsyncPipelineStep<?, V, B>[] steps, Supplier<B> builderFactory) {
-        //i used the future to create the future
+    static <V, B extends IEarthAsyncDataBuilder<V>> CompletableFuture<V> getFuture(
+            ChunkPos pos,
+            GeneratorDatasets datasets,
+            IEarthAsyncPipelineStep<?, V, B>[] steps,
+            Supplier<B> builderFactory) {
+        // i used the future to create the future
         return CompletableFuture.supplyAsync(() -> {
-            int baseX = ChunkPos.cubeToMinBlock(pos.x());
-            int baseZ = ChunkPos.cubeToMinBlock(pos.z());
+                    int baseX = ChunkPos.cubeToMinBlock(pos.x());
+                    int baseZ = ChunkPos.cubeToMinBlock(pos.z());
 
-            CompletableFuture<?>[] futures = new CompletableFuture[steps.length];
-            try {
-                Bounds2d chunkBounds = Bounds2d.of(baseX, baseX + 16, baseZ, baseZ + 16);
-                CornerBoundingBox2d chunkBoundsGeo = chunkBounds.toCornerBB(datasets.projection(), false).toGeo();
-
-                for (int i = 0; i < steps.length; i++) {
+                    CompletableFuture<?>[] futures = new CompletableFuture[steps.length];
                     try {
-                        futures[i] = steps[i].requestData(pos, datasets, chunkBounds, chunkBoundsGeo);
-                    } catch (OutOfProjectionBoundsException ignored) {
-                    }
-                }
-            } catch (OutOfProjectionBoundsException ignored) {
-            }
-
-            boolean areAnyFuturesNull = Arrays.stream(futures).anyMatch(Objects::isNull);
-            CompletableFuture<?>[] nonNullFutures = areAnyFuturesNull
-                    ? Arrays.stream(futures).filter(Objects::nonNull).toArray(CompletableFuture[]::new)
-                    : futures;
-
-            CompletableFuture<V> future = (nonNullFutures.length != 0 ? CompletableFuture.allOf(nonNullFutures) : CompletableFuture.completedFuture(null))
-                    .thenApply(unused -> {
-                        B builder = builderFactory.get();
+                        Bounds2d chunkBounds = Bounds2d.of(baseX, baseX + 16, baseZ, baseZ + 16);
+                        CornerBoundingBox2d chunkBoundsGeo = chunkBounds
+                                .toCornerBB(datasets.projection(), false)
+                                .toGeo();
 
                         for (int i = 0; i < steps.length; i++) {
-                            CompletableFuture<?> stepFuture = futures[i];
-                            steps[i].bake(pos, builder, stepFuture != null ? uncheckedCast(stepFuture.join()) : null);
+                            try {
+                                futures[i] = steps[i].requestData(pos, datasets, chunkBounds, chunkBoundsGeo);
+                            } catch (OutOfProjectionBoundsException ignored) {
+                            }
                         }
+                    } catch (OutOfProjectionBoundsException ignored) {
+                    }
 
-                        return builder.build();
+                    boolean areAnyFuturesNull = Arrays.stream(futures).anyMatch(Objects::isNull);
+                    CompletableFuture<?>[] nonNullFutures = areAnyFuturesNull
+                            ? Arrays.stream(futures).filter(Objects::nonNull).toArray(CompletableFuture[]::new)
+                            : futures;
+
+                    CompletableFuture<V> future = (nonNullFutures.length != 0
+                                    ? CompletableFuture.allOf(nonNullFutures)
+                                    : CompletableFuture.completedFuture(null))
+                            .thenApply(unused -> {
+                                B builder = builderFactory.get();
+
+                                for (int i = 0; i < steps.length; i++) {
+                                    CompletableFuture<?> stepFuture = futures[i];
+                                    steps[i].bake(
+                                            pos, builder, stepFuture != null ? uncheckedCast(stepFuture.join()) : null);
+                                }
+
+                                return builder.build();
+                            });
+                    future.whenComplete((data, t) -> {
+                        if (t != null) {
+                            GeneratorLogging.LOGGER.error("async exception while loading data", t);
+                        }
                     });
-            future.whenComplete((data, t) -> {
-                if (t != null) {
-                    GeneratorLogging.LOGGER.error("async exception while loading data", t);
-                }
-            });
-            return future;
-        }).thenCompose(Function.identity());
+                    return future;
+                })
+                .thenCompose(Function.identity());
     }
 
     /**
@@ -71,7 +80,9 @@ public interface IEarthAsyncPipelineStep<D, V, B extends IEarthAsyncDataBuilder<
      * @param boundsGeo the bounding box of the chunk (in world coordinates)
      * @return a {@link CompletableFuture} which will be completed with the required data
      */
-    CompletableFuture<D> requestData(ChunkPos pos, GeneratorDatasets datasets, Bounds2d bounds, CornerBoundingBox2d boundsGeo) throws OutOfProjectionBoundsException;
+    CompletableFuture<D> requestData(
+            ChunkPos pos, GeneratorDatasets datasets, Bounds2d bounds, CornerBoundingBox2d boundsGeo)
+            throws OutOfProjectionBoundsException;
 
     /**
      * Bakes the retrieved data into the chunk data for the given column.

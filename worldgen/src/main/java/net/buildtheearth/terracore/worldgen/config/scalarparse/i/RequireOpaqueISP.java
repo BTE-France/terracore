@@ -5,16 +5,15 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.netty.buffer.ByteBuf;
+import java.io.IOException;
 import lombok.Getter;
 import lombok.NonNull;
-
-import java.io.IOException;
 
 /**
  * @author DaPorkchop_
  */
 @JsonDeserialize
-@Getter(onMethod_ = { @JsonGetter })
+@Getter(onMethod_ = {@JsonGetter})
 public class RequireOpaqueISP implements IntScalarParser {
     protected final IntScalarParser delegate;
 
@@ -27,7 +26,7 @@ public class RequireOpaqueISP implements IntScalarParser {
     public int[] parse(int resolution, @NonNull ByteBuf buffer) throws IOException {
         int[] arr = this.delegate.parse(resolution, buffer);
         for (int i = 0, len = resolution * resolution; i < len; i++) {
-            if ((arr[i] >>> 24) != 0xFF) { //pixel is not fully transparent
+            if ((arr[i] >>> 24) != 0xFF) { // pixel is not fully transparent
                 arr[i] = Integer.MIN_VALUE;
             }
         }

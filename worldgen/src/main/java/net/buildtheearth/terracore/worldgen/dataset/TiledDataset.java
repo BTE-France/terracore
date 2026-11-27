@@ -11,5 +11,6 @@ import net.buildtheearth.terracore.geo.projection.GeographicProjection;
 public abstract class TiledDataset<V> extends Dataset<TileLocation, V> {
     @NonNull
     protected final GeographicProjection projection;
+
     protected final double tileSize;
 }

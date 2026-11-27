@@ -1,15 +1,14 @@
 package net.buildtheearth.terracore.worldgen.config.scalarparse.i;
 
+import static net.daporkchop.lib.common.util.PValidation.*;
+
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
-import lombok.NonNull;
-
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-
-import static net.daporkchop.lib.common.util.PValidation.*;
+import javax.imageio.ImageIO;
+import lombok.NonNull;
 
 /**
  * @author DaPorkchop_
@@ -22,7 +21,12 @@ public class ParsePngISP implements IntScalarParser {
 
         int w = image.getWidth();
         int h = image.getHeight();
-        checkArg(w == resolution && h == resolution, "invalid image resolution: %dx%d (expected: %dx%3$d)", w, h, resolution);
+        checkArg(
+                w == resolution && h == resolution,
+                "invalid image resolution: %dx%d (expected: %dx%3$d)",
+                w,
+                h,
+                resolution);
 
         return image.getRGB(0, 0, resolution, resolution, null, 0, resolution);
     }

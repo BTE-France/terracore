@@ -1,16 +1,14 @@
 package net.buildtheearth.terracore.worldgen.dataset.geojson.geometry;
 
+import com.google.common.collect.Iterators;
 import java.util.Arrays;
 import java.util.Iterator;
-
-import com.google.common.collect.Iterators;
-
 import lombok.Data;
 import lombok.NonNull;
-import net.buildtheearth.terracore.worldgen.dataset.geojson.Geometry;
+import net.buildtheearth.terracore.geo.bvh.Bounds2d;
 import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
 import net.buildtheearth.terracore.geo.projection.ProjectionFunction;
-import net.buildtheearth.terracore.geo.bvh.Bounds2d;
+import net.buildtheearth.terracore.worldgen.dataset.geojson.Geometry;
 
 /**
  * @author DaPorkchop_
@@ -36,6 +34,9 @@ public final class MultiLineString implements Geometry, Iterable<LineString> {
 
     @Override
     public Bounds2d bounds() {
-        return Arrays.stream(this.lines).map(LineString::bounds).reduce(Bounds2d::union).orElse(null);
+        return Arrays.stream(this.lines)
+                .map(LineString::bounds)
+                .reduce(Bounds2d::union)
+                .orElse(null);
     }
 }

@@ -1,14 +1,12 @@
 package net.buildtheearth.terracore.worldgen.dataset.osm.mapper;
 
+import com.google.gson.annotations.JsonAdapter;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
-
-import com.google.gson.annotations.JsonAdapter;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonToken;
-
 import lombok.Builder;
 import lombok.NonNull;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.Geometry;
@@ -28,14 +26,21 @@ import net.buildtheearth.terracore.worldgen.dataset.vector.geometry.line.WideLin
 final class LineWide implements LineMapper {
     @NonNull
     protected final DrawFunction draw;
+
     @NonNull
     protected final DValue layer;
+
     @NonNull
     protected final DValue radius;
 
     @Override
-    public Collection<VectorGeometry> apply(String id, @NonNull Map<String, String> tags, @NonNull Geometry originalGeometry, @NonNull MultiLineString projectedGeometry) {
-        return Collections.singleton(new WideLine(id, this.layer.apply(tags), this.draw, projectedGeometry, this.radius.apply(tags)));
+    public Collection<VectorGeometry> apply(
+            String id,
+            @NonNull Map<String, String> tags,
+            @NonNull Geometry originalGeometry,
+            @NonNull MultiLineString projectedGeometry) {
+        return Collections.singleton(
+                new WideLine(id, this.layer.apply(tags), this.draw, projectedGeometry, this.radius.apply(tags)));
     }
 
     static final class Parser extends JsonParser<LineWide> {

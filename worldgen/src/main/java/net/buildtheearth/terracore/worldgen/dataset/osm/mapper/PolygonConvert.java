@@ -1,16 +1,14 @@
 package net.buildtheearth.terracore.worldgen.dataset.osm.mapper;
 
+import com.google.gson.annotations.JsonAdapter;
+import com.google.gson.stream.JsonReader;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
-import com.google.gson.annotations.JsonAdapter;
-import com.google.gson.stream.JsonReader;
-
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.Geometry;
@@ -54,8 +52,12 @@ public interface PolygonConvert extends PolygonMapper {
         protected final LineMapper next;
 
         @Override
-        public Collection<VectorGeometry> apply(String id, @NonNull Map<String, String> tags, @NonNull Geometry originalGeometry, @NonNull MultiPolygon projectedGeometry) {
-            //convert multipolygon to multilinestring
+        public Collection<VectorGeometry> apply(
+                String id,
+                @NonNull Map<String, String> tags,
+                @NonNull Geometry originalGeometry,
+                @NonNull MultiPolygon projectedGeometry) {
+            // convert multipolygon to multilinestring
             List<LineString> lines = new ArrayList<>();
             for (Polygon polygon : projectedGeometry.polygons()) {
                 lines.add(polygon.outerRing());

@@ -8,12 +8,12 @@ import static java.lang.Math.sqrt;
 import static net.daporkchop.lib.common.math.PMath.floorI;
 
 import lombok.NonNull;
+import net.buildtheearth.terracore.geo.GeoMaths;
+import net.buildtheearth.terracore.geo.bvh.Bounds2d;
 import net.buildtheearth.terracore.minecraft.ChunkPos;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.geometry.MultiLineString;
 import net.buildtheearth.terracore.worldgen.dataset.vector.draw.DrawFunction;
 import net.buildtheearth.terracore.worldgen.generator.CachedChunkData;
-import net.buildtheearth.terracore.geo.GeoMaths;
-import net.buildtheearth.terracore.geo.bvh.Bounds2d;
 
 /**
  * @author DaPorkchop_
@@ -21,7 +21,12 @@ import net.buildtheearth.terracore.geo.bvh.Bounds2d;
 public final class WideLine extends AbstractLine {
     protected final double radius;
 
-    public WideLine(@NonNull String id, double layer, @NonNull DrawFunction draw, @NonNull MultiLineString lines, double radius) {
+    public WideLine(
+            @NonNull String id,
+            double layer,
+            @NonNull DrawFunction draw,
+            @NonNull MultiLineString lines,
+            double radius) {
         super(id, layer, draw, lines);
 
         this.radius = radius;

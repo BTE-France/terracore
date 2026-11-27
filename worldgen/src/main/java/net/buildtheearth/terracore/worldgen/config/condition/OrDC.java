@@ -11,9 +11,9 @@ import net.buildtheearth.terracore.worldgen.config.SingleProperty;
 /**
  * @author DaPorkchop_
  */
-@RequiredArgsConstructor(onConstructor_ = { @JsonCreator(mode = JsonCreator.Mode.DELEGATING) })
+@RequiredArgsConstructor(onConstructor_ = {@JsonCreator(mode = JsonCreator.Mode.DELEGATING)})
 @JsonDeserialize
-@Getter(onMethod_ = { @JsonValue })
+@Getter(onMethod_ = {@JsonValue})
 @SingleProperty
 public class OrDC implements DoubleCondition {
     @NonNull

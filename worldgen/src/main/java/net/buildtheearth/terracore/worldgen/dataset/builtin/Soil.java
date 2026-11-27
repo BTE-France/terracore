@@ -2,11 +2,10 @@ package net.buildtheearth.terracore.worldgen.dataset.builtin;
 
 import static net.daporkchop.lib.common.math.PMath.floorI;
 
-import java.io.InputStream;
-import java.util.zip.GZIPInputStream;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import java.io.InputStream;
+import java.util.zip.GZIPInputStream;
 import net.buildtheearth.terracore.worldgen.dataset.binary.RLEByteArray;
 import net.daporkchop.lib.binary.oio.StreamUtil;
 import net.daporkchop.lib.common.function.io.IOSupplier;
@@ -20,20 +19,22 @@ public class Soil extends AbstractBuiltinDataset {
 
     private static final String RESOURCE_PATH = "soil.gz";
 
-    private static final Cached<RLEByteArray> DATA_CACHE = Cached.global((IOSupplier<RLEByteArray>) () -> {
-        ByteBuf buf;
-        try (InputStream inCompressed = Climate.class.getResourceAsStream(RESOURCE_PATH)) {
-            PValidation.checkState(inCompressed != null, "Missing builtin dataset resource: " + RESOURCE_PATH);
-            InputStream in = new GZIPInputStream(inCompressed);
-            buf = Unpooled.wrappedBuffer(StreamUtil.toByteArray(in));
-        }
+    private static final Cached<RLEByteArray> DATA_CACHE = Cached.global(
+            (IOSupplier<RLEByteArray>) () -> {
+                ByteBuf buf;
+                try (InputStream inCompressed = Climate.class.getResourceAsStream(RESOURCE_PATH)) {
+                    PValidation.checkState(inCompressed != null, "Missing builtin dataset resource: " + RESOURCE_PATH);
+                    InputStream in = new GZIPInputStream(inCompressed);
+                    buf = Unpooled.wrappedBuffer(StreamUtil.toByteArray(in));
+                }
 
-        RLEByteArray.Builder builder = RLEByteArray.builder();
-        for (int i = 0, lim = buf.readableBytes(); i < lim; i++) {
-            builder.append(buf.getByte(i));
-        }
-        return builder.build();
-    }, ReferenceStrength.SOFT);
+                RLEByteArray.Builder builder = RLEByteArray.builder();
+                for (int i = 0, lim = buf.readableBytes(); i < lim; i++) {
+                    builder.append(buf.getByte(i));
+                }
+                return builder.build();
+            },
+            ReferenceStrength.SOFT);
 
     private final RLEByteArray data = DATA_CACHE.get();
 

@@ -2,13 +2,11 @@ package net.buildtheearth.terracore.worldgen.dataset.osm.dvalue;
 
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.stream.JsonReader;
-
+import java.io.IOException;
+import java.util.Map;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.buildtheearth.terracore.worldgen.dataset.osm.JsonParser;
-
-import java.io.IOException;
-import java.util.Map;
 
 /**
  * Returns a single, constant value.

@@ -8,13 +8,12 @@ import static net.daporkchop.lib.common.math.PMath.floorI;
 import static net.daporkchop.lib.common.util.PValidation.positive;
 
 import java.util.Arrays;
-
 import lombok.NonNull;
+import net.buildtheearth.terracore.geo.bvh.Bounds2d;
 import net.buildtheearth.terracore.minecraft.ChunkPos;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.geometry.MultiPolygon;
 import net.buildtheearth.terracore.worldgen.dataset.vector.draw.DrawFunction;
 import net.buildtheearth.terracore.worldgen.generator.CachedChunkData;
-import net.buildtheearth.terracore.geo.bvh.Bounds2d;
 
 /**
  * @author DaPorkchop_
@@ -22,7 +21,8 @@ import net.buildtheearth.terracore.geo.bvh.Bounds2d;
 public final class DistancePolygon extends AbstractPolygon {
     protected final int maxDist;
 
-    public DistancePolygon(@NonNull String id, double layer, @NonNull DrawFunction draw, @NonNull MultiPolygon polygons, int maxDist) {
+    public DistancePolygon(
+            @NonNull String id, double layer, @NonNull DrawFunction draw, @NonNull MultiPolygon polygons, int maxDist) {
         super(id, layer, draw, polygons);
 
         this.maxDist = positive(maxDist, "maxDist");
@@ -38,28 +38,28 @@ public final class DistancePolygon extends AbstractPolygon {
 
         for (int x = -maxDist; x < 16 + maxDist; x++) {
             DISTANCES:
-            { //compute distances
+            { // compute distances
                 int[] distances = distances2d[0];
-                System.arraycopy(distances2d, 1, distances2d, 0, maxDist << 1); //shift distances down by one
+                System.arraycopy(distances2d, 1, distances2d, 0, maxDist << 1); // shift distances down by one
                 distances2d[maxDist << 1] = distances;
                 double[] intersectionPoints = this.getIntersectionPoints(x + baseX);
 
-                if (intersectionPoints.length == 0) { //no intersections along this line
+                if (intersectionPoints.length == 0) { // no intersections along this line
                     Arrays.fill(distances, Integer.MIN_VALUE);
                     break DISTANCES;
                 }
 
                 int i = Arrays.binarySearch(intersectionPoints, baseZ - maxDist);
-                i ^= i >> 31; //convert possibly negative insertion index to positive
-                i -= i & 1; //ensure we start on an even index
+                i ^= i >> 31; // convert possibly negative insertion index to positive
+                i -= i & 1; // ensure we start on an even index
 
                 int max;
 
-                if (i < intersectionPoints.length) { //index is valid
+                if (i < intersectionPoints.length) { // index is valid
                     int mask = 0;
                     int min = floorI(intersectionPoints[i++]) - baseZ;
 
-                    //fill everything up to this point with blanks
+                    // fill everything up to this point with blanks
                     for (int z = 0, itrMax = clamp(min, 0, 16); z < itrMax; z++) {
                         distances[z] = z - min;
                     }
@@ -74,11 +74,11 @@ public final class DistancePolygon extends AbstractPolygon {
                         min = max;
                         mask = ~mask;
                     } while (i < intersectionPoints.length && max <= baseX + 16);
-                } else { //index is too high, simply fill from the end
+                } else { // index is too high, simply fill from the end
                     max = floorI(intersectionPoints[intersectionPoints.length - 1]) - baseZ;
                 }
 
-                //fill everything to the edge with blanks
+                // fill everything to the edge with blanks
                 for (int z = clamp(max, 0, 16); z < 16; z++) {
                     distances[z] = max - z - 1;
                 }

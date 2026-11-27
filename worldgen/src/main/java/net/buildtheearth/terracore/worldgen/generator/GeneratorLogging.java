@@ -8,5 +8,4 @@ import org.apache.logging.log4j.Logger;
 class GeneratorLogging {
 
     final Logger LOGGER = LogManager.getLogger(GeneratorLogging.class);
-
 }

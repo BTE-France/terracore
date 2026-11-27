@@ -1,5 +1,15 @@
 package net.buildtheearth.terracore.worldgen.dataset.scalar;
 
+import static net.daporkchop.lib.common.util.PValidation.*;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.json.JsonReadFeature;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
@@ -11,31 +21,19 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.stream.Stream;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.json.JsonReadFeature;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.SneakyThrows;
-import net.buildtheearth.terracore.worldgen.config.condition.DoubleCondition;
-import net.buildtheearth.terracore.worldgen.dataset.IScalarDataset;
-import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
 import net.buildtheearth.terracore.geo.CornerBoundingBox2d;
-import net.buildtheearth.terracore.worldgen.util.IntRange;
 import net.buildtheearth.terracore.geo.bvh.BVH;
 import net.buildtheearth.terracore.geo.bvh.Bounds2d;
+import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
 import net.buildtheearth.terracore.http.Disk;
+import net.buildtheearth.terracore.worldgen.config.condition.DoubleCondition;
+import net.buildtheearth.terracore.worldgen.dataset.IScalarDataset;
+import net.buildtheearth.terracore.worldgen.util.IntRange;
 import net.daporkchop.lib.common.function.io.IOFunction;
 import net.daporkchop.lib.common.function.throwing.EFunction;
-
-import static net.daporkchop.lib.common.util.PValidation.*;
 
 /**
  * Implementation of {@link IScalarDataset} which can sample from multiple {@link IScalarDataset}s and combine the results.
@@ -57,14 +55,15 @@ public class MultiScalarDataset implements IScalarDataset {
     @SneakyThrows(IOException.class)
     public MultiScalarDataset(@NonNull String name, boolean useDefault) {
         List<URL> configSources = new ArrayList<>();
-        if (useDefault) { //add default configuration
+        if (useDefault) { // add default configuration
             configSources.add(MultiScalarDataset.class.getResource(name + ".json5"));
         }
 
         try (Stream<Path> stream = Files.list(Files.createDirectories(Disk.configFile(name)))) {
             stream.filter(Files::isRegularFile)
                     .filter(p -> p.getFileName().toString().matches(".*\\.json5?$"))
-                    .map(Path::toUri).map((EFunction<URI, URL>) URI::toURL)
+                    .map(Path::toUri)
+                    .map((EFunction<URI, URL>) URI::toURL)
                     .forEach(configSources::add);
         }
 
@@ -77,15 +76,16 @@ public class MultiScalarDataset implements IScalarDataset {
 
     @Override
     public CompletableFuture<Double> getAsync(double lon, double lat) throws OutOfProjectionBoundsException {
-        WrappedDataset[] datasets = this.bvh.getAllIntersecting(Bounds2d.of(lon, lon, lat, lat)).toArray(new WrappedDataset[0]);
-        if (datasets.length == 0) { //no matching datasets!
+        WrappedDataset[] datasets =
+                this.bvh.getAllIntersecting(Bounds2d.of(lon, lon, lat, lat)).toArray(new WrappedDataset[0]);
+        if (datasets.length == 0) { // no matching datasets!
             return CompletableFuture.completedFuture(Double.NaN);
-        } else if (datasets.length == 1) { //only one dataset matches
-            if (datasets[0].condition == null) { //if it doesn't have a condition, there's no reason to do any merging
+        } else if (datasets.length == 1) { // only one dataset matches
+            if (datasets[0].condition == null) { // if it doesn't have a condition, there's no reason to do any merging
                 return datasets[0].dataset.getAsync(lon, lat);
             }
         }
-        Arrays.sort(datasets); //ensure datasets are in priority order
+        Arrays.sort(datasets); // ensure datasets are in priority order
 
         class State implements BiConsumer<Double, Throwable> {
             final CompletableFuture<Double> future = new CompletableFuture<>();
@@ -95,9 +95,11 @@ public class MultiScalarDataset implements IScalarDataset {
             public void accept(Double v, Throwable cause) {
                 if (cause != null) {
                     this.future.completeExceptionally(cause);
-                } else if (!Double.isNaN(v) && datasets[this.i].test(v)) { //if the value in the input array is accepted, use it as the output
+                } else if (!Double.isNaN(v)
+                        && datasets[this.i].test(
+                                v)) { // if the value in the input array is accepted, use it as the output
                     this.future.complete(v);
-                } else { //sample the next dataset
+                } else { // sample the next dataset
                     this.advance();
                 }
             }
@@ -109,7 +111,7 @@ public class MultiScalarDataset implements IScalarDataset {
                     } catch (OutOfProjectionBoundsException e) {
                         this.future.completeExceptionally(e);
                     }
-                } else { //no datasets remain, complete the future successfully with whatever value we currently have
+                } else { // no datasets remain, complete the future successfully with whatever value we currently have
                     this.future.complete(Double.NaN);
                 }
             }
@@ -121,20 +123,22 @@ public class MultiScalarDataset implements IScalarDataset {
     }
 
     @Override
-    public CompletableFuture<double[]> getAsync(@NonNull CornerBoundingBox2d bounds, int sizeX, int sizeZ) throws OutOfProjectionBoundsException {
-        if (notNegative(sizeX, "sizeX") == 0 | notNegative(sizeZ, "sizeZ") == 0) { //no input points -> no output points, ez
+    public CompletableFuture<double[]> getAsync(@NonNull CornerBoundingBox2d bounds, int sizeX, int sizeZ)
+            throws OutOfProjectionBoundsException {
+        if (notNegative(sizeX, "sizeX") == 0
+                | notNegative(sizeZ, "sizeZ") == 0) { // no input points -> no output points, ez
             return CompletableFuture.completedFuture(new double[0]);
         }
 
         WrappedDataset[] datasets = this.bvh.getAllIntersecting(bounds).toArray(new WrappedDataset[0]);
-        if (datasets.length == 0) { //no matching datasets!
+        if (datasets.length == 0) { // no matching datasets!
             return CompletableFuture.completedFuture(null);
-        } else if (datasets.length == 1) { //only one dataset matches
-            if (datasets[0].condition == null) { //if it doesn't have a condition, there's no reason to do any merging
+        } else if (datasets.length == 1) { // only one dataset matches
+            if (datasets[0].condition == null) { // if it doesn't have a condition, there's no reason to do any merging
                 return datasets[0].dataset.getAsync(bounds, sizeX, sizeZ);
             }
         }
-        Arrays.sort(datasets); //ensure datasets are in priority order
+        Arrays.sort(datasets); // ensure datasets are in priority order
 
         class State implements BiConsumer<double[], Throwable> {
             final CompletableFuture<double[]> future = new CompletableFuture<>();
@@ -146,20 +150,24 @@ public class MultiScalarDataset implements IScalarDataset {
             public void accept(double[] data, Throwable cause) {
                 if (cause != null) {
                     this.future.completeExceptionally(cause);
-                } else if (data != null) { //if the array is null, it's as if it were an array of NaNs - nothing would be set, we simply skip it
+                } else if (data
+                        != null) { // if the array is null, it's as if it were an array of NaNs - nothing would be set,
+                    // we simply skip it
                     double[] out = this.out;
-                    if (out == null) { //ensure the destination array is set
+                    if (out == null) { // ensure the destination array is set
                         Arrays.fill(this.out = out = new double[sizeX * sizeZ], Double.NaN);
                     }
 
                     WrappedDataset dataset = datasets[this.i];
 
                     for (int i = 0; i < sizeX * sizeZ; i++) {
-                        if (Double.isNaN(out[i])) { //if value in output array is NaN, consider replacing it
+                        if (Double.isNaN(out[i])) { // if value in output array is NaN, consider replacing it
                             double v = data[i];
-                            if (!Double.isNaN(v) && dataset.test(v)) { //if the value in the input array is accepted, use it as the output
+                            if (!Double.isNaN(v)
+                                    && dataset.test(
+                                            v)) { // if the value in the input array is accepted, use it as the output
                                 out[i] = v;
-                                if (--this.remaining == 0) { //if no samples are left to process, we're done!
+                                if (--this.remaining == 0) { // if no samples are left to process, we're done!
                                     this.future.complete(out);
                                     return;
                                 }
@@ -177,7 +185,7 @@ public class MultiScalarDataset implements IScalarDataset {
                     } catch (OutOfProjectionBoundsException e) {
                         this.future.completeExceptionally(e);
                     }
-                } else { //no datasets remain, complete the future successfully with whatever value we currently have
+                } else { // no datasets remain, complete the future successfully with whatever value we currently have
                     this.future.complete(this.out);
                 }
             }
@@ -197,12 +205,14 @@ public class MultiScalarDataset implements IScalarDataset {
     @JsonSerialize
     @Getter
     private static class WrappedDataset implements Bounds2d, Comparable<WrappedDataset>, DoubleCondition {
-        @Getter(onMethod_ = { @JsonGetter })
+        @Getter(onMethod_ = {@JsonGetter})
         protected final IScalarDataset dataset;
-        @Getter(onMethod_ = { @JsonGetter })
+
+        @Getter(onMethod_ = {@JsonGetter})
         protected final DoubleCondition condition;
-        @Getter(onMethod_ = { @JsonGetter })
-        protected final IntRange zooms; //TODO: use this
+
+        @Getter(onMethod_ = {@JsonGetter})
+        protected final IntRange zooms; // TODO: use this
 
         protected final Bounds2d[] bounds;
 
@@ -211,7 +221,7 @@ public class MultiScalarDataset implements IScalarDataset {
         protected final double minZ;
         protected final double maxZ;
 
-        @Getter(onMethod_ = { @JsonGetter })
+        @Getter(onMethod_ = {@JsonGetter})
         protected final double priority;
 
         @JsonCreator
@@ -237,7 +247,9 @@ public class MultiScalarDataset implements IScalarDataset {
         protected Stream<WrappedDataset> flatten() {
             return this.bounds == null
                     ? Stream.of(this)
-                    : Stream.of(this.bounds).map(bounds -> new WrappedDataset(this.dataset, new Bounds2d[]{bounds}, this.zooms, this.priority, this.condition));
+                    : Stream.of(this.bounds)
+                            .map(bounds -> new WrappedDataset(
+                                    this.dataset, new Bounds2d[] {bounds}, this.zooms, this.priority, this.condition));
         }
 
         @Override
