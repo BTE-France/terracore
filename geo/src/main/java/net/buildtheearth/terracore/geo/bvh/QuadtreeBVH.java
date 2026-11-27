@@ -141,10 +141,11 @@ final class QuadtreeBVH<V extends Bounds2d> implements BVH<V> {
         }
 
         protected void insert(@NonNull V value, @NonNull Class<V> componentType) {
-            if (this.values == null) { // allocate initial value array
+            if (this.values == null) {
+                // allocate initial value array
                 this.values = uncheckedCast(Array.newInstance(componentType, NODE_SPLIT_CAPACITY));
-            } else if (this.size == NODE_SPLIT_CAPACITY
-                    && this.canSplit()) { // we're at capacity and haven't split yet, attempt to split now
+            } else if (this.size == NODE_SPLIT_CAPACITY && this.canSplit()) {
+                // we're at capacity and haven't split yet, attempt to split now
                 this.split(componentType);
             }
 
@@ -174,12 +175,13 @@ final class QuadtreeBVH<V extends Bounds2d> implements BVH<V> {
             Arrays.fill(this.values, 0, this.size, null);
             this.size = 0;
 
-            this.children =
-                    uncheckedCast(new Node[4]); // create children array, also marking this node as having been split
+            // create children array, also marking this node as having been split
+            this.children = uncheckedCast(new Node[4]);
+
             for (V value : oldValues) {
                 // re-insert previous values into self
-                // since the children array is now non-null, it will attempt to insert the values into one of the
-                // children first
+                // since the children array is now non-null,
+                // it will attempt to insert the values into one of the children first
                 this.insert(value, componentType);
             }
         }
@@ -194,8 +196,8 @@ final class QuadtreeBVH<V extends Bounds2d> implements BVH<V> {
                         size += child.size;
                     }
                 }
-                if (size == 0) { // none of the children contain any values, so there's no need to keep the array object
-                    // lying around
+                if (size == 0) {
+                    // none of the children contain any values, so there's no need to keep the array object lying around
                     this.children = null;
                 }
             }
@@ -220,14 +222,16 @@ final class QuadtreeBVH<V extends Bounds2d> implements BVH<V> {
                     }
                 }
 
-                if (this.values != null) { // this node contains some values
-                    if (bb.contains(
-                            this)) { // the query box contains this entire node, therefore we can assume that all of the
-                        // values intersect it
+                if (this.values != null) {
+                    // this node contains some values
+                    if (bb.contains(this)) {
+                        // the query box contains this entire node,
+                        // therefore we can assume that all of the values intersect it
                         for (Object value : this.values) {
                             callback.accept(uncheckedCast(value));
                         }
-                    } else { // check intersection with each value individually
+                    } else {
+                        // check intersection with each value individually
                         for (Bounds2d value : this.values) {
                             if (bb.intersects(value)) {
                                 callback.accept(uncheckedCast(value));

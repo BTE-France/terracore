@@ -35,8 +35,7 @@ public class ConformalDynmaxionProjection extends DymaxionProjection {
                         PArrays.filledBy(SIDE_LENGTH + 1, double[][]::new, i -> new double[SIDE_LENGTH + 1 - i]);
 
                 ByteBuf buf;
-                try (InputStream compressedStream =
-                        ConformalDynmaxionProjection.class.getResourceAsStream(RESOURCE_PATH)) {
+                try (var compressedStream = ConformalDynmaxionProjection.class.getResourceAsStream(RESOURCE_PATH)) {
                     checkState(compressedStream != null, "Missing builtin resource: " + RESOURCE_PATH);
                     InputStream stream = new GZIPInputStream(compressedStream);
                     buf = Unpooled.wrappedBuffer(StreamUtil.toByteArray(stream));

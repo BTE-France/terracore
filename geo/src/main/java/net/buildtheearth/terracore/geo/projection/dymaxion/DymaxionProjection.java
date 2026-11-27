@@ -63,7 +63,7 @@ public class DymaxionProjection implements GeographicProjection {
         {2, 3, 7},
         {3, 0, 2},
         {0, 3, 4},
-        {4, 0, 5}, // 9, qubec
+        {4, 0, 5}, // 9, Quebec
         {5, 4, 9},
         {9, 5, 10},
         {10, 9, 11},
@@ -206,8 +206,8 @@ public class DymaxionProjection implements GeographicProjection {
 
         yp += 0.25; // change origin to vertex 4, to allow grids to align
 
-        // rotate coords 45 degrees so left and right sides of the triangle become the x/y axies (also side lengths are
-        // now 1)
+        // rotate coords 45 degrees so left and right sides of the triangle become the x/y axies
+        // (also side lengths are now 1)
         double xr = xp - yp;
         double yr = xp + yp;
 
@@ -289,8 +289,8 @@ public class DymaxionProjection implements GeographicProjection {
 
     protected double[] inverseTriangleTransformNewton(double xpp, double ypp) {
 
-        // a & b are linearly related to c, so using the tan of sum formula we know: tan(c+off) = (tanc +
-        // tanoff)/(1-tanc*tanoff)
+        // a & b are linearly related to c, so using the tan of sum formula we know:
+        // tan(c+off) = (tanc + tanoff) / (1-tanc*tanoff)
         double tanaoff = Math.tan(GeoMaths.ROOT3 * ypp + xpp); // a = c + root3*y'' + x''
         double tanboff = Math.tan(2 * xpp); // b = c + 2x''
 

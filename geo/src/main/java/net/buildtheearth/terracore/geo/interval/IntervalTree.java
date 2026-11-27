@@ -123,17 +123,18 @@ public class IntervalTree<V extends Interval> {
         }
 
         protected void insert(V value) {
-            // empty segments can occur sometimes, either because the line segment itself is actually horizontal, or due
-            // to floating-point errors in the projection code.
-            //  we'll simply discard them, as it's not like they'll ever intersect anything anyway.
+            // Empty segments can occur sometimes, either because the line segment itself is actually horizontal,
+            // or due to floating-point errors in the projection code.
+            // We'll simply discard them, as it's not like they'll ever intersect anything anyway.
             if (value.length() == 0.0d) {
                 return;
             }
 
-            if (this.values == null) { // allocate initial value array
+            if (this.values == null) {
+                // allocate initial value array
                 this.values = new Object[NODE_SPLIT_CAPACITY];
-            } else if (this.size == NODE_SPLIT_CAPACITY
-                    && this.canSplit()) { // we're at capacity and haven't split yet, attempt to split now
+            } else if (this.size == NODE_SPLIT_CAPACITY && this.canSplit()) {
+                // we're at capacity and haven't split yet, attempt to split now
                 this.split();
             }
 
@@ -239,8 +240,8 @@ public class IntervalTree<V extends Interval> {
                         size += child.size;
                     }
                 }
-                if (size == 0) { // none of the children contain any values, so there's no need to keep the array object
-                    // lying around
+                if (size == 0) {
+                    // none of the children contain any values, so there's no need to keep the array object lying around
                     this.children = null;
                 }
             }
