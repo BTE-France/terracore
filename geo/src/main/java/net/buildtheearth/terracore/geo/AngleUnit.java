@@ -132,5 +132,4 @@ public enum AngleUnit {
             case DEGREES -> (float) Math.toDegrees(angle);
         };
     }
-
 }

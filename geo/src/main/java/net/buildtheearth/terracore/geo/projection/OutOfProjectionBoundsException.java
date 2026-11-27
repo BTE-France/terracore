@@ -20,7 +20,8 @@ public final class OutOfProjectionBoundsException extends Exception {
      * @param maxY
      * @throws OutOfProjectionBoundsException if <code> Math.abs(x) > maxX || Math.abs(y) > maxY </code>
      */
-    public static void checkInRange(double x, double y, double maxX, double maxY) throws OutOfProjectionBoundsException {
+    public static void checkInRange(double x, double y, double maxX, double maxY)
+            throws OutOfProjectionBoundsException {
         if (Math.abs(x) > maxX || Math.abs(y) > maxY) {
             throw OutOfProjectionBoundsException.get();
         }
@@ -31,7 +32,8 @@ public final class OutOfProjectionBoundsException extends Exception {
      * @param latitude
      * @throws OutOfProjectionBoundsException if <code> Math.abs(longitude) > 180 || Math.abs(latitude) > 90 </code>
      */
-    public static void checkLongitudeLatitudeInRange(double longitude, double latitude) throws OutOfProjectionBoundsException {
+    public static void checkLongitudeLatitudeInRange(double longitude, double latitude)
+            throws OutOfProjectionBoundsException {
         checkInRange(longitude, latitude, 180, 90);
     }
 

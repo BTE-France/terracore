@@ -3,7 +3,6 @@ package net.buildtheearth.terracore.geo.projection.transform;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
 import net.buildtheearth.terracore.geo.projection.GeographicProjection;
 import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
 
@@ -39,7 +38,7 @@ public class SwapAxesProjectionTransform extends ProjectionTransform {
     @Override
     public double[] bounds() {
         double[] b = this.delegate.bounds();
-        return new double[]{ b[1], b[0], b[3], b[2] };
+        return new double[] {b[1], b[0], b[3], b[2]};
     }
 
     @Override

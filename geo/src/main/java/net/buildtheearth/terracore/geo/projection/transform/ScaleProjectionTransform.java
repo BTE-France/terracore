@@ -1,5 +1,7 @@
 package net.buildtheearth.terracore.geo.projection.transform;
 
+import static net.daporkchop.lib.common.util.PValidation.*;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -8,14 +10,12 @@ import lombok.Getter;
 import net.buildtheearth.terracore.geo.projection.GeographicProjection;
 import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
 
-import static net.daporkchop.lib.common.util.PValidation.*;
-
 /**
  * Scales the warps projection's projected space up or down.
  * More specifically, it multiplies x and y by there respective scale factors.
  */
 @JsonDeserialize
-@Getter(onMethod_ = { @JsonGetter })
+@Getter(onMethod_ = {@JsonGetter})
 public class ScaleProjectionTransform extends ProjectionTransform {
     private final double x;
     private final double y;
@@ -69,7 +69,8 @@ public class ScaleProjectionTransform extends ProjectionTransform {
 
     @Override
     public double metersPerUnit() {
-        return this.delegate.metersPerUnit() / Math.sqrt((this.x * this.x + this.y * this.y) / 2); //TODO: better transform
+        return this.delegate.metersPerUnit()
+                / Math.sqrt((this.x * this.x + this.y * this.y) / 2); // TODO: better transform
     }
 
     @Override

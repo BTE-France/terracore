@@ -1,10 +1,9 @@
 package net.buildtheearth.terracore.geo.projection.dymaxion;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
+import net.buildtheearth.terracore.geo.GeoMaths;
 import net.buildtheearth.terracore.geo.projection.GeographicProjection;
 import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
-import net.buildtheearth.terracore.geo.GeoMaths;
 
 /**
  * Implementation of the Dynmaxion projection.
@@ -36,18 +35,18 @@ public class DymaxionProjection implements GeographicProjection {
      * @see <a href="https://en.wikipedia.org/wiki/Regular_icosahedron#Spherical_coordinates">Wikipedia</a>
      */
     protected static final double[][] VERTICES = {
-            { 10.536199, 64.700000 },
-            { -5.245390, 2.300882 },
-            { 58.157706, 10.447378 },
-            { 122.300000, 39.100000 },
-            { -143.478490, 50.103201 },
-            { -67.132330, 23.717925 },
-            { 36.521510, -50.103200 },
-            { 112.867673, -23.717930 },
-            { 174.754610, -2.300882 },
-            { -121.842290, -10.447350 },
-            { -57.700000, -39.100000 },
-            { -169.463800, -64.700000 },
+        {10.536199, 64.700000},
+        {-5.245390, 2.300882},
+        {58.157706, 10.447378},
+        {122.300000, 39.100000},
+        {-143.478490, 50.103201},
+        {-67.132330, 23.717925},
+        {36.521510, -50.103200},
+        {112.867673, -23.717930},
+        {174.754610, -2.300882},
+        {-121.842290, -10.447350},
+        {-57.700000, -39.100000},
+        {-169.463800, -64.700000},
     };
 
     /**
@@ -55,63 +54,61 @@ public class DymaxionProjection implements GeographicProjection {
      * Each entry refers to the index of a vertex in {@link #VERTICES}
      */
     protected static final int[][] ISO = {
-            { 2, 1, 6 },
-            { 1, 0, 2 },
-            { 0, 1, 5 },
-            { 1, 5, 10 },
-            { 1, 6, 10 },
-            { 7, 2, 6 },
-            { 2, 3, 7 },
-            { 3, 0, 2 },
-            { 0, 3, 4 },
-            { 4, 0, 5 }, //9, qubec
-            { 5, 4, 9 },
-            { 9, 5, 10 },
-            { 10, 9, 11 },
-            { 11, 6, 10 },
-            { 6, 7, 11 },
-            { 8, 3, 7 },
-            { 8, 3, 4 },
-            { 8, 4, 9 },
-            { 9, 8, 11 },
-            { 7, 8, 11 },
-            { 11, 6, 7 }, //child of 14
-            { 3, 7, 8 } //child of 15
+        {2, 1, 6},
+        {1, 0, 2},
+        {0, 1, 5},
+        {1, 5, 10},
+        {1, 6, 10},
+        {7, 2, 6},
+        {2, 3, 7},
+        {3, 0, 2},
+        {0, 3, 4},
+        {4, 0, 5}, // 9, qubec
+        {5, 4, 9},
+        {9, 5, 10},
+        {10, 9, 11},
+        {11, 6, 10},
+        {6, 7, 11},
+        {8, 3, 7},
+        {8, 3, 4},
+        {8, 4, 9},
+        {9, 8, 11},
+        {7, 8, 11},
+        {11, 6, 7}, // child of 14
+        {3, 7, 8} // child of 15
     };
 
     protected static final double[][] CENTER_MAP = {
-            { -3, 7 },
-            { -2, 5 },
-            { -1, 7 },
-            { 2, 5 },
-            { 4, 5 },
-            { -4, 1 },
-            { -3, -1 },
-            { -2, 1 },
-            { -1, -1 },
-            { 0, 1 },
-            { 1, -1 },
-            { 2, 1 },
-            { 3, -1 },
-            { 4, 1 },
-            { 5, -1 }, //14, left side, right to be cut
-            { -3, -5 },
-            { -1, -5 },
-            { 1, -5 },
-            { 2, -7 },
-            { -4, -7 },
-            { -5, -5 }, //20, pseudo triangle, child of 14
-            { -2, -7 } //21 , pseudo triangle, child of 15
+        {-3, 7},
+        {-2, 5},
+        {-1, 7},
+        {2, 5},
+        {4, 5},
+        {-4, 1},
+        {-3, -1},
+        {-2, 1},
+        {-1, -1},
+        {0, 1},
+        {1, -1},
+        {2, 1},
+        {3, -1},
+        {4, 1},
+        {5, -1}, // 14, left side, right to be cut
+        {-3, -5},
+        {-1, -5},
+        {1, -5},
+        {2, -7},
+        {-4, -7},
+        {-5, -5}, // 20, pseudo triangle, child of 14
+        {-2, -7} // 21 , pseudo triangle, child of 15
     };
 
     /**
      * Indicates for each face if it needs to be flipped after projecting
      */
     protected static final boolean[] FLIP_TRIANGLE = {
-            true, false, true, false, false,
-            true, false, true, false, true, false, true, false, true, false,
-            true, true, true, false, false,
-            true, false
+        true, false, true, false, false, true, false, true, false, true, false, true, false, true, false, true, true,
+        true, false, false, true, false
     };
 
     /**
@@ -133,13 +130,12 @@ public class DymaxionProjection implements GeographicProjection {
     protected static final double[][][] INVERSE_ROTATION_MATRICES = new double[22][3][3];
 
     protected static final int[] FACE_ON_GRID = {
-            -1, -1, 0, 1, 2, -1, -1, 3, -1, 4, -1,
-            -1, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
-            20, 19, 15, 21, 16, -1, 17, 18, -1, -1, -1,
+        -1, -1, 0, 1, 2, -1, -1, 3, -1, 4, -1,
+        -1, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
+        20, 19, 15, 21, 16, -1, 17, 18, -1, -1, -1,
     };
 
     static {
-
         for (int i = 0; i < 22; i++) {
             CENTER_MAP[i][0] *= 0.5 * ARC;
             CENTER_MAP[i][1] *= ARC * GeoMaths.ROOT3 / 12;
@@ -168,63 +164,65 @@ public class DymaxionProjection implements GeographicProjection {
             double ysum = vec1[1] + vec2[1] + vec3[1];
             double zsum = vec1[2] + vec2[2] + vec3[2];
             double mag = Math.sqrt(xsum * xsum + ysum * ysum + zsum * zsum);
-            CENTROIDS[i] = new double[]{ xsum / mag, ysum / mag, zsum / mag };
+            CENTROIDS[i] = new double[] {xsum / mag, ysum / mag, zsum / mag};
 
             double[] centroidSpherical = GeoMaths.cartesian2Spherical(CENTROIDS[i]);
             double centroidLambda = centroidSpherical[0];
             double centroidPhi = centroidSpherical[1];
 
             double[] vertex = VERTICES[ISO[i][0]];
-            double[] v = { vertex[0] - centroidLambda, vertex[1] };
+            double[] v = {vertex[0] - centroidLambda, vertex[1]};
             v = yRot(v, -centroidPhi);
 
-            ROTATION_MATRICES[i] = GeoMaths.produceZYZRotationMatrix(-centroidLambda, -centroidPhi, (Math.PI / 2) - v[0]);
-            INVERSE_ROTATION_MATRICES[i] = GeoMaths.produceZYZRotationMatrix(v[0] - (Math.PI / 2), centroidPhi, centroidLambda);
-
+            ROTATION_MATRICES[i] =
+                    GeoMaths.produceZYZRotationMatrix(-centroidLambda, -centroidPhi, (Math.PI / 2) - v[0]);
+            INVERSE_ROTATION_MATRICES[i] =
+                    GeoMaths.produceZYZRotationMatrix(v[0] - (Math.PI / 2), centroidPhi, centroidLambda);
         }
     }
 
     protected static int findTriangleGrid(double x, double y) {
 
-        //cast equilateral triangles to 45 degrees right triangles (side length of root2)
+        // cast equilateral triangles to 45 degrees right triangles (side length of root2)
         double xp = x / ARC;
         double yp = y / (ARC * GeoMaths.ROOT3);
 
         int row;
         if (yp > -0.25) {
-            if (yp < 0.25) { //middle
+            if (yp < 0.25) { // middle
                 row = 1;
-            } else if (yp <= 0.75) { //top
+            } else if (yp <= 0.75) { // top
                 row = 0;
-                yp = 0.5 - yp; //translate to middle and flip
+                yp = 0.5 - yp; // translate to middle and flip
             } else {
                 return -1;
             }
-        } else if (yp >= -0.75) { //bottom
+        } else if (yp >= -0.75) { // bottom
             row = 2;
-            yp = -yp - 0.5; //translate to middle and flip
+            yp = -yp - 0.5; // translate to middle and flip
         } else {
             return -1;
         }
 
-        yp += 0.25; //change origin to vertex 4, to allow grids to align
+        yp += 0.25; // change origin to vertex 4, to allow grids to align
 
-        //rotate coords 45 degrees so left and right sides of the triangle become the x/y axies (also side lengths are now 1)
+        // rotate coords 45 degrees so left and right sides of the triangle become the x/y axies (also side lengths are
+        // now 1)
         double xr = xp - yp;
         double yr = xp + yp;
 
-        //assign a order to what grid along the y=x line it is
+        // assign a order to what grid along the y=x line it is
         int gx = (int) Math.floor(xr);
         int gy = (int) Math.floor(yr);
 
         int col = 2 * gx + (gy != gx ? 1 : 0) + 6;
 
-        //out of bounds
+        // out of bounds
         if (col < 0 || col >= 11) {
             return -1;
         }
 
-        return FACE_ON_GRID[row * 11 + col]; //get face at this position
+        return FACE_ON_GRID[row * 11 + col]; // get face at this position
     }
 
     protected static double[] yRot(double[] spherical, double rot) {
@@ -239,10 +237,7 @@ public class DymaxionProjection implements GeographicProjection {
         c[1] /= mag;
         c[2] /= mag;
 
-        return new double[]{
-                Math.atan2(c[1], c[0]),
-                Math.atan2(Math.sqrt(c[0] * c[0] + c[1] * c[1]), c[2])
-        };
+        return new double[] {Math.atan2(c[1], c[0]), Math.atan2(Math.sqrt(c[0] * c[0] + c[1] * c[1]), c[2])};
     }
 
     /**
@@ -265,7 +260,7 @@ public class DymaxionProjection implements GeographicProjection {
             double dissq = xd * xd + yd * yd + zd * zd;
             if (dissq < min) {
 
-                if (dissq < 0.1) //TODO: enlarge radius
+                if (dissq < 0.1) // TODO: enlarge radius
                 {
                     return i;
                 }
@@ -285,23 +280,24 @@ public class DymaxionProjection implements GeographicProjection {
         double xp = S * vec[0];
         double yp = S * vec[1];
 
-        double a = Math.atan((2 * yp / GeoMaths.ROOT3 - EL6) / DVE); //ARC/2 terms cancel
+        double a = Math.atan((2 * yp / GeoMaths.ROOT3 - EL6) / DVE); // ARC/2 terms cancel
         double b = Math.atan((xp - yp / GeoMaths.ROOT3 - EL6) / DVE);
         double c = Math.atan((-xp - yp / GeoMaths.ROOT3 - EL6) / DVE);
 
-        return new double[]{ 0.5 * (b - c), (2 * a - b - c) / (2 * GeoMaths.ROOT3) };
+        return new double[] {0.5 * (b - c), (2 * a - b - c) / (2 * GeoMaths.ROOT3)};
     }
 
     protected double[] inverseTriangleTransformNewton(double xpp, double ypp) {
 
-        //a & b are linearly related to c, so using the tan of sum formula we know: tan(c+off) = (tanc + tanoff)/(1-tanc*tanoff)
+        // a & b are linearly related to c, so using the tan of sum formula we know: tan(c+off) = (tanc +
+        // tanoff)/(1-tanc*tanoff)
         double tanaoff = Math.tan(GeoMaths.ROOT3 * ypp + xpp); // a = c + root3*y'' + x''
         double tanboff = Math.tan(2 * xpp); // b = c + 2x''
 
         double anumer = tanaoff * tanaoff + 1;
         double bnumer = tanboff * tanboff + 1;
 
-        //we will be solving for tanc, starting at t=0, tan(0) = 0
+        // we will be solving for tanc, starting at t=0, tan(0) = 0
         double tana = tanaoff;
         double tanb = tanboff;
         double tanc = 0;
@@ -309,14 +305,14 @@ public class DymaxionProjection implements GeographicProjection {
         double adenom = 1;
         double bdenom = 1;
 
-        //double fp = anumer + bnumer + 1; //derivative relative to tanc
+        // double fp = anumer + bnumer + 1; //derivative relative to tanc
 
-        //int i = newton;
+        // int i = newton;
         for (int i = 0; i < NEWTON; i++) {
-            double f = tana + tanb + tanc - R; //R = tana + tanb + tanc
-            double fp = anumer * adenom * adenom + bnumer * bdenom * bdenom + 1; //derivative relative to tanc
+            double f = tana + tanb + tanc - R; // R = tana + tanb + tanc
+            double fp = anumer * adenom * adenom + bnumer * bdenom * bdenom + 1; // derivative relative to tanc
 
-            //TODO: fp could be simplified on first loop: 1 + anumer + bnumer
+            // TODO: fp could be simplified on first loop: 1 + anumer + bnumer
 
             tanc -= f / fp;
 
@@ -327,17 +323,17 @@ public class DymaxionProjection implements GeographicProjection {
             tanb = (tanc + tanboff) * bdenom;
         }
 
-        //simple reversal algebra based on tan values
+        // simple reversal algebra based on tan values
         double yp = GeoMaths.ROOT3 * (DVE * tana + EL6) / 2;
         double xp = DVE * tanb + yp / GeoMaths.ROOT3 + EL6;
 
-        //x = z*xp/Z, y = z*yp/Z, x^2 + y^2 + z^2 = 1
+        // x = z*xp/Z, y = z*yp/Z, x^2 + y^2 + z^2 = 1
         double xpoZ = xp / Z;
         double ypoZ = yp / Z;
 
         double z = 1 / Math.sqrt(1 + xpoZ * xpoZ + ypoZ * ypoZ);
 
-        return new double[]{ z * xpoZ, z * ypoZ, z };
+        return new double[] {z * xpoZ, z * ypoZ, z};
     }
 
     protected double[] inverseTriangleTransform(double x, double y) {
@@ -346,29 +342,29 @@ public class DymaxionProjection implements GeographicProjection {
 
     @Override
     public double[] fromGeo(double longitude, double latitude) throws OutOfProjectionBoundsException {
-    	
-    	OutOfProjectionBoundsException.checkLongitudeLatitudeInRange(longitude, latitude);
 
-        double[] vector = GeoMaths.spherical2Cartesian(GeoMaths.geo2Spherical(new double[]{ longitude, latitude }));
+        OutOfProjectionBoundsException.checkLongitudeLatitudeInRange(longitude, latitude);
+
+        double[] vector = GeoMaths.spherical2Cartesian(GeoMaths.geo2Spherical(new double[] {longitude, latitude}));
 
         int face = this.findTriangle(vector);
 
-        //apply rotation matrix (move triangle onto template triangle)
+        // apply rotation matrix (move triangle onto template triangle)
         double[] pvec = GeoMaths.matVecProdD(ROTATION_MATRICES[face], vector);
         double[] projectedVec = this.triangleTransform(pvec);
 
-        //flip triangle to correct orientation
+        // flip triangle to correct orientation
         if (FLIP_TRIANGLE[face]) {
             projectedVec[0] = -projectedVec[0];
             projectedVec[1] = -projectedVec[1];
         }
 
         vector[0] = projectedVec[0];
-        //deal with special snowflakes (child faces 20, 21)
+        // deal with special snowflakes (child faces 20, 21)
         if (((face == 15 && vector[0] > projectedVec[1] * GeoMaths.ROOT3) || face == 14) && vector[0] > 0) {
             projectedVec[0] = 0.5 * vector[0] - 0.5 * GeoMaths.ROOT3 * projectedVec[1];
             projectedVec[1] = 0.5 * GeoMaths.ROOT3 * vector[0] + 0.5 * projectedVec[1];
-            face += 6; //shift 14->20 & 15->21
+            face += 6; // shift 14->20 & 15->21
         }
 
         projectedVec[0] += CENTER_MAP[face][0];
@@ -388,7 +384,7 @@ public class DymaxionProjection implements GeographicProjection {
         x -= CENTER_MAP[face][0];
         y -= CENTER_MAP[face][1];
 
-        //deal with bounds of special snowflakes
+        // deal with bounds of special snowflakes
         switch (face) {
             case 14:
                 if (x > 0) {
@@ -412,29 +408,29 @@ public class DymaxionProjection implements GeographicProjection {
                 break;
         }
 
-        //flip triangle to upright orientation (if not already)
+        // flip triangle to upright orientation (if not already)
         if (FLIP_TRIANGLE[face]) {
             x = -x;
             y = -y;
         }
 
-        //invert triangle transform
+        // invert triangle transform
         double[] c = this.inverseTriangleTransform(x, y);
         x = c[0];
         y = c[1];
         double z = c[2];
 
-        double[] vec = { x, y, z };
-        //apply inverse rotation matrix (move triangle from template triangle to correct position on globe)
+        double[] vec = {x, y, z};
+        // apply inverse rotation matrix (move triangle from template triangle to correct position on globe)
         double[] vecp = GeoMaths.matVecProdD(INVERSE_ROTATION_MATRICES[face], vec);
 
-        //convert back to geo coordinates
+        // convert back to geo coordinates
         return GeoMaths.spherical2Geo(GeoMaths.cartesian2Spherical(vecp));
     }
 
     @Override
     public double[] bounds() {
-        return new double[]{ -3 * ARC, -0.75 * ARC * GeoMaths.ROOT3, 2.5 * ARC, 0.75 * ARC * GeoMaths.ROOT3 };
+        return new double[] {-3 * ARC, -0.75 * ARC * GeoMaths.ROOT3, 2.5 * ARC, 0.75 * ARC * GeoMaths.ROOT3};
     }
 
     @Override

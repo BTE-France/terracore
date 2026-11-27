@@ -1,9 +1,9 @@
 package net.buildtheearth.terracore.geo;
 
+import static net.buildtheearth.terracore.geo.GeoMaths.*;
+
 import lombok.Getter;
 import lombok.NonNull;
-
-import static net.buildtheearth.terracore.geo.GeoMaths.*;
 
 /**
  * Represents one of the eight main cardinal and intercardinal directions.
@@ -110,5 +110,4 @@ public enum CardinalDirection {
     public boolean matches(float azimuth, @NonNull AngleUnit unit) {
         return ofAzimuth(azimuth, unit) == this;
     }
-
 }

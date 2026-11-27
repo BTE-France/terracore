@@ -1,8 +1,6 @@
 package net.buildtheearth.terracore.geo.bvh;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import static net.daporkchop.lib.common.util.PorkUtil.*;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -11,8 +9,9 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
-
-import static net.daporkchop.lib.common.util.PorkUtil.*;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 /**
  * Implementation of {@link BVH} which contains no values.
@@ -39,7 +38,7 @@ final class EmptyBVH<V extends Bounds2d> implements BVH<V> {
 
     @Override
     public void forEachIntersecting(@NonNull Bounds2d bb, @NonNull Consumer<V> callback) {
-        //no-op
+        // no-op
     }
 
     @Override
@@ -74,7 +73,7 @@ final class EmptyBVH<V extends Bounds2d> implements BVH<V> {
 
     @Override
     public void forEach(@NonNull Consumer<? super V> action) {
-        //no-op
+        // no-op
     }
 
     @Override

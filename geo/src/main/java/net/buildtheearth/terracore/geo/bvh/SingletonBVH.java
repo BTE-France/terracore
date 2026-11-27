@@ -2,15 +2,14 @@ package net.buildtheearth.terracore.geo.bvh;
 
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Implementation of {@link BVH} which contains a single value.

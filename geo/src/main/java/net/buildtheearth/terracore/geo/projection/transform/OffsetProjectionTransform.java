@@ -1,5 +1,7 @@
 package net.buildtheearth.terracore.geo.projection.transform;
 
+import static net.daporkchop.lib.common.util.PValidation.*;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -8,14 +10,12 @@ import lombok.Getter;
 import net.buildtheearth.terracore.geo.projection.GeographicProjection;
 import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
 
-import static net.daporkchop.lib.common.util.PValidation.*;
-
 /**
  * Applies a simple translation to the projected space, such that:
  * x' = x + offsetX and y' = y + offsetY
  */
 @JsonDeserialize
-@Getter(onMethod_ = { @JsonGetter })
+@Getter(onMethod_ = {@JsonGetter})
 public class OffsetProjectionTransform extends ProjectionTransform {
     private final double dx;
     private final double dy;

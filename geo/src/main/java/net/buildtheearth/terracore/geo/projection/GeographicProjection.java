@@ -1,16 +1,15 @@
 package net.buildtheearth.terracore.geo.projection;
 
+import static net.buildtheearth.terracore.geo.GeoConstants.*;
+
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import lombok.NonNull;
-import lombok.SneakyThrows;
-import net.buildtheearth.terracore.geo.GeoMaths;
-
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
-
-import static net.buildtheearth.terracore.geo.GeoConstants.*;
+import lombok.NonNull;
+import lombok.SneakyThrows;
+import net.buildtheearth.terracore.geo.GeoMaths;
 
 /**
  * Support for various projection types.
@@ -67,12 +66,9 @@ public interface GeographicProjection {
      */
     default double[] bounds() {
         try {
-            //get max in by using extreme coordinates
+            // get max in by using extreme coordinates
             double[] bounds = {
-                    this.fromGeo(-180, 0)[0],
-                    this.fromGeo(0, -90)[1],
-                    this.fromGeo(180, 0)[0],
-                    this.fromGeo(0, 90)[1]
+                this.fromGeo(-180, 0)[0], this.fromGeo(0, -90)[1], this.fromGeo(180, 0)[0], this.fromGeo(0, 90)[1]
             };
 
             if (bounds[0] > bounds[2]) {
@@ -89,7 +85,7 @@ public interface GeographicProjection {
 
             return bounds;
         } catch (OutOfProjectionBoundsException e) {
-            return new double[]{ 0, 0, 1, 1 };
+            return new double[] {0, 0, 1, 1};
         }
     }
 
@@ -120,11 +116,12 @@ public interface GeographicProjection {
     default double[] vector(double x, double y, double north, double east) throws OutOfProjectionBoundsException {
         double[] geo = this.toGeo(x, y);
 
-        //TODO: east may be slightly off because earth not a sphere
-        double[] off = this.fromGeo(geo[0] + east * 360.0 / (Math.cos(Math.toRadians(geo[1])) * EARTH_CIRCUMFERENCE),
+        // TODO: east may be slightly off because earth not a sphere
+        double[] off = this.fromGeo(
+                geo[0] + east * 360.0 / (Math.cos(Math.toRadians(geo[1])) * EARTH_CIRCUMFERENCE),
                 geo[1] + north * 360.0 / EARTH_POLAR_CIRCUMFERENCE);
 
-        return new double[]{ off[0] - x, off[1] - y };
+        return new double[] {off[0] - x, off[1] - y};
     }
 
     /**
@@ -165,7 +162,7 @@ public interface GeographicProjection {
         double a = (ap + bp) / 2;
         double b = (ap - bp) / 2;
 
-        return new double[]{ h * k * sint, 2 * Math.asin(bp / ap), a, b };
+        return new double[] {h * k * sint, 2 * Math.asin(bp / ap), a, b};
     }
 
     /**
@@ -204,7 +201,7 @@ public interface GeographicProjection {
         GeoMaths.toRadians(geo2);
         double dlon = geo2[0] - geo1[0];
         double dlat = geo2[1] - geo1[1];
-        double a = Math.toDegrees(Math.atan2(dlat, dlon*Math.cos(geo1[1])));
+        double a = Math.toDegrees(Math.atan2(dlat, dlon * Math.cos(geo1[1])));
         a = 90 - a;
         if (a < 0) {
             a += 360;
@@ -234,5 +231,4 @@ public interface GeographicProjection {
     default Map<String, Object> properties() {
         return Collections.emptyMap();
     }
-
 }

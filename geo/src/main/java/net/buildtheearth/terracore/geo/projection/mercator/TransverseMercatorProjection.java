@@ -1,11 +1,10 @@
 package net.buildtheearth.terracore.geo.projection.mercator;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import static net.buildtheearth.terracore.geo.GeoConstants.*;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import net.buildtheearth.terracore.geo.projection.GeographicProjection;
 import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
-
-import static net.buildtheearth.terracore.geo.GeoConstants.*;
 
 /**
  * Implementation of the universal transverse Mercator projection.
@@ -29,7 +28,7 @@ public class TransverseMercatorProjection implements GeographicProjection {
      * @return the central meridian to use when projecting at the given longitude, in radians
      */
     public static double getCentralMeridian(double longitude) {
-        //TODO Why is there a Math.floor here? It seems to work a lot better without it
+        // TODO Why is there a Math.floor here? It seems to work a lot better without it
         return (Math.floor(longitude / ZONE_WIDTH) + 0.5) * ZONE_WIDTH;
     }
 
@@ -45,7 +44,7 @@ public class TransverseMercatorProjection implements GeographicProjection {
         double x = Math.log((1.0 + b) / (1.0 - b)) / 2;
         double y = Math.atan2(Math.tan(phi), Math.cos(lam));
         x += centralMeridian;
-        return new double[]{ x, y };
+        return new double[] {x, y};
     }
 
     @Override
@@ -57,7 +56,7 @@ public class TransverseMercatorProjection implements GeographicProjection {
         double phi = Math.asin(Math.sin(y) / Math.cosh(x));
         double lon = Math.toDegrees(lam);
         double lat = Math.toDegrees(phi);
-        return new double[]{ lon, lat };
+        return new double[] {lon, lat};
     }
 
     @Override

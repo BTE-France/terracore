@@ -1,8 +1,8 @@
 package net.buildtheearth.terracore.geo.projection;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
 import static net.buildtheearth.terracore.geo.GeoConstants.*;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 /**
  * Implementation of the Sinusoidal projection.
@@ -13,18 +13,18 @@ import static net.buildtheearth.terracore.geo.GeoConstants.*;
 public class SinusoidalProjection implements GeographicProjection {
     @Override
     public double[] toGeo(double x, double y) {
-        return new double[]{ x / Math.cos(Math.toRadians(y)), y };
+        return new double[] {x / Math.cos(Math.toRadians(y)), y};
     }
 
     @Override
     public double[] fromGeo(double longitude, double latitude) throws OutOfProjectionBoundsException {
-    	OutOfProjectionBoundsException.checkLongitudeLatitudeInRange(longitude, latitude);
-        return new double[]{ longitude * Math.cos(Math.toRadians(latitude)), latitude };
+        OutOfProjectionBoundsException.checkLongitudeLatitudeInRange(longitude, latitude);
+        return new double[] {longitude * Math.cos(Math.toRadians(latitude)), latitude};
     }
 
     @Override
     public double metersPerUnit() {
-        return EARTH_CIRCUMFERENCE / 360.0; //gotta make good on that exact area
+        return EARTH_CIRCUMFERENCE / 360.0; // gotta make good on that exact area
     }
 
     @Override

@@ -1,11 +1,11 @@
 package net.buildtheearth.terracore.geo;
 
-import lombok.NonNull;
-import lombok.experimental.UtilityClass;
-
 import static java.lang.Float.*;
 import static net.buildtheearth.terracore.geo.AngleUnit.*;
 import static net.daporkchop.lib.common.util.PValidation.*;
+
+import lombok.NonNull;
+import lombok.experimental.UtilityClass;
 
 /**
  * Miscellaneous mathematical utilities for geographic and spherical calculations.
@@ -22,7 +22,6 @@ public class GeoMaths {
      */
     public final double TAU = 2 * Math.PI;
 
-
     /**
      * Converts geographic latitude and longitude coordinates to spherical coordinates on a sphere of radius 1.
      *
@@ -32,9 +31,8 @@ public class GeoMaths {
     public double[] geo2Spherical(double[] geo) {
         double lambda = Math.toRadians(geo[0]);
         double phi = Math.toRadians(90 - geo[1]);
-        return new double[]{ lambda, phi };
+        return new double[] {lambda, phi};
     }
-
 
     /**
      * Converts spherical coordinates to geographic coordinates on a sphere of radius 1.
@@ -45,9 +43,8 @@ public class GeoMaths {
     public double[] spherical2Geo(double[] spherical) {
         double lon = Math.toDegrees(spherical[0]);
         double lat = 90 - Math.toDegrees(spherical[1]);
-        return new double[]{ lon, lat };
+        return new double[] {lon, lat};
     }
-
 
     /**
      * Converts spherical coordinates to Cartesian coordinates on a sphere of radius 1.
@@ -60,7 +57,7 @@ public class GeoMaths {
         double x = sinphi * Math.cos(spherical[0]);
         double y = sinphi * Math.sin(spherical[0]);
         double z = Math.cos(spherical[1]);
-        return new double[]{ x, y, z };
+        return new double[] {x, y, z};
     }
 
     /**
@@ -72,9 +69,8 @@ public class GeoMaths {
     public double[] cartesian2Spherical(double[] cartesian) {
         double lambda = Math.atan2(cartesian[1], cartesian[0]);
         double phi = Math.atan2(Math.sqrt(cartesian[0] * cartesian[0] + cartesian[1] * cartesian[1]), cartesian[2]);
-        return new double[]{ lambda, phi };
+        return new double[] {lambda, phi};
     }
-
 
     /**
      * Produces the 3x3 rotation matrix for a Z-Y-Z Euler rotation: a rotation by {@code a} about the
@@ -128,7 +124,7 @@ public class GeoMaths {
         }
         return result;
     }
-    
+
     /**
      * Converts all values in a double array from degrees to radians.
      * The array is converted in place.
@@ -136,7 +132,7 @@ public class GeoMaths {
      * @param arr - array to work on
      */
     public void toRadians(double[] arr) {
-    	for(int i=0; i<arr.length; i++) arr[i] = Math.toRadians(arr[i]);
+        for (int i = 0; i < arr.length; i++) arr[i] = Math.toRadians(arr[i]);
     }
 
     /**
@@ -146,7 +142,7 @@ public class GeoMaths {
      * @param arr - array to work on
      */
     public void toDegrees(double[] arr) {
-    	for(int i=0; i<arr.length; i++) arr[i] = Math.toDegrees(arr[i]);
+        for (int i = 0; i < arr.length; i++) arr[i] = Math.toDegrees(arr[i]);
     }
 
     /**
@@ -168,8 +164,7 @@ public class GeoMaths {
         }
         return res;
     }
-    
-    
+
     /**
      * Clamps a value to the given inclusive range.
      *
@@ -221,5 +216,4 @@ public class GeoMaths {
         degrees = ((degrees % 360f) + 360f) % 360f;
         return unit.fromDegrees(degrees);
     }
-    
 }

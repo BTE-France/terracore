@@ -1,22 +1,21 @@
 package net.buildtheearth.terracore.geo.projection.transform;
 
+import static net.daporkchop.lib.common.util.PValidation.*;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import java.util.Arrays;
 import lombok.Getter;
 import net.buildtheearth.terracore.geo.projection.GeographicProjection;
 import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
-
-import java.util.Arrays;
-
-import static net.daporkchop.lib.common.util.PValidation.*;
 
 /**
  * @author DaPorkchop_
  */
 @JsonDeserialize
-@Getter(onMethod_ = { @JsonGetter })
+@Getter(onMethod_ = {@JsonGetter})
 public class ClampProjectionTransform extends ProjectionTransform {
     private final double minX;
     private final double maxX;
@@ -34,7 +33,9 @@ public class ClampProjectionTransform extends ProjectionTransform {
             @JsonProperty(value = "minY", required = true) double minY,
             @JsonProperty(value = "maxY", required = true) double maxY) {
         super(delegate);
-        checkArg(Double.isFinite(minX) && Double.isFinite(maxX) && Double.isFinite(minY) && Double.isFinite(maxY), "Projection bounds must be finite doubles");
+        checkArg(
+                Double.isFinite(minX) && Double.isFinite(maxX) && Double.isFinite(minY) && Double.isFinite(maxY),
+                "Projection bounds must be finite doubles");
         this.minX = minX;
         this.maxX = maxX;
         this.minY = minY;
@@ -43,7 +44,7 @@ public class ClampProjectionTransform extends ProjectionTransform {
 
     @Override
     public double[] bounds() {
-        return new double[] { this.minX, this.minY, this.maxX, this.maxY };
+        return new double[] {this.minX, this.minY, this.maxX, this.maxY};
     }
 
     @Override

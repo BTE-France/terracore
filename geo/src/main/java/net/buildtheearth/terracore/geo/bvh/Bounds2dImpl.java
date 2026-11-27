@@ -1,5 +1,7 @@
 package net.buildtheearth.terracore.geo.bvh;
 
+import static net.daporkchop.lib.common.util.PValidation.*;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -9,8 +11,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
-import static net.daporkchop.lib.common.util.PValidation.*;
-
 /**
  * Trivial implementation of {@link Bounds2d}.
  *
@@ -18,7 +18,7 @@ import static net.daporkchop.lib.common.util.PValidation.*;
  */
 @JsonDeserialize
 @JsonSerialize
-@Getter(onMethod_ = { @JsonGetter })
+@Getter(onMethod_ = {@JsonGetter})
 @ToString
 @EqualsAndHashCode
 class Bounds2dImpl implements Bounds2d {

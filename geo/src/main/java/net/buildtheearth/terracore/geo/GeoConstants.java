@@ -17,5 +17,4 @@ public class GeoConstants {
      * Earth's circumference around the poles, in meters.
      */
     public static final double EARTH_POLAR_CIRCUMFERENCE = 40008000;
-
 }

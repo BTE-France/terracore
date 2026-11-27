@@ -1,14 +1,14 @@
 package net.buildtheearth.terracore.geo;
 
-import lombok.NonNull;
-import lombok.ToString;
-import net.buildtheearth.terracore.geo.projection.GeographicProjection;
-import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
-import net.buildtheearth.terracore.geo.bvh.Bounds2d;
-
 import static java.lang.Math.*;
 import static net.daporkchop.lib.common.math.PMath.*;
 import static net.daporkchop.lib.common.util.PValidation.*;
+
+import lombok.NonNull;
+import lombok.ToString;
+import net.buildtheearth.terracore.geo.bvh.Bounds2d;
+import net.buildtheearth.terracore.geo.projection.GeographicProjection;
+import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
 
 /**
  * A 2D bounding box consisting of 4 corners.
@@ -28,12 +28,15 @@ public class CornerBoundingBox2d implements Bounds2d {
 
     @NonNull
     protected final GeographicProjection proj;
+
     protected final boolean geo;
 
     @ToString.Exclude
     protected CornerBoundingBox2d other;
 
-    public CornerBoundingBox2d(double x, double z, double sizeX, double sizeZ, @NonNull GeographicProjection proj, boolean geo) throws OutOfProjectionBoundsException {
+    public CornerBoundingBox2d(
+            double x, double z, double sizeX, double sizeZ, @NonNull GeographicProjection proj, boolean geo)
+            throws OutOfProjectionBoundsException {
         this.lon00 = x;
         this.lon01 = x;
         this.lon10 = x + sizeX;
@@ -48,7 +51,14 @@ public class CornerBoundingBox2d implements Bounds2d {
         this.validate();
     }
 
-    public CornerBoundingBox2d(@NonNull double[] point00, @NonNull double[] point01, @NonNull double[] point10, @NonNull double[] point11, @NonNull GeographicProjection proj, boolean geo) throws OutOfProjectionBoundsException {
+    public CornerBoundingBox2d(
+            @NonNull double[] point00,
+            @NonNull double[] point01,
+            @NonNull double[] point10,
+            @NonNull double[] point11,
+            @NonNull GeographicProjection proj,
+            boolean geo)
+            throws OutOfProjectionBoundsException {
         this.lon00 = point00[0];
         this.lat00 = point00[1];
         this.lon01 = point01[0];
@@ -123,7 +133,8 @@ public class CornerBoundingBox2d implements Bounds2d {
                 proj.toGeo(this.lon01, this.lat01),
                 proj.toGeo(this.lon10, this.lat10),
                 proj.toGeo(this.lon11, this.lat11),
-                proj, true);
+                proj,
+                true);
     }
 
     /**
@@ -136,7 +147,8 @@ public class CornerBoundingBox2d implements Bounds2d {
                 proj.fromGeo(this.lon01, this.lat01),
                 proj.fromGeo(this.lon10, this.lat10),
                 proj.fromGeo(this.lon11, this.lat11),
-                proj, false);
+                proj,
+                false);
     }
 
     /**
@@ -145,7 +157,7 @@ public class CornerBoundingBox2d implements Bounds2d {
      * @throws OutOfProjectionBoundsException if any part of this bounding box is out of valid projection bounds
      */
     public CornerBoundingBox2d validate() throws OutOfProjectionBoundsException {
-        if (this.geo) { //validate bounds
+        if (this.geo) { // validate bounds
             this.proj.fromGeo(this.lon00, this.lat00);
             this.proj.fromGeo(this.lon01, this.lat01);
             this.proj.fromGeo(this.lon10, this.lat10);

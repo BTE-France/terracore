@@ -1,22 +1,21 @@
 package net.buildtheearth.terracore.geo.projection;
 
+import static java.lang.Math.*;
+import static net.buildtheearth.terracore.geo.GeoConstants.*;
+import static net.daporkchop.lib.common.util.PValidation.*;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import lombok.Getter;
-
 import java.util.Map;
-
-import static java.lang.Math.*;
-import static net.buildtheearth.terracore.geo.GeoConstants.*;
-import static net.daporkchop.lib.common.util.PValidation.*;
+import lombok.Getter;
 
 /**
  * https://mathworld.wolfram.com/StereographicProjection.html
  */
 @JsonDeserialize
-@Getter(onMethod_ = { @JsonGetter })
+@Getter(onMethod_ = {@JsonGetter})
 public class StereographicProjection implements GeographicProjection {
     private static double modDegrees(double val, double bound) {
         if (val == bound * 0.5d) {
@@ -66,7 +65,7 @@ public class StereographicProjection implements GeographicProjection {
         double longitude = -modDegrees(toDegrees(lambda), 360.0d);
         double latitude = toDegrees(phi);
 
-        return new double[]{ longitude, latitude };
+        return new double[] {longitude, latitude};
     }
 
     @Override
@@ -81,7 +80,7 @@ public class StereographicProjection implements GeographicProjection {
         double x = k * cos(phi) * sin(lambda);
         double y = k * sin(phi);
 
-        return new double[]{ x, y };
+        return new double[] {x, y};
     }
 
     @Override
@@ -90,7 +89,7 @@ public class StereographicProjection implements GeographicProjection {
         double k = 2.0d / (1.0d + cos(lambda));
         double r = abs(k * sin(lambda));
 
-        return new double[]{ -r, -r, r, r };
+        return new double[] {-r, -r, r, r};
     }
 
     @Override
@@ -108,7 +107,6 @@ public class StereographicProjection implements GeographicProjection {
         return Map.of(
                 "centerX", this.centerX,
                 "centerY", this.centerY,
-                "radius", this.radius
-        );
+                "radius", this.radius);
     }
 }

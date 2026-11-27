@@ -1,9 +1,8 @@
 package net.buildtheearth.terracore.geo.projection.dymaxion;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
-import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
 import net.buildtheearth.terracore.geo.GeoMaths;
+import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
 
 /**
  * Implementation of the BTE modified Dynmaxion projection.
@@ -17,13 +16,13 @@ public class BTEDymaxionProjection extends ConformalDynmaxionProjection {
     protected static final double THETA = Math.toRadians(-150);
     protected static final double SIN_THETA = Math.sin(THETA);
     protected static final double COS_THETA = Math.cos(THETA);
-    protected static final double BERING_X = -0.3420420960118339;//-0.3282152608138795;
-    protected static final double BERING_Y = -0.322211064085279;//-0.3281491467713469;
-    protected static final double ARCTIC_Y = -0.2;//-0.3281491467713469;
+    protected static final double BERING_X = -0.3420420960118339; // -0.3282152608138795;
+    protected static final double BERING_Y = -0.322211064085279; // -0.3281491467713469;
+    protected static final double ARCTIC_Y = -0.2; // -0.3281491467713469;
     protected static final double ARCTIC_M = (ARCTIC_Y - GeoMaths.ROOT3 * ARC / 4) / (BERING_X - -0.5 * ARC);
     protected static final double ARCTIC_B = ARCTIC_Y - ARCTIC_M * BERING_X;
-    protected static final double ALEUTIAN_Y = -0.5000446805492526;//-0.5127463765943157;
-    protected static final double ALEUTIAN_XL = -0.5149231279757507;//-0.4957832938238718;
+    protected static final double ALEUTIAN_Y = -0.5000446805492526; // -0.5127463765943157;
+    protected static final double ALEUTIAN_XL = -0.5149231279757507; // -0.4957832938238718;
     protected static final double ALEUTIAN_XR = -0.45;
     protected static final double ALEUTIAN_M = (BERING_Y - ALEUTIAN_Y) / (BERING_X - ALEUTIAN_XR);
     protected static final double ALEUTIAN_B = BERING_Y - ALEUTIAN_M * BERING_X;
@@ -81,7 +80,7 @@ public class BTEDymaxionProjection extends ConformalDynmaxionProjection {
 
         y += 0.75 * ARC * GeoMaths.ROOT3;
 
-        //check to make sure still in right part
+        // check to make sure still in right part
         if (easia != this.isEurasianPart(x, y)) {
             throw OutOfProjectionBoundsException.get();
         }
@@ -91,7 +90,7 @@ public class BTEDymaxionProjection extends ConformalDynmaxionProjection {
 
     protected boolean isEurasianPart(double x, double y) {
 
-        //catch vast majority of cases in not near boundary
+        // catch vast majority of cases in not near boundary
         if (x > 0) {
             return false;
         }
@@ -99,23 +98,23 @@ public class BTEDymaxionProjection extends ConformalDynmaxionProjection {
             return true;
         }
 
-        if (y > GeoMaths.ROOT3 * ARC / 4) //above arctic ocean
+        if (y > GeoMaths.ROOT3 * ARC / 4) // above arctic ocean
         {
             return x < 0;
         }
 
-        if (y < ALEUTIAN_Y) //below bering sea
+        if (y < ALEUTIAN_Y) // below bering sea
         {
             return y < (ALEUTIAN_Y + ALEUTIAN_XL) - x;
         }
 
-        if (y > BERING_Y) { //boundary across arctic ocean
+        if (y > BERING_Y) { // boundary across arctic ocean
 
             if (y < ARCTIC_Y) {
-                return x < BERING_X; //in strait
+                return x < BERING_X; // in strait
             }
 
-            return y < ARCTIC_M * x + ARCTIC_B; //above strait
+            return y < ARCTIC_M * x + ARCTIC_B; // above strait
         }
 
         return y > ALEUTIAN_M * x + ALEUTIAN_B;
@@ -123,7 +122,8 @@ public class BTEDymaxionProjection extends ConformalDynmaxionProjection {
 
     @Override
     public double[] bounds() {
-        return new double[]{ -1.5 * ARC * GeoMaths.ROOT3, -1.5 * ARC, 3 * ARC, GeoMaths.ROOT3 * ARC }; //TODO: 3*ARC is prly to high
+        return new double[] {-1.5 * ARC * GeoMaths.ROOT3, -1.5 * ARC, 3 * ARC, GeoMaths.ROOT3 * ARC
+        }; // TODO: 3*ARC is prly to high
     }
 
     @Override

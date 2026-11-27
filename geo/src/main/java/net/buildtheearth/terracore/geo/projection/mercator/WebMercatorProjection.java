@@ -1,18 +1,17 @@
 package net.buildtheearth.terracore.geo.projection.mercator;
 
+import static net.daporkchop.lib.common.util.PValidation.*;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import lombok.Getter;
-import net.buildtheearth.terracore.geo.projection.GeographicProjection;
-import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
-import net.buildtheearth.terracore.geo.GeoMaths;
-
 import java.util.Collections;
 import java.util.Map;
-
-import static net.daporkchop.lib.common.util.PValidation.*;
+import lombok.Getter;
+import net.buildtheearth.terracore.geo.GeoMaths;
+import net.buildtheearth.terracore.geo.projection.GeographicProjection;
+import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
 
 /**
  * Implementation of the web Mercator projection, with projected space normalized between 0 and 2^zoom * 256.
@@ -28,11 +27,11 @@ public class WebMercatorProjection implements GeographicProjection {
 
     public static final double LIMIT_LATITUDE = Math.toDegrees(2 * Math.atan(Math.pow(Math.E, Math.PI)) - Math.PI / 2);
 
-    @Getter(onMethod_ = { @JsonGetter })
+    @Getter(onMethod_ = {@JsonGetter})
     protected final int zoom;
 
-    protected transient final double scaleTo;
-    protected transient final double scaleFrom;
+    protected final transient double scaleTo;
+    protected final transient double scaleFrom;
 
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
     public WebMercatorProjection(@JsonProperty("zoom") Integer zoom) {
@@ -47,24 +46,24 @@ public class WebMercatorProjection implements GeographicProjection {
         if (x < 0 || y < 0 || x > this.scaleFrom || y > this.scaleFrom) {
             throw OutOfProjectionBoundsException.get();
         }
-        return new double[]{
-                Math.toDegrees(this.scaleTo * x * GeoMaths.TAU - Math.PI),
-                Math.toDegrees(Math.atan(Math.exp(Math.PI - this.scaleTo * y * GeoMaths.TAU)) * 2 - Math.PI / 2)
+        return new double[] {
+            Math.toDegrees(this.scaleTo * x * GeoMaths.TAU - Math.PI),
+            Math.toDegrees(Math.atan(Math.exp(Math.PI - this.scaleTo * y * GeoMaths.TAU)) * 2 - Math.PI / 2)
         };
     }
 
     @Override
     public double[] fromGeo(double longitude, double latitude) throws OutOfProjectionBoundsException {
         OutOfProjectionBoundsException.checkInRange(longitude, latitude, 180, LIMIT_LATITUDE);
-        return new double[]{
-                this.scaleFrom * (Math.toRadians(longitude) + Math.PI) / GeoMaths.TAU,
-                this.scaleFrom * (Math.PI - Math.log(Math.tan((Math.PI / 2 + Math.toRadians(latitude)) / 2))) / GeoMaths.TAU
+        return new double[] {
+            this.scaleFrom * (Math.toRadians(longitude) + Math.PI) / GeoMaths.TAU,
+            this.scaleFrom * (Math.PI - Math.log(Math.tan((Math.PI / 2 + Math.toRadians(latitude)) / 2))) / GeoMaths.TAU
         };
     }
 
     @Override
     public double[] bounds() {
-        return new double[]{ 0, 0, this.scaleFrom, this.scaleFrom };
+        return new double[] {0, 0, this.scaleFrom, this.scaleFrom};
     }
 
     @Override

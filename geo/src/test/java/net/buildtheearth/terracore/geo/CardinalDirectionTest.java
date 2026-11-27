@@ -1,9 +1,9 @@
 package net.buildtheearth.terracore.geo;
 
-import org.junit.jupiter.api.Test;
-
 import static net.buildtheearth.terracore.geo.AngleUnit.*;
 import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Test;
 
 public class CardinalDirectionTest {
 
@@ -49,9 +49,12 @@ public class CardinalDirectionTest {
     @Test
     void nonFiniteAzimuthsAreRejected() {
         assertThrows(IllegalArgumentException.class, () -> CardinalDirection.NORTH.matches(Float.NaN, DEGREES));
-        assertThrows(IllegalArgumentException.class, () -> CardinalDirection.NORTH.matches(Float.POSITIVE_INFINITY, DEGREES));
-        assertThrows(IllegalArgumentException.class, () -> CardinalDirection.NORTH.matches(Float.NEGATIVE_INFINITY, DEGREES));
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> CardinalDirection.NORTH.matches(Float.POSITIVE_INFINITY, DEGREES));
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> CardinalDirection.NORTH.matches(Float.NEGATIVE_INFINITY, DEGREES));
         assertThrows(IllegalArgumentException.class, () -> CardinalDirection.ofAzimuth(Float.NaN, RADIANS));
     }
-
 }
