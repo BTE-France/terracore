@@ -1,5 +1,9 @@
 package net.buildtheearth.terracore.http;
 
+import static com.google.common.base.Strings.*;
+import static net.daporkchop.lib.common.misc.string.PStrings.*;
+import static net.daporkchop.lib.common.util.PValidation.*;
+
 import com.google.common.base.Preconditions;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
@@ -26,17 +30,6 @@ import io.netty.resolver.dns.DefaultDnsServerAddressStreamProvider;
 import io.netty.resolver.dns.RoundRobinDnsAddressResolverGroup;
 import io.netty.util.ReferenceCountUtil;
 import io.netty.util.concurrent.DefaultThreadFactory;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
-import lombok.experimental.UtilityClass;
-import net.daporkchop.lib.common.function.throwing.EFunction;
-import net.daporkchop.lib.common.reference.cache.Cached;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import javax.net.ssl.SSLException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -54,10 +47,16 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static com.google.common.base.Strings.*;
-import static net.daporkchop.lib.common.misc.string.PStrings.*;
-import static net.daporkchop.lib.common.util.PValidation.*;
+import javax.net.ssl.SSLException;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.experimental.UtilityClass;
+import net.daporkchop.lib.common.function.throwing.EFunction;
+import net.daporkchop.lib.common.reference.cache.Cached;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Handles sending and caching of HTTP requests.
@@ -111,17 +110,18 @@ public class Http {
         LIB_URL = libUrl;
     }
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private static String userAgent = fastFormat("%s/%s; +%s", LIB_NAME, LIB_VERSION, LIB_URL);
-
 
     protected static final long TIMEOUT = 20L;
 
     protected final EventLoopGroup NETWORK_EVENT_LOOP_GROUP;
 
     static {
-        //create a dedicated eventloop with one thread
-        ThreadFactory threadFactory = new DefaultThreadFactory("terracore HTTP network thread", true, Thread.MIN_PRIORITY);
+        // create a dedicated eventloop with one thread
+        ThreadFactory threadFactory =
+                new DefaultThreadFactory("terracore HTTP network thread", true, Thread.MIN_PRIORITY);
         NETWORK_EVENT_LOOP_GROUP = Epoll.isAvailable()
                 ? new EpollEventLoopGroup(1, threadFactory)
                 : new NioEventLoopGroup(1, threadFactory);
@@ -139,9 +139,11 @@ public class Http {
 
     protected final Map<Host, HostManager> MANAGERS = new ConcurrentHashMap<>();
 
-    protected final int MAX_CONTENT_LENGTH = Integer.MAX_VALUE; //impossibly large, no requests will actually be this big but whatever
+    protected final int MAX_CONTENT_LENGTH =
+            Integer.MAX_VALUE; // impossibly large, no requests will actually be this big but whatever
 
-    protected static final Cached<Matcher> URL_FORMATTING_MATCHER_CACHE = Cached.regex(Pattern.compile("\\$\\{([a-z0-9.]+)}"));
+    protected static final Cached<Matcher> URL_FORMATTING_MATCHER_CACHE =
+            Cached.regex(Pattern.compile("\\$\\{([a-z0-9.]+)}"));
 
     static {
         try {
@@ -154,7 +156,8 @@ public class Http {
         }
     }
 
-    public static final RequestOptions DEFAULT_REQUEST_OPTIONS = RequestOptions.builder().build();
+    public static final RequestOptions DEFAULT_REQUEST_OPTIONS =
+            RequestOptions.builder().build();
 
     private HostManager managerFor(@NonNull URL url) {
         return MANAGERS.computeIfAbsent(new Host(url), HostManager::new);
@@ -184,7 +187,8 @@ public class Http {
             }
 
             @Override
-            public synchronized void accept(ByteBuf cachedData, Throwable throwable) { //stage 1: handle value from cache
+            public synchronized void accept(
+                    ByteBuf cachedData, Throwable throwable) { // stage 1: handle value from cache
                 checkState(options.readFromCache, "readFromCache is disabled, so how did we get here?!?");
 
                 if (throwable != null) {
@@ -192,12 +196,12 @@ public class Http {
                 }
 
                 try {
-                    if (cachedData != null //we found something in the cache
-                        && cachedData.readByte() == CacheEntry.CACHE_VERSION) { //cache file isn't old...
+                    if (cachedData != null // we found something in the cache
+                            && cachedData.readByte() == CacheEntry.CACHE_VERSION) { // cache file isn't old...
                         CacheEntry cacheEntry = new CacheEntry(cachedData);
 
                         long now = System.currentTimeMillis();
-                        if (cacheEntry.isStale(now)) { //attempt to revalidate response data
+                        if (cacheEntry.isStale(now)) { // attempt to revalidate response data
                             if (!Http.CONFIG.reducedLogging) {
                                 LOGGER.info("Cache stale: {}", this.parsed);
                             }
@@ -205,11 +209,11 @@ public class Http {
                             this.cacheEntry = cacheEntry;
                             this.cachedData = cachedData.retain();
                             cacheEntry.touch(this.nextHeaders = new DefaultHttpHeaders());
-                        } else if (cacheEntry.isExpired(now)) { //discard data and pretend it doesn't exist
+                        } else if (cacheEntry.isExpired(now)) { // discard data and pretend it doesn't exist
                             if (!Http.CONFIG.reducedLogging) {
                                 LOGGER.info("Cache expired: {}", this.parsed);
                             }
-                        } else { //return cached response value
+                        } else { // return cached response value
                             if (!Http.CONFIG.reducedLogging) {
                                 LOGGER.info("Cache hit: {}", this.parsed);
                             }
@@ -227,21 +231,23 @@ public class Http {
                     ReferenceCountUtil.release(cachedData);
                 }
 
-                //cache miss, send the actual request
+                // cache miss, send the actual request
                 managerFor(this.parsed).submit(this.parsed.getFile(), this, this.nextHeaders);
                 this.nextHeaders = EmptyHttpHeaders.INSTANCE;
             }
 
             void handleCacheEntry(@NonNull CacheEntry cacheEntry, @NonNull ByteBuf cachedData) {
                 switch (cacheEntry.status) {
-                    case CacheEntry.STATUS_NOT_FOUND: //404 Not Found
+                    case CacheEntry.STATUS_NOT_FOUND: // 404 Not Found
                         future.complete(null);
                         return;
-                    case CacheEntry.STATUS_SUCCESS: //2xx
+                    case CacheEntry.STATUS_SUCCESS: // 2xx
                         future.complete(cachedData.retain());
                         return;
-                    case CacheEntry.STATUS_REDIRECT: //redirect
-                        checkState(options.followRedirects, "don't know how to handle an HTTP redirect when followRedirects is disabled!");
+                    case CacheEntry.STATUS_REDIRECT: // redirect
+                        checkState(
+                                options.followRedirects,
+                                "don't know how to handle an HTTP redirect when followRedirects is disabled!");
                         this.step(cacheEntry.location);
                         return;
                     default:
@@ -250,7 +256,7 @@ public class Http {
             }
 
             void releaseCacheEntry() {
-                if (this.cacheEntry != null) { //release data
+                if (this.cacheEntry != null) { // release data
                     this.cacheEntry = null;
                     this.cachedData.release();
                     this.cachedData = null;
@@ -258,12 +264,13 @@ public class Http {
             }
 
             @Override
-            public synchronized void handle(FullHttpResponse response, Throwable throwable) { //stage 2: handle HTTP response
+            public synchronized void handle(
+                    FullHttpResponse response, Throwable throwable) { // stage 2: handle HTTP response
                 try {
-                    //if cacheEntry is non-null, it means we're currently attempting to refresh a stale entry
+                    // if cacheEntry is non-null, it means we're currently attempting to refresh a stale entry
 
                     if (throwable != null) {
-                        if (this.cacheEntry != null) { //fall back to stale cache data
+                        if (this.cacheEntry != null) { // fall back to stale cache data
                             if (!Http.CONFIG.reducedLogging) {
                                 LOGGER.warn("Refresh failed, falling back to stale data in cache: {}", this.parsed);
                             }
@@ -276,17 +283,21 @@ public class Http {
                         }
                         return;
                     }
-                    //attempt to parse cache entry
+                    // attempt to parse cache entry
                     CacheEntry cacheEntry = new CacheEntry(response, this.parsed);
 
                     if (!Http.CONFIG.reducedLogging) {
-                        LOGGER.info(this.cacheEntry != null ? cacheEntry.status == CacheEntry.STATUS_NOT_MODIFIED
-                                ? "Refresh succeeded, data in cache not modified: {}"
-                                : "Refresh succeeded, updating data in cache: {}"
-                                : "Request succeeded: {}", this.parsed);
+                        LOGGER.info(
+                                this.cacheEntry != null
+                                        ? cacheEntry.status == CacheEntry.STATUS_NOT_MODIFIED
+                                                ? "Refresh succeeded, data in cache not modified: {}"
+                                                : "Refresh succeeded, updating data in cache: {}"
+                                        : "Request succeeded: {}",
+                                this.parsed);
                     }
 
-                    //copy the response body because it's a composite buffer by default, which is slow for random access
+                    // copy the response body because it's a composite buffer by default, which is slow for random
+                    // access
                     ByteBuf copiedBuffer;
                     if (cacheEntry.status == CacheEntry.STATUS_NOT_MODIFIED) {
                         checkState(this.cacheEntry != null, "not modified for unknown URL: %s", this.parsed);
@@ -300,12 +311,13 @@ public class Http {
                         cacheEntryBuffer.writeByte(CacheEntry.CACHE_VERSION);
                         cacheEntry.write(cacheEntryBuffer);
 
-                        ByteBuf toCacheData = UnpooledByteBufAllocator.DEFAULT.compositeBuffer(2)
+                        ByteBuf toCacheData = UnpooledByteBufAllocator.DEFAULT
+                                .compositeBuffer(2)
                                 .addComponent(true, cacheEntryBuffer)
                                 .addComponent(true, copiedBuffer.retainedSlice());
-                        if (options.writeToCache && !cacheEntry.noCache && this.cacheFile != null) { //store in cache
+                        if (options.writeToCache && !cacheEntry.noCache && this.cacheFile != null) { // store in cache
                             Disk.write(this.cacheFile, toCacheData);
-                        } else { //manually release the data that would have been written to cache
+                        } else { // manually release the data that would have been written to cache
                             toCacheData.release();
                         }
 
@@ -327,7 +339,7 @@ public class Http {
                     throw new IllegalArgumentException(url, e);
                 }
 
-                if ("file".equalsIgnoreCase(this.parsed.getProtocol())) { //it's a file, read from disk (also async)
+                if ("file".equalsIgnoreCase(this.parsed.getProtocol())) { // it's a file, read from disk (also async)
                     Path path = Paths.get(url.substring("file://".length()));
                     if (!Http.CONFIG.reducedLogging) {
                         future.whenComplete((data, t) -> {
@@ -344,10 +356,10 @@ public class Http {
                     return;
                 }
 
-                if (options.readFromCache) { //attempt to read from cache
+                if (options.readFromCache) { // attempt to read from cache
                     this.cacheFile = Disk.cacheFileFor(this.parsed.toString());
                     Disk.read(this.cacheFile).whenComplete(this);
-                } else { //send the actual request
+                } else { // send the actual request
                     managerFor(this.parsed).submit(this.parsed.getFile(), this, this.nextHeaders);
                 }
             }
@@ -389,7 +401,8 @@ public class Http {
      * @param parseFunction a function to use to parse the response body
      * @return the parsed response body
      */
-    public static <T> CompletableFuture<T> getFirst(@NonNull String[] urls, @NonNull RequestOptions options, @NonNull EFunction<ByteBuf, T> parseFunction) {
+    public static <T> CompletableFuture<T> getFirst(
+            @NonNull String[] urls, @NonNull RequestOptions options, @NonNull EFunction<ByteBuf, T> parseFunction) {
         checkArg(urls.length > 0, "must provide at least one url");
 
         if (urls.length == 1) {
@@ -417,9 +430,9 @@ public class Http {
                         this.suppressed = new ArrayList<>();
                     }
                     this.suppressed.add(new RuntimeException(urls[this.i], cause));
-                } else if (value == null) { //remember that one of the URLs 404'd
+                } else if (value == null) { // remember that one of the URLs 404'd
                     this.foundMissing = true;
-                } else { //complete the future successfully with the retrieved value
+                } else { // complete the future successfully with the retrieved value
                     this.future.complete(value);
                     return;
                 }
@@ -430,7 +443,7 @@ public class Http {
             protected void advance() {
                 if (++this.i < urls.length) {
                     getSingle(urls[this.i], options, parseFunction).whenComplete(this);
-                } else if (this.foundMissing) { //the best result from any of the URLs was a 404
+                } else if (this.foundMissing) { // the best result from any of the URLs was a 404
                     if (this.suppressed != null) {
                         RuntimeException e = new RuntimeException();
                         this.suppressed.forEach(e::addSuppressed);
@@ -457,17 +470,18 @@ public class Http {
      * @param parseFunction a function to use to parse the response body
      * @return the parsed response body
      */
-    public static <T> CompletableFuture<T> getSingle(@NonNull String url, @NonNull RequestOptions options, @NonNull EFunction<ByteBuf, T> parseFunction) {
+    public static <T> CompletableFuture<T> getSingle(
+            @NonNull String url, @NonNull RequestOptions options, @NonNull EFunction<ByteBuf, T> parseFunction) {
         return get(url, options)
                 .thenCompose(buf -> buf == null
                         ? CompletableFuture.completedFuture(null)
                         : CompletableFuture.supplyAsync(() -> {
-                    try {
-                        return parseFunction.apply(buf);
-                    } finally {
-                        buf.release();
-                    }
-                }));
+                            try {
+                                return parseFunction.apply(buf);
+                            } finally {
+                                buf.release();
+                            }
+                        }));
     }
 
     public static String formatUrl(@NonNull Map<String, String> properties, @NonNull String url) {
@@ -541,11 +555,11 @@ public class Http {
     public static class HttpConfig {
 
         public String[] maxConcurrentRequests = {
-                "8: https://cloud.daporkchop.net/",
-                "8: https://s3.amazonaws.com/",
-                "1: http://gis-treecover.wri.org/",
-                "1: https://overpass.kumi.systems/",
-                "1: https://lz4.overpass-api.de/"
+            "8: https://cloud.daporkchop.net/",
+            "8: https://s3.amazonaws.com/",
+            "1: http://gis-treecover.wri.org/",
+            "1: https://overpass.kumi.systems/",
+            "1: https://lz4.overpass-api.de/"
         };
 
         public boolean cache = true;
@@ -554,5 +568,4 @@ public class Http {
 
         public boolean reducedLogging = false;
     }
-
 }

@@ -1,9 +1,8 @@
 package net.buildtheearth.terracore.http;
 
+import java.net.URL;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
-
-import java.net.URL;
 
 /**
  * @author DaPorkchop_
@@ -12,6 +11,7 @@ import java.net.URL;
 class Host {
     @NonNull
     protected final String host;
+
     protected final int port;
 
     protected final boolean ssl;

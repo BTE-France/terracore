@@ -1,11 +1,10 @@
 package net.buildtheearth.terracore.http;
 
 import io.netty.handler.codec.http.HttpResponseStatus;
-import lombok.Getter;
-import lombok.NonNull;
-
 import java.io.IOException;
 import java.net.URL;
+import lombok.Getter;
+import lombok.NonNull;
 
 /**
  * Used as the failure cause for requests issued from {@link Http} when an unknown HTTP status code is encountered.
