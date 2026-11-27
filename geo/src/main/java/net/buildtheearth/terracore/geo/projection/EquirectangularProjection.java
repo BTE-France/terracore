@@ -18,7 +18,7 @@ public class EquirectangularProjection implements GeographicProjection {
     @Override
     public double[] toGeo(double x, double y) throws OutOfProjectionBoundsException {
         OutOfProjectionBoundsException.checkLongitudeLatitudeInRange(x, y);
-        return new double[]{ x, y };
+        return new double[] {x, y};
     }
 
     /**
@@ -31,7 +31,7 @@ public class EquirectangularProjection implements GeographicProjection {
     @Override
     public double[] fromGeo(double longitude, double latitude) throws OutOfProjectionBoundsException {
         OutOfProjectionBoundsException.checkLongitudeLatitudeInRange(longitude, latitude);
-        return new double[]{ longitude, latitude };
+        return new double[] {longitude, latitude};
     }
 
     /**

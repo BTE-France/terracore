@@ -1,11 +1,10 @@
 package net.buildtheearth.terracore.geo.bvh;
 
-import lombok.NonNull;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
+import lombok.NonNull;
 
 /**
  * A simple, immutable, quadtree-based implementation of a BVH (Bounding Volume Hierarchy) on arbitrary values implementing {@link Bounds2d}.

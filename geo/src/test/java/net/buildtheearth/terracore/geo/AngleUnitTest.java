@@ -1,8 +1,8 @@
 package net.buildtheearth.terracore.geo;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Test;
 
 public class AngleUnitTest {
 
@@ -62,5 +62,4 @@ public class AngleUnitTest {
         assertEquals(42.5f, AngleUnit.DEGREES.fromDegrees(42.5f), 0.0);
         assertEquals(42.5f, AngleUnit.RADIANS.fromRadians(42.5f), 0.0);
     }
-
 }

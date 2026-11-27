@@ -6,12 +6,11 @@ import static net.daporkchop.lib.common.math.PMath.ceilI;
 import static net.daporkchop.lib.common.math.PMath.floorI;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
 import lombok.NonNull;
+import net.buildtheearth.terracore.geo.CornerBoundingBox2d;
 import net.buildtheearth.terracore.geo.TileLocation;
 import net.buildtheearth.terracore.geo.projection.GeographicProjection;
 import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
-import net.buildtheearth.terracore.geo.CornerBoundingBox2d;
 
 /**
  * An axis-aligned, 2D bounding box using double-precision floating-point coordinates.
@@ -51,7 +50,10 @@ public interface Bounds2d {
      * @return whether or not the two bounding boxes intersect
      */
     default boolean intersects(@NonNull Bounds2d other) {
-        return this.minX() <= other.maxX() && this.maxX() >= other.minX() && this.minZ() <= other.maxZ() && this.maxZ() >= other.minZ();
+        return this.minX() <= other.maxX()
+                && this.maxX() >= other.minX()
+                && this.minZ() <= other.maxZ()
+                && this.maxZ() >= other.minZ();
     }
 
     /**
@@ -61,7 +63,10 @@ public interface Bounds2d {
      * @return whether or not this bounding box contains the given bounding box
      */
     default boolean contains(@NonNull Bounds2d other) {
-        return this.minX() <= other.minX() && this.maxX() >= other.maxX() && this.minZ() <= other.minZ() && this.maxZ() >= other.maxZ();
+        return this.minX() <= other.minX()
+                && this.maxX() >= other.maxX()
+                && this.minZ() <= other.minZ()
+                && this.maxZ() >= other.maxZ();
     }
 
     /**
@@ -93,7 +98,11 @@ public interface Bounds2d {
      * @return the minimum bounding box containing both bounding boxes
      */
     default Bounds2d union(@NonNull Bounds2d other) {
-        return of(min(this.minX(), other.minX()), max(this.maxX(), other.maxX()), min(this.minZ(), other.minZ()), max(this.maxZ(), other.maxZ()));
+        return of(
+                min(this.minX(), other.minX()),
+                max(this.maxX(), other.maxX()),
+                min(this.minZ(), other.minZ()),
+                max(this.maxZ(), other.maxZ()));
     }
 
     /**
@@ -113,7 +122,8 @@ public interface Bounds2d {
      * @param geo  whether or not this bounding box uses geographic coordinates
      * @return a {@link CornerBoundingBox2d} equivalent to this bounding box
      */
-    default CornerBoundingBox2d toCornerBB(@NonNull GeographicProjection proj, boolean geo) throws OutOfProjectionBoundsException {
+    default CornerBoundingBox2d toCornerBB(@NonNull GeographicProjection proj, boolean geo)
+            throws OutOfProjectionBoundsException {
         double minX = this.minX();
         double minZ = this.minZ();
         return new CornerBoundingBox2d(minX, minZ, this.maxX() - minX, this.maxZ() - minZ, proj, geo);
@@ -132,7 +142,7 @@ public interface Bounds2d {
         double minZ = this.minZ();
         double maxZ = this.maxZ();
 
-        if (geo) { //validate bounds
+        if (geo) { // validate bounds
             proj.fromGeo(minX, minZ);
             proj.fromGeo(minX, maxZ);
             proj.fromGeo(maxX, minZ);

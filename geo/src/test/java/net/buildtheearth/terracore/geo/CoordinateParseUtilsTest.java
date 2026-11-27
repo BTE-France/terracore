@@ -1,9 +1,8 @@
 package net.buildtheearth.terracore.geo;
 
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Smyler
@@ -106,7 +105,6 @@ public class CoordinateParseUtilsTest {
         this.testInvalidStringParsing("95 125");
         this.testInvalidStringParsing("-97, -172");
         this.testInvalidStringParsing("45, 223");
-
     }
 
     void testValidStringParsing(String string, double longitude, double latitude) {
@@ -121,5 +119,4 @@ public class CoordinateParseUtilsTest {
     private void testInvalidStringParsing(String string) {
         assertNull(CoordinateParseUtils.parseVerbatimCoordinates(string));
     }
-
 }

@@ -1,21 +1,20 @@
 package net.buildtheearth.terracore.geo.projection;
 
+import static java.lang.Math.*;
+import static net.buildtheearth.terracore.geo.GeoConstants.*;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import lombok.Getter;
-
 import java.util.Map;
-
-import static java.lang.Math.*;
-import static net.buildtheearth.terracore.geo.GeoConstants.*;
+import lombok.Getter;
 
 /**
  * https://mathworld.wolfram.com/AzimuthalEquidistantProjection.html
  */
 @JsonDeserialize
-@Getter(onMethod_ = { @JsonGetter })
+@Getter(onMethod_ = {@JsonGetter})
 public class AzimuthalEquidistantProjection implements GeographicProjection {
     private static double modDegrees(double val, double bound) {
         if (val == bound * 0.5d) {
@@ -35,8 +34,7 @@ public class AzimuthalEquidistantProjection implements GeographicProjection {
 
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
     public AzimuthalEquidistantProjection(
-            @JsonProperty("centerX") Double centerX,
-            @JsonProperty("centerY") Double centerY) {
+            @JsonProperty("centerX") Double centerX, @JsonProperty("centerY") Double centerY) {
         this.centerX = modDegrees(centerX != null ? centerX : 0.0d, 360.0d);
         this.centerY = modDegrees(centerY != null ? centerY : 0.0d, 180.0d);
     }
@@ -64,7 +62,7 @@ public class AzimuthalEquidistantProjection implements GeographicProjection {
         double longitude = -modDegrees(toDegrees(lambda), 360.0d);
         double latitude = toDegrees(phi);
 
-        return new double[]{ longitude, latitude };
+        return new double[] {longitude, latitude};
     }
 
     @Override
@@ -77,17 +75,18 @@ public class AzimuthalEquidistantProjection implements GeographicProjection {
         double lambda = -toRadians(longitude);
 
         double p = acos(sin(phi1) * sin(phi) + cos(phi1) * cos(phi) * cos(lambda - lambda0));
-        double t = atan2(cos(phi) * sin(lambda - lambda0), cos(phi1) * sin(phi) - sin(phi1) * cos(phi) * cos(lambda - lambda0));
+        double t = atan2(
+                cos(phi) * sin(lambda - lambda0), cos(phi1) * sin(phi) - sin(phi1) * cos(phi) * cos(lambda - lambda0));
 
         double x = p * sin(t);
         double y = p * cos(t);
 
-        return new double[]{ x, y };
+        return new double[] {x, y};
     }
 
     @Override
     public double[] bounds() {
-        return new double[]{ -PI, -PI, PI, PI };
+        return new double[] {-PI, -PI, PI, PI};
     }
 
     @Override
@@ -104,7 +103,6 @@ public class AzimuthalEquidistantProjection implements GeographicProjection {
     public Map<String, Object> properties() {
         return Map.of(
                 "centerX", this.centerX,
-                "centerY", this.centerY
-        );
+                "centerY", this.centerY);
     }
 }

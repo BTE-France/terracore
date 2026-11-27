@@ -1,10 +1,9 @@
 package net.buildtheearth.terracore.geo;
 
-import org.junit.jupiter.api.Test;
-
 import static net.buildtheearth.terracore.geo.Strings.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.junit.jupiter.api.Test;
 
 public class StringsTest {
 
@@ -40,5 +39,4 @@ public class StringsTest {
         assertArrayEquals(new String[] {"a", "a", "c", "def", ""}, split("ababcbdefb", 'b'));
         assertArrayEquals(new String[] {"", "a", "a", "c", "def"}, split("bababcbdef", 'b'));
     }
-
 }

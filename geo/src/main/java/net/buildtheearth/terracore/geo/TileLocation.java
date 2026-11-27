@@ -21,5 +21,4 @@ public record TileLocation(int x, int y, int zoom) {
     public TileLocation(int x, int y) {
         this(x, y, 0);
     }
-
 }

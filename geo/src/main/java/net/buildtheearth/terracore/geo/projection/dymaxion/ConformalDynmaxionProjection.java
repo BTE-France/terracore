@@ -1,19 +1,18 @@
 package net.buildtheearth.terracore.geo.projection.dymaxion;
 
+import static net.daporkchop.lib.common.util.PValidation.*;
+
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import java.io.InputStream;
+import java.util.zip.GZIPInputStream;
 import net.buildtheearth.terracore.geo.GeoMaths;
 import net.daporkchop.lib.binary.oio.StreamUtil;
 import net.daporkchop.lib.common.function.io.IOSupplier;
 import net.daporkchop.lib.common.reference.ReferenceStrength;
 import net.daporkchop.lib.common.reference.cache.Cached;
 import net.daporkchop.lib.common.util.PArrays;
-
-import java.io.InputStream;
-import java.util.zip.GZIPInputStream;
-
-import static net.daporkchop.lib.common.util.PValidation.*;
 
 /**
  * Implementation of the Dynmaxion like conformal projection.
@@ -28,26 +27,31 @@ public class ConformalDynmaxionProjection extends DymaxionProjection {
 
     private static final String RESOURCE_PATH = "conformal.gz";
 
-    protected static final Cached<InvertableVectorField> INVERSE_CACHE = Cached.global((IOSupplier<InvertableVectorField>) () -> {
-        double[][] vx = PArrays.filledBy(SIDE_LENGTH + 1, double[][]::new, i -> new double[SIDE_LENGTH + 1 - i]);
-        double[][] vy = PArrays.filledBy(SIDE_LENGTH + 1, double[][]::new, i -> new double[SIDE_LENGTH + 1 - i]);
+    protected static final Cached<InvertableVectorField> INVERSE_CACHE = Cached.global(
+            (IOSupplier<InvertableVectorField>) () -> {
+                double[][] vx =
+                        PArrays.filledBy(SIDE_LENGTH + 1, double[][]::new, i -> new double[SIDE_LENGTH + 1 - i]);
+                double[][] vy =
+                        PArrays.filledBy(SIDE_LENGTH + 1, double[][]::new, i -> new double[SIDE_LENGTH + 1 - i]);
 
-        ByteBuf buf;
-        try (InputStream compressedStream = ConformalDynmaxionProjection.class.getResourceAsStream(RESOURCE_PATH)) {
-            checkState(compressedStream != null, "Missing builtin resource: " + RESOURCE_PATH);
-            InputStream stream = new GZIPInputStream(compressedStream);
-            buf = Unpooled.wrappedBuffer(StreamUtil.toByteArray(stream));
-        }
+                ByteBuf buf;
+                try (InputStream compressedStream =
+                        ConformalDynmaxionProjection.class.getResourceAsStream(RESOURCE_PATH)) {
+                    checkState(compressedStream != null, "Missing builtin resource: " + RESOURCE_PATH);
+                    InputStream stream = new GZIPInputStream(compressedStream);
+                    buf = Unpooled.wrappedBuffer(StreamUtil.toByteArray(stream));
+                }
 
-        for (int v = 0; v < SIDE_LENGTH + 1; v++) {
-            for (int u = 0; u < SIDE_LENGTH + 1 - v; u++) {
-                vx[u][v] = buf.readDouble() * VECTOR_SCALE_FACTOR;
-                vy[u][v] = buf.readDouble() * VECTOR_SCALE_FACTOR;
-            }
-        }
+                for (int v = 0; v < SIDE_LENGTH + 1; v++) {
+                    for (int u = 0; u < SIDE_LENGTH + 1 - v; u++) {
+                        vx[u][v] = buf.readDouble() * VECTOR_SCALE_FACTOR;
+                        vy[u][v] = buf.readDouble() * VECTOR_SCALE_FACTOR;
+                    }
+                }
 
-        return new InvertableVectorField(vx, vy);
-    }, ReferenceStrength.SOFT);
+                return new InvertableVectorField(vx, vy);
+            },
+            ReferenceStrength.SOFT);
 
     protected final InvertableVectorField inverse = INVERSE_CACHE.get();
 
@@ -64,13 +68,13 @@ public class ConformalDynmaxionProjection extends DymaxionProjection {
         c[0] += 0.5;
         c[1] += GeoMaths.ROOT3 / 6;
 
-        //use another interpolated vector to have a really good guess before using Newton's method
-        //Note: foward was removed for now, will need to be added back if this improvement is ever re-implemented
-        //c = forward.getInterpolatedVector(c[0], c[1]);
-        //c = inverse.applyNewtonsMethod(x, y, c[0]/ARC + 0.5, c[1]/ARC + ROOT3/6, 1);
+        // use another interpolated vector to have a really good guess before using Newton's method
+        // Note: foward was removed for now, will need to be added back if this improvement is ever re-implemented
+        // c = forward.getInterpolatedVector(c[0], c[1]);
+        // c = inverse.applyNewtonsMethod(x, y, c[0]/ARC + 0.5, c[1]/ARC + ROOT3/6, 1);
 
-        //just use newtons method: slower
-        c = this.inverse.applyNewtonsMethod(x, y, c[0], c[1], 5);//c[0]/ARC + 0.5, c[1]/ARC + ROOT3/6
+        // just use newtons method: slower
+        c = this.inverse.applyNewtonsMethod(x, y, c[0], c[1], 5); // c[0]/ARC + 0.5, c[1]/ARC + ROOT3/6
 
         c[0] -= 0.5;
         c[1] -= GeoMaths.ROOT3 / 6;
@@ -114,11 +118,11 @@ public class ConformalDynmaxionProjection extends DymaxionProjection {
         }
 
         public double[] getInterpolatedVector(double x, double y) {
-            //scale up triangle to be triangleSize across
+            // scale up triangle to be triangleSize across
             x *= SIDE_LENGTH;
             y *= SIDE_LENGTH;
 
-            //convert to triangle units
+            // convert to triangle units
             double v = 2 * y / GeoMaths.ROOT3;
             double u = x - v * 0.5;
 
@@ -173,14 +177,19 @@ public class ConformalDynmaxionProjection extends DymaxionProjection {
                 x3 = (u1 + 1) + 0.5 * (v1 + 1);
             }
 
-            //TODO: not sure if weights are right (but weirdly mirrors stuff so there may be simplifcation yet)
+            // TODO: not sure if weights are right (but weirdly mirrors stuff so there may be simplifcation yet)
             double w1 = -(y - y3) / GeoMaths.ROOT3 - (x - x3);
             double w2 = 2 * (y - y3) / GeoMaths.ROOT3;
             double w3 = 1 - w1 - w2;
 
-            return new double[]{ valx1 * w1 + valx2 * w2 + valx3 * w3, valy1 * w1 + valy2 * w2 + valy3 * w3,
-                    (valx3 - valx1) * SIDE_LENGTH, SIDE_LENGTH * flip * (2 * valx2 - valx1 - valx3) / GeoMaths.ROOT3,
-                    (valy3 - valy1) * SIDE_LENGTH, SIDE_LENGTH * flip * (2 * valy2 - valy1 - valy3) / GeoMaths.ROOT3 };
+            return new double[] {
+                valx1 * w1 + valx2 * w2 + valx3 * w3,
+                valy1 * w1 + valy2 * w2 + valy3 * w3,
+                (valx3 - valx1) * SIDE_LENGTH,
+                SIDE_LENGTH * flip * (2 * valx2 - valx1 - valx3) / GeoMaths.ROOT3,
+                (valy3 - valy1) * SIDE_LENGTH,
+                SIDE_LENGTH * flip * (2 * valy2 - valy1 - valy3) / GeoMaths.ROOT3
+            };
         }
 
         public double[] applyNewtonsMethod(double expectedf, double expectedg, double xest, double yest, int iter) {
@@ -200,7 +209,7 @@ public class ConformalDynmaxionProjection extends DymaxionProjection {
                 yest -= determinant * (-dgdx * f + dfdx * g);
             }
 
-            return new double[]{ xest, yest };
+            return new double[] {xest, yest};
         }
     }
 }

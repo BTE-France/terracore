@@ -1,5 +1,8 @@
 package net.buildtheearth.terracore.geo.projection.transform;
 
+import static java.lang.Math.*;
+import static net.daporkchop.lib.common.util.PValidation.*;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -8,21 +11,18 @@ import lombok.Getter;
 import net.buildtheearth.terracore.geo.projection.GeographicProjection;
 import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
 
-import static java.lang.Math.*;
-import static net.daporkchop.lib.common.util.PValidation.*;
-
 /**
  * @author DaPorkchop_
  */
 @JsonDeserialize
 public class RotateProjectionTransform extends ProjectionTransform {
-    @Getter(onMethod_ = { @JsonGetter })
+    @Getter(onMethod_ = {@JsonGetter})
     private final double by;
 
-    private transient final double sin;
-    private transient final double cos;
-    private transient final double sinBackwards;
-    private transient final double cosBackwards;
+    private final transient double sin;
+    private final transient double cos;
+    private final transient double sinBackwards;
+    private final transient double cosBackwards;
 
     /**
      * @param delegate - Input projection
@@ -57,27 +57,24 @@ public class RotateProjectionTransform extends ProjectionTransform {
         double y3 = bounds[2] * this.sin + bounds[3] * this.cos;
 
         return new double[] {
-                min(min(x0, x1), min(x2, x3)),
-                min(min(y0, y1), min(y2, y3)),
-                max(max(x0, x1), max(x2, x3)),
-                max(max(y0, y1), max(y2, y3))
+            min(min(x0, x1), min(x2, x3)),
+            min(min(y0, y1), min(y2, y3)),
+            max(max(x0, x1), max(x2, x3)),
+            max(max(y0, y1), max(y2, y3))
         };
     }
 
     @Override
     public double[] toGeo(double x, double y) throws OutOfProjectionBoundsException {
-        return super.delegate.toGeo(
-                x * this.cos - y * this.sin,
-                x * this.sin + y * this.cos
-        );
+        return super.delegate.toGeo(x * this.cos - y * this.sin, x * this.sin + y * this.cos);
     }
 
     @Override
     public double[] fromGeo(double longitude, double latitude) throws OutOfProjectionBoundsException {
         double[] pos = super.delegate.fromGeo(longitude, latitude);
         return new double[] {
-                pos[0] * this.cosBackwards - pos[1] * this.sinBackwards,
-                pos[0] * this.sinBackwards + pos[1] * this.cosBackwards,
+            pos[0] * this.cosBackwards - pos[1] * this.sinBackwards,
+            pos[0] * this.sinBackwards + pos[1] * this.cosBackwards,
         };
     }
 

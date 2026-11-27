@@ -1,5 +1,8 @@
 package net.buildtheearth.terracore.geo.projection;
 
+import static java.util.Map.*;
+import static java.util.Map.entry;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
@@ -14,6 +17,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import java.io.IOException;
 import lombok.experimental.UtilityClass;
 import net.buildtheearth.terracore.geo.projection.dymaxion.BTEDymaxionProjection;
 import net.buildtheearth.terracore.geo.projection.dymaxion.ConformalDynmaxionProjection;
@@ -30,11 +34,6 @@ import net.buildtheearth.terracore.geo.projection.transform.ScaleProjectionTrans
 import net.buildtheearth.terracore.geo.projection.transform.SwapAxesProjectionTransform;
 import net.daporkchop.lib.common.util.PorkUtil;
 
-import java.io.IOException;
-
-import static java.util.Map.*;
-import static java.util.Map.entry;
-
 @UtilityClass
 class ProjectionJson {
 
@@ -48,7 +47,7 @@ class ProjectionJson {
             .build();
 
     private final BiMap<String, Class<? extends GeographicProjection>> PROJECTIONS = HashBiMap.create(ofEntries(
-            //normal projections
+            // normal projections
             entry("centered_mercator", CenteredMercatorProjection.class),
             entry("web_mercator", WebMercatorProjection.class),
             entry("transverse_mercator", TransverseMercatorProjection.class),
@@ -61,15 +60,14 @@ class ProjectionJson {
             entry("lambert_azimuthal", LambertAzimuthalProjection.class),
             entry("azimuthal_equidistant", AzimuthalEquidistantProjection.class),
             entry("stereographic", StereographicProjection.class),
-            //transformations
+            // transformations
             entry("clamp", ClampProjectionTransform.class),
             entry("flip_horizontal", FlipHorizontalProjectionTransform.class),
             entry("flip_vertical", FlipVerticalProjectionTransform.class),
             entry("offset", OffsetProjectionTransform.class),
             entry("rotate", RotateProjectionTransform.class),
             entry("scale", ScaleProjectionTransform.class),
-            entry("swap_axes", SwapAxesProjectionTransform.class)
-    ));
+            entry("swap_axes", SwapAxesProjectionTransform.class)));
 
     class Deserializer extends JsonDeserializer<GeographicProjection> {
         @Override
@@ -88,7 +86,8 @@ class ProjectionJson {
                 throw JsonMappingException.from(p, "expected json object, but found: " + p.currentToken());
             }
 
-            GeographicProjection value = context.readValue(p, PorkUtil.<Class<? extends GeographicProjection>>uncheckedCast(clazz));
+            GeographicProjection value =
+                    context.readValue(p, PorkUtil.<Class<? extends GeographicProjection>>uncheckedCast(clazz));
 
             if (p.nextToken() != JsonToken.END_OBJECT) {
                 throw JsonMappingException.from(p, "expected json object end, but found: " + p.currentToken());
@@ -100,7 +99,8 @@ class ProjectionJson {
 
     class Serializer extends JsonSerializer<GeographicProjection> {
         @Override
-        public void serialize(GeographicProjection value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+        public void serialize(GeographicProjection value, JsonGenerator gen, SerializerProvider serializers)
+                throws IOException {
             if (value == null) {
                 gen.writeNull();
                 return;
@@ -122,6 +122,6 @@ class ProjectionJson {
     }
 
     @JsonSerialize
-    private class MixIn {} // Have this here to avoid a bug in forge Gradle (https://forums.minecraftforge.net/topic/40670-build-terminates-at-extractrangemapreplacedmain/)
-
+    private class MixIn {} // Have this here to avoid a bug in forge Gradle
+    // (https://forums.minecraftforge.net/topic/40670-build-terminates-at-extractrangemapreplacedmain/)
 }

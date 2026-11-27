@@ -1,17 +1,15 @@
 package net.buildtheearth.terracore.geo;
 
+import static net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException.*;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
 import net.daporkchop.lib.common.util.PArrays;
-
-
-import static net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException.*;
 
 /**
  * Utilities for assisting in the parsing of latitude and longitude strings into Decimals.
@@ -20,26 +18,29 @@ import static net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsEx
  */
 public final class CoordinateParseUtils {
 
-    private final static String DMS = "\\s*(\\d{1,3})\\s*(?:°|d|º| |g|o)"  // The degrees
-                                      + "\\s*([0-6]?\\d)\\s*(?:'|m| |´|’|′)" // The minutes
-                                      + "\\s*(?:"                            // Non-capturing group
-                                      + "([0-6]?\\d(?:[,.]\\d+)?)"           // Seconds and optional decimal
-                                      + "\\s*(?:\"|''|s|´´|″)?"
-                                      + ")?\\s*";
-    private final static String DM = "\\s*(\\d{1,3})\\s*(?:°|d|º| |g|o)" // The degrees
-                                     + "\\s*(?:"                           // Non-capturing group
-                                     + "([0-6]?\\d(?:[,.]\\d+)?)"          // Minutes and optional decimal
-                                     + "\\s*(?:'|m| |´|’|′)?"
-                                     + ")?\\s*";
-    private final static String D = "\\s*(\\d{1,3}(?:[,.]\\d+)?)\\s*(?:°|d|º| |g|o|)\\s*"; // The degrees and optional decimal
-    private final static Pattern DMS_SINGLE = Pattern.compile("^" + DMS + "$", Pattern.CASE_INSENSITIVE);
-    private final static Pattern DM_SINGLE = Pattern.compile("^" + DM + "$", Pattern.CASE_INSENSITIVE);
-    private final static Pattern D_SINGLE = Pattern.compile("^" + D + "$", Pattern.CASE_INSENSITIVE);
-    private final static Pattern DMS_COORD = Pattern.compile("^" + DMS + "([NSEOW])" + "[ ,;/]?" + DMS + "([NSEOW])$", Pattern.CASE_INSENSITIVE);
-    private final static String POSITIVE = "NEO";
+    private static final String DMS = "\\s*(\\d{1,3})\\s*(?:°|d|º| |g|o)" // The degrees
+            + "\\s*([0-6]?\\d)\\s*(?:'|m| |´|’|′)" // The minutes
+            + "\\s*(?:" // Non-capturing group
+            + "([0-6]?\\d(?:[,.]\\d+)?)" // Seconds and optional decimal
+            + "\\s*(?:\"|''|s|´´|″)?"
+            + ")?\\s*";
+    private static final String DM = "\\s*(\\d{1,3})\\s*(?:°|d|º| |g|o)" // The degrees
+            + "\\s*(?:" // Non-capturing group
+            + "([0-6]?\\d(?:[,.]\\d+)?)" // Minutes and optional decimal
+            + "\\s*(?:'|m| |´|’|′)?"
+            + ")?\\s*";
+    private static final String D =
+            "\\s*(\\d{1,3}(?:[,.]\\d+)?)\\s*(?:°|d|º| |g|o|)\\s*"; // The degrees and optional decimal
+    private static final Pattern DMS_SINGLE = Pattern.compile("^" + DMS + "$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern DM_SINGLE = Pattern.compile("^" + DM + "$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern D_SINGLE = Pattern.compile("^" + D + "$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern DMS_COORD =
+            Pattern.compile("^" + DMS + "([NSEOW])" + "[ ,;/]?" + DMS + "([NSEOW])$", Pattern.CASE_INSENSITIVE);
+    private static final String POSITIVE = "NEO";
 
     private static final char[] PART_DELIMITERS = ";/,".toCharArray();
     private static final List<Function<String, Double>> NUMBER_PARSERS;
+
     static {
         List<Function<String, Double>> parsers = new ArrayList<>();
         parsers.add(Double::parseDouble);
@@ -48,7 +49,10 @@ public final class CoordinateParseUtils {
     }
 
     private static boolean inRange(double lat, double lon) {
-        return Double.compare(lat, 90) <= 0 && Double.compare(lat, -90) >= 0 && Double.compare(lon, 180) <= 0 && Double.compare(lon, -180) >= 0;
+        return Double.compare(lat, 90) <= 0
+                && Double.compare(lat, -90) >= 0
+                && Double.compare(lon, 180) <= 0
+                && Double.compare(lon, -180) >= 0;
     }
 
     private static boolean isLat(String direction) {
@@ -87,7 +91,7 @@ public final class CoordinateParseUtils {
                 final String direction1 = m.group(4);
                 final String direction2 = m.group(8);
 
-                for (Function<String, Double> format: NUMBER_PARSERS) {
+                for (Function<String, Double> format : NUMBER_PARSERS) {
 
                     try {
 
@@ -107,18 +111,16 @@ public final class CoordinateParseUtils {
 
                     } catch (Exception ignored) {
                     }
-
                 }
 
                 return null;
-
             }
 
             // Now try parsing with a separator
             String[] latlon = separateParts(coordinates);
 
             // Try with DMS format
-            for (Function<String, Double> format: NUMBER_PARSERS) {
+            for (Function<String, Double> format : NUMBER_PARSERS) {
                 try {
                     double lat = parseDMS(latlon[0], true, format);
                     double lon = parseDMS(latlon[1], false, format);
@@ -128,7 +130,7 @@ public final class CoordinateParseUtils {
             }
 
             // Try with literal values
-            for (Function<String, Double> format: NUMBER_PARSERS) {
+            for (Function<String, Double> format : NUMBER_PARSERS) {
                 try {
                     double lat = parseDecimal(latlon[0], format);
                     double lon = parseDecimal(latlon[1], format);
@@ -197,14 +199,15 @@ public final class CoordinateParseUtils {
         for (final char delimiter : PART_DELIMITERS) {
             int count = Strings.countMatches(coordinates, String.valueOf(delimiter));
             int delimiterIndex;
-            if (count == 1 && (delimiterIndex = coordinates.indexOf(delimiter)) > 0 && delimiterIndex < coordinates.length() - 1) {
+            if (count == 1
+                    && (delimiterIndex = coordinates.indexOf(delimiter)) > 0
+                    && delimiterIndex < coordinates.length() - 1) {
                 return Strings.split(coordinates, delimiter);
             }
         }
 
         // We didn't manage to split, the string is malformed
         throw new NumberFormatException();
-
     }
 
     private static double parseDMS(String coord, boolean lat, Function<String, Double> format) {
@@ -249,14 +252,16 @@ public final class CoordinateParseUtils {
         return format.apply(coord);
     }
 
-    private static double coordFromMatcher(Matcher m, int idx1, int idx2, int idx3, String sign, Function<String, Double> format) {
+    private static double coordFromMatcher(
+            Matcher m, int idx1, int idx2, int idx3, String sign, Function<String, Double> format) {
         double degrees = format.apply(m.group(idx1));
         double minutes = format.apply(m.group(idx2));
         double seconds = format.apply(m.group(idx3));
         return roundTo6decimals(coordSign(sign) * dmsToDecimal(degrees, minutes, seconds));
     }
 
-    private static double coordFromMatcher(Matcher m, int idx1, int idx2, String sign, Function<String, Double> format) {
+    private static double coordFromMatcher(
+            Matcher m, int idx1, int idx2, String sign, Function<String, Double> format) {
         double degrees = format.apply(m.group(idx1));
         double minutes = format.apply(m.group(idx2));
         return roundTo6decimals(coordSign(sign) * dmsToDecimal(degrees, minutes, 0.0));
