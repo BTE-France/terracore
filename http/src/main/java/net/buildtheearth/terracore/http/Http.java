@@ -296,8 +296,8 @@ public class Http {
                                 this.parsed);
                     }
 
-                    // copy the response body because it's a composite buffer by default, which is slow for random
-                    // access
+                    // copy the response body because it's a composite buffer by default,
+                    // which is slow for random access
                     ByteBuf copiedBuffer;
                     if (cacheEntry.status == CacheEntry.STATUS_NOT_MODIFIED) {
                         checkState(this.cacheEntry != null, "not modified for unknown URL: %s", this.parsed);
