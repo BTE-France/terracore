@@ -1,29 +1,27 @@
 package net.buildtheearth.terracore.minecraft;
 
-import net.daporkchop.lib.common.reference.ReferenceStrength;
-import net.daporkchop.lib.common.reference.cache.Cached;
-import org.jetbrains.annotations.NotNull;
+import static java.lang.Integer.*;
+import static java.util.Collections.*;
+import static java.util.stream.Collectors.*;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static java.lang.Integer.*;
-import static java.util.Collections.*;
-import static java.util.stream.Collectors.*;
+import net.daporkchop.lib.common.reference.ReferenceStrength;
+import net.daporkchop.lib.common.reference.cache.Cached;
+import org.jetbrains.annotations.NotNull;
 
 public final class BlockStateBuilder {
 
     private Identifier block;
     private Map<String, BlockPropertyValue> properties = new HashMap<>();
-    private static final Cached<BlockStateBuilder> instances = Cached.threadLocal(BlockStateBuilder::new, ReferenceStrength.SOFT);
+    private static final Cached<BlockStateBuilder> instances =
+            Cached.threadLocal(BlockStateBuilder::new, ReferenceStrength.SOFT);
     private static final Pattern SERIALIZED_REGEX = Pattern.compile(
-            "^(?<identifier>[a-z0-9_.-]+(:?:[a-z0-9/_.-]+)?)"
-            + "(?:\\[(?<properties>(?:[a-z0-9_]+=[a-z0-9_]+,?)*)])?$",
-            Pattern.CASE_INSENSITIVE
-    );
+            "^(?<identifier>[a-z0-9_.-]+(:?:[a-z0-9/_.-]+)?)" + "(?:\\[(?<properties>(?:[a-z0-9_]+=[a-z0-9_]+,?)*)])?$",
+            Pattern.CASE_INSENSITIVE);
 
     public static BlockStateBuilder get() {
         return instances.get();
@@ -35,20 +33,24 @@ public final class BlockStateBuilder {
     }
 
     public BlockStateBuilder setProperty(String property, String value) {
-        if (property == null || property.isEmpty()) throw new IllegalArgumentException("Property name cannot be null or empty.");
-        if (value == null || value.isEmpty()) throw new IllegalArgumentException("Property value cannot be null or empty.");
+        if (property == null || property.isEmpty())
+            throw new IllegalArgumentException("Property name cannot be null or empty.");
+        if (value == null || value.isEmpty())
+            throw new IllegalArgumentException("Property value cannot be null or empty.");
         this.properties.put(property, new StringPropertyValue(value));
         return this;
     }
 
     public BlockStateBuilder setProperty(String property, int value) {
-        if (property == null || property.isEmpty()) throw new IllegalArgumentException("Property name cannot be null or empty.");
+        if (property == null || property.isEmpty())
+            throw new IllegalArgumentException("Property name cannot be null or empty.");
         this.properties.put(property, new IntPropertyValue(value));
         return this;
     }
 
     public BlockStateBuilder setProperty(String property, boolean value) {
-        if (property == null || property.isEmpty()) throw new IllegalArgumentException("Property name cannot be null or empty.");
+        if (property == null || property.isEmpty())
+            throw new IllegalArgumentException("Property name cannot be null or empty.");
         this.properties.put(property, new BoolPropertyValue(value));
         return this;
     }
@@ -91,7 +93,7 @@ public final class BlockStateBuilder {
                 propertyValues[i] = parsePropertyValues(parts[1]);
             }
         } else {
-            properties = new  String[0];
+            properties = new String[0];
             propertyValues = new BlockPropertyValue[0];
         }
 
@@ -109,7 +111,8 @@ public final class BlockStateBuilder {
         try {
             int value = parseInt(valueString);
             return new IntPropertyValue(value);
-        } catch (NumberFormatException ignored) { }
+        } catch (NumberFormatException ignored) {
+        }
         if ("true".equalsIgnoreCase(valueString)) {
             return new BoolPropertyValue(true);
         }
@@ -161,17 +164,26 @@ public final class BlockStateBuilder {
 
         @Override
         public BlockState withProperty(String property, String value) {
-            return BlockStateBuilder.get().setFrom(this).setProperty(property, value).build();
+            return BlockStateBuilder.get()
+                    .setFrom(this)
+                    .setProperty(property, value)
+                    .build();
         }
 
         @Override
         public BlockState withProperty(String property, int value) {
-            return BlockStateBuilder.get().setFrom(this).setProperty(property, value).build();
+            return BlockStateBuilder.get()
+                    .setFrom(this)
+                    .setProperty(property, value)
+                    .build();
         }
 
         @Override
         public BlockState withProperty(String property, boolean value) {
-            return BlockStateBuilder.get().setFrom(this).setProperty(property, value).build();
+            return BlockStateBuilder.get()
+                    .setFrom(this)
+                    .setProperty(property, value)
+                    .build();
         }
 
         @Override
@@ -185,10 +197,10 @@ public final class BlockStateBuilder {
 
         static String formatProperties(BlockState blockState) {
             return '['
-                   + blockState.getProperties().entrySet().stream()
-                           .map(BlockStateImplementation::formatProperty)
-                           .collect(joining(","))
-                   + ']';
+                    + blockState.getProperties().entrySet().stream()
+                            .map(BlockStateImplementation::formatProperty)
+                            .collect(joining(","))
+                    + ']';
         }
 
         public static String toString(BlockState blockState) {
@@ -202,15 +214,12 @@ public final class BlockStateBuilder {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o)
-                return true;
-            if (o == null || getClass() != o.getClass())
-                return false;
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
 
             BlockStateImplementation that = (BlockStateImplementation) o;
 
-            if (!block.equals(that.block))
-                return false;
+            if (!block.equals(that.block)) return false;
             return properties.equals(that.properties);
         }
 
@@ -220,7 +229,6 @@ public final class BlockStateBuilder {
             result = 31 * result + properties.hashCode();
             return result;
         }
-
     }
 
     private static final class StringPropertyValue implements BlockPropertyValue {
@@ -237,8 +245,7 @@ public final class BlockStateBuilder {
 
         @Override
         public boolean equals(Object o) {
-            if (o == null || getClass() != o.getClass())
-                return false;
+            if (o == null || getClass() != o.getClass()) return false;
             StringPropertyValue that = (StringPropertyValue) o;
             return Objects.equals(this.value, that.value);
         }
@@ -247,7 +254,6 @@ public final class BlockStateBuilder {
         public int hashCode() {
             return Objects.hashCode(this.value);
         }
-
     }
 
     private static final class IntPropertyValue implements BlockPropertyValue {
@@ -274,8 +280,7 @@ public final class BlockStateBuilder {
 
         @Override
         public boolean equals(Object o) {
-            if (o == null || getClass() != o.getClass())
-                return false;
+            if (o == null || getClass() != o.getClass()) return false;
             IntPropertyValue that = (IntPropertyValue) o;
             return this.value == that.value;
         }
@@ -310,8 +315,7 @@ public final class BlockStateBuilder {
 
         @Override
         public boolean equals(Object o) {
-            if (o == null || getClass() != o.getClass())
-                return false;
+            if (o == null || getClass() != o.getClass()) return false;
             BoolPropertyValue that = (BoolPropertyValue) o;
             return this.value == that.value;
         }
@@ -321,5 +325,4 @@ public final class BlockStateBuilder {
             return Objects.hashCode(this.value);
         }
     }
-
 }

@@ -1,9 +1,9 @@
 package net.buildtheearth.terracore.minecraft;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import net.buildtheearth.terracore.minecraft.exceptions.SubstituteParseException;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 public class IdentifierTest {
 
@@ -52,5 +52,4 @@ public class IdentifierTest {
         assertEquals(namespace, identifier.namespace());
         assertEquals(path, identifier.path());
     }
-
 }

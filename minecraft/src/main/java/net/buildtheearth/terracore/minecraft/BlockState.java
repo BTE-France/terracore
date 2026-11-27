@@ -1,8 +1,7 @@
 package net.buildtheearth.terracore.minecraft;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Map;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A block state is a block and all its properties when placed in a world.
@@ -92,10 +91,6 @@ public interface BlockState {
      * @throws IllegalArgumentException if the supplied String is not a valid serialied {@link BlockState}
      */
     static BlockState parse(@NotNull String string) {
-        return BlockStateBuilder.get()
-                .reset()
-                .setFromSerializedString(string)
-                .build();
+        return BlockStateBuilder.get().reset().setFromSerializedString(string).build();
     }
-    
 }

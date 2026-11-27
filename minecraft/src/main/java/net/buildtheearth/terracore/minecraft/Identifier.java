@@ -1,13 +1,12 @@
 package net.buildtheearth.terracore.minecraft;
 
+import static java.util.Objects.*;
+
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.With;
 import net.buildtheearth.terracore.minecraft.exceptions.SubstituteParseException;
 import org.jetbrains.annotations.NotNull;
-
-import static java.util.Objects.*;
-
 
 /**
  * A unique identifier for a namespaced game resource.
@@ -32,20 +31,21 @@ import static java.util.Objects.*;
  *
  * @author Smyler
  */
-@Getter @With
+@Getter
+@With
 public final class Identifier implements Comparable<Identifier> {
 
     /**
      * The namespace of this identifier.
      * Is never <code>null</code> and always matches <code>[a-z0-9_.-]+</code>.
      */
-	public final @NonNull String namespace;
+    public final @NonNull String namespace;
 
     /**
      * The path of this identifier.
      * Is never <code>null</code> and always matches <code>[a-z0-9_./-]+</code>.
      */
-	public final @NonNull String path;
+    public final @NonNull String path;
 
     /**
      * Creates a new {@link Identifier} with the given namespace and path.
@@ -58,10 +58,10 @@ public final class Identifier implements Comparable<Identifier> {
      * @throws NullPointerException if either the namespace or path are <code>null</code>
      * @throws IllegalArgumentException if either the namespace or path are not valid
      */
-	public Identifier(@NonNull String namespace, @NonNull String path) {
+    public Identifier(@NonNull String namespace, @NonNull String path) {
         this.namespace = checkNamespaceString(namespace);
         this.path = checkPathString(path);
-	}
+    }
 
     /**
      * Creates a new {@link Identifier} with the given path in the namespace <code>minecraft</code>.
@@ -97,13 +97,13 @@ public final class Identifier implements Comparable<Identifier> {
         for (int i = 0; i < namespace.length(); i++) {
             char ch = namespace.charAt(i);
             final boolean isValidChar =
-                    ch == '_'
-                    || ch == '-'
-                    || ch == '.'
-                    || (ch >= '0' && ch <= '9')
-                    || (ch >= 'a' && ch <= 'z');
+                    ch == '_' || ch == '-' || ch == '.' || (ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'z');
             if (!isValidChar) {
-                throw new SubstituteParseException(namespace, Identifier.class, "invalid identifier namespace character '" + ch + "' at index " + i + " in string \"" + namespace + "\"");
+                throw new SubstituteParseException(
+                        namespace,
+                        Identifier.class,
+                        "invalid identifier namespace character '" + ch + "' at index " + i + " in string \""
+                                + namespace + "\"");
             }
         }
         return namespace;
@@ -115,42 +115,43 @@ public final class Identifier implements Comparable<Identifier> {
         }
         for (int i = 0; i < path.length(); i++) {
             char ch = path.charAt(i);
-            final boolean isValidChar =
-                    ch == '_'
+            final boolean isValidChar = ch == '_'
                     || ch == '-'
                     || ch == '.'
                     || ch == '/'
                     || (ch >= '0' && ch <= '9')
                     || (ch >= 'a' && ch <= 'z');
             if (!isValidChar) {
-                throw new SubstituteParseException(path, Identifier.class, "invalid identifier path character '" + ch + "' at index " + i + " in string \"" + path + "\"");
+                throw new SubstituteParseException(
+                        path,
+                        Identifier.class,
+                        "invalid identifier path character '" + ch + "' at index " + i + " in string \"" + path + "\"");
             }
         }
         return path;
     }
 
     @Override
-	public String toString() {
-		return this.namespace + ':' + this.path;
-	}
+    public String toString() {
+        return this.namespace + ':' + this.path;
+    }
 
     @Override
-	public boolean equals(Object other) {
-		if(this == other) return true;
-		if(!(other instanceof Identifier)) return false;
+    public boolean equals(Object other) {
+        if (this == other) return true;
+        if (!(other instanceof Identifier)) return false;
         Identifier otherName = (Identifier) other;
         return this.namespace.equals(otherName.namespace) && this.path.equals(otherName.path);
-	}
+    }
 
     @Override
-	public int hashCode() {
+    public int hashCode() {
         return hash(this.namespace, this.path);
-	}
+    }
 
     @Override
-	public int compareTo(Identifier other) {
-		int spaces = this.namespace.compareTo(other.namespace);
-        return spaces != 0 ? spaces: this.path.compareTo(other.path);
-	}
-
+    public int compareTo(Identifier other) {
+        int spaces = this.namespace.compareTo(other.namespace);
+        return spaces != 0 ? spaces : this.path.compareTo(other.path);
+    }
 }

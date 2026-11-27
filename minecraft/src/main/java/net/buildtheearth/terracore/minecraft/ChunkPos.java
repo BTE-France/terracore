@@ -60,8 +60,7 @@ public class ChunkPos {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass())
-            return false;
+        if (o == null || getClass() != o.getClass()) return false;
         ChunkPos chunkPos = (ChunkPos) o;
         return this.x == chunkPos.x && this.z == chunkPos.z;
     }
@@ -70,5 +69,4 @@ public class ChunkPos {
     public int hashCode() {
         return Objects.hash(this.x, this.z);
     }
-
 }

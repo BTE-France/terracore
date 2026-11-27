@@ -1,9 +1,8 @@
 package net.buildtheearth.terracore.minecraft;
 
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 public class BlockStateTest {
 
@@ -17,7 +16,10 @@ public class BlockStateTest {
         assertEquals(new Identifier("minecraft", "dirt"), state.getBlock());
         assertEquals(0, state.getProperties().size());
 
-        state = builder.setBlock(dirt).setProperty("facing", "north").setProperty("facing", "south").build();
+        state = builder.setBlock(dirt)
+                .setProperty("facing", "north")
+                .setProperty("facing", "south")
+                .build();
         assertEquals(new Identifier("minecraft", "dirt"), state.getBlock());
         assertEquals(1, state.getProperties().size());
         assertEquals("south", state.getProperty("facing").getAsString());
@@ -34,7 +36,11 @@ public class BlockStateTest {
         assertTrue(state.getProperty("power").canBeInt());
         assertEquals(10, state.getProperty("power").getAsInt());
 
-        state = builder.setBlock(dirt).setProperty("power", 10).setProperty("dirty", true).setProperty("facing", "north").build();
+        state = builder.setBlock(dirt)
+                .setProperty("power", 10)
+                .setProperty("dirty", true)
+                .setProperty("facing", "north")
+                .build();
         assertEquals(3, state.getProperties().size());
         assertEquals("north", state.getProperty("facing").getAsString());
         assertTrue(state.getProperty("dirty").canBeBoolean());
@@ -57,7 +63,9 @@ public class BlockStateTest {
     @Test
     void testStringProperty() {
         BlockStateBuilder builder = BlockStateBuilder.get();
-        BlockState state = builder.setProperty("name", "value").setBlock(new Identifier("minecraft", "dirt")).build();
+        BlockState state = builder.setProperty("name", "value")
+                .setBlock(new Identifier("minecraft", "dirt"))
+                .build();
         BlockPropertyValue value = state.getProperty("name");
         assertFalse(value.canBeBoolean());
         assertFalse(value.canBeInt());
@@ -69,7 +77,9 @@ public class BlockStateTest {
     @Test
     void testIntProperty() {
         BlockStateBuilder builder = BlockStateBuilder.get();
-        BlockState state = builder.setProperty("name", 42).setBlock(new Identifier("minecraft", "dirt")).build();
+        BlockState state = builder.setProperty("name", 42)
+                .setBlock(new Identifier("minecraft", "dirt"))
+                .build();
         BlockPropertyValue value = state.getProperty("name");
         assertFalse(value.canBeBoolean());
         assertTrue(value.canBeInt());
@@ -81,7 +91,9 @@ public class BlockStateTest {
     @Test
     void testBoolProperty() {
         BlockStateBuilder builder = BlockStateBuilder.get();
-        BlockState state = builder.setProperty("name", true).setBlock(new Identifier("minecraft", "dirt")).build();
+        BlockState state = builder.setProperty("name", true)
+                .setBlock(new Identifier("minecraft", "dirt"))
+                .build();
         BlockPropertyValue value = state.getProperty("name");
         assertTrue(value.canBeBoolean());
         assertFalse(value.canBeInt());
@@ -170,5 +182,4 @@ public class BlockStateTest {
         assertThrows(IllegalArgumentException.class, () -> BlockState.parse("foo[=fizz]"));
         assertThrows(IllegalArgumentException.class, () -> BlockState.parse("foo[,bar=fizz]"));
     }
-
 }
