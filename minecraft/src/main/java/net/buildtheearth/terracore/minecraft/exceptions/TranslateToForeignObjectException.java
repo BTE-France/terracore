@@ -16,15 +16,13 @@ public class TranslateToForeignObjectException extends SubstituteException {
     private final @NonNull Object substituteObject;
     private final @NonNull Class<?> foreignClass;
 
-    public TranslateToForeignObjectException(@NonNull Object substituteObject, @NonNull Class<?> foreignClass, @NonNull String errorMessage) {
-        super(
-                "Failed to convert substitute object " + substituteObject
+    public TranslateToForeignObjectException(
+            @NonNull Object substituteObject, @NonNull Class<?> foreignClass, @NonNull String errorMessage) {
+        super("Failed to convert substitute object " + substituteObject
                 + " of class " + substituteObject.getClass()
                 + " into a substitute of class " + foreignClass
-                + ": " + errorMessage
-        );
+                + ": " + errorMessage);
         this.substituteObject = substituteObject;
         this.foreignClass = foreignClass;
     }
-
 }

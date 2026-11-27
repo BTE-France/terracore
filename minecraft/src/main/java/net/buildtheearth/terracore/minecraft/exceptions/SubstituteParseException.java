@@ -13,5 +13,4 @@ public class SubstituteParseException extends SubstituteException {
     public SubstituteParseException(@NotNull String serialized, @NonNull Class<?> clazz, @NonNull String message) {
         super("Failed to parse '" + serialized + "' into " + clazz + ": " + message);
     }
-
 }

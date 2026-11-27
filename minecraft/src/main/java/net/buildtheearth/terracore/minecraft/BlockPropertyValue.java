@@ -41,5 +41,4 @@ public interface BlockPropertyValue {
     default boolean getAsBoolean() {
         throw new UnsupportedOperationException("Block property \"" + this.getAsString() + "\" cannot be a boolean.");
     }
-
 }

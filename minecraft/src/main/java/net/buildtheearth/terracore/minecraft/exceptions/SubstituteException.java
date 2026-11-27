@@ -15,5 +15,4 @@ public abstract class SubstituteException extends RuntimeException {
     public SubstituteException(String message) {
         super(message);
     }
-
 }
