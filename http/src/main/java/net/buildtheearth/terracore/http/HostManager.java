@@ -104,9 +104,8 @@ final class HostManager extends Host {
     }
 
     private boolean trySendRequest0(@NonNull Request request) {
-        if (request.callback
-                .isCancelled()) { // future is already completed (probably due to cancellation), pretend that we handled
-            // it
+        if (request.callback.isCancelled()) {
+            // future is already completed (probably due to cancellation), pretend that we handled it
             return true;
         }
 
@@ -125,8 +124,8 @@ final class HostManager extends Host {
 
     private void considerOpeningAnotherConnection() {
         if (this.channelFuture == null) { // channelFuture is null, so there is no currently opening channel
-            (this.channelFuture = this.bootstrap.connect())
-                    .addListener((ChannelFutureListener) this::handleChannelOpened);
+            this.channelFuture = this.bootstrap.connect();
+            this.channelFuture.addListener((ChannelFutureListener) this::handleChannelOpened);
         }
     }
 
@@ -159,9 +158,8 @@ final class HostManager extends Host {
                 // and the server closed it at the same time as we sent the request. let's re-submit the request
                 // so that it can be issued again on a new channel
 
-                this.pendingRequests.addFirst(
-                        request); // add to front of queue so that it doesn't have to wait through the entire queue
-                // again
+                // add to front of queue so that it doesn't have to wait through the entire queue again
+                this.pendingRequests.addFirst(request);
             }
 
             // working off the queue may open a new channel to replace this one if there are more pending requests
@@ -290,9 +288,8 @@ final class HostManager extends Host {
     private final class Handler extends ChannelInboundHandlerAdapter {
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-            ctx.pipeline()
-                    .remove("read_timeout"); // remove read timeout listener to prevent a fake timeout if the connection
-            // is idle
+            // remove read timeout listener to prevent a fake timeout if the connection is idle
+            ctx.pipeline().remove("read_timeout");
             HostManager.this.handleResponse(ctx.channel(), msg);
         }
 
