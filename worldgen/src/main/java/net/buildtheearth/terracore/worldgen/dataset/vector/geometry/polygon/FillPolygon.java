@@ -4,11 +4,11 @@ import static net.daporkchop.lib.common.math.PMath.clamp;
 import static net.daporkchop.lib.common.math.PMath.floorI;
 
 import lombok.NonNull;
+import net.buildtheearth.terracore.geo.bvh.Bounds2d;
 import net.buildtheearth.terracore.minecraft.ChunkPos;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.geometry.MultiPolygon;
 import net.buildtheearth.terracore.worldgen.dataset.vector.draw.DrawFunction;
 import net.buildtheearth.terracore.worldgen.generator.CachedChunkData;
-import net.buildtheearth.terracore.geo.bvh.Bounds2d;
 
 /**
  * @author DaPorkchop_

@@ -1,9 +1,8 @@
 package net.buildtheearth.terracore.worldgen.dataset.osm.dvalue;
 
 import com.google.gson.annotations.JsonAdapter;
-import lombok.NonNull;
-
 import java.util.Map;
+import lombok.NonNull;
 
 /**
  * @author DaPorkchop_

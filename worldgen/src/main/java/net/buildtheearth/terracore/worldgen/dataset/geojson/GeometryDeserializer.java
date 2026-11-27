@@ -21,7 +21,6 @@
 package net.buildtheearth.terracore.worldgen.dataset.geojson;
 
 import com.google.gson.stream.JsonReader;
-
 import java.io.IOException;
 
 /**

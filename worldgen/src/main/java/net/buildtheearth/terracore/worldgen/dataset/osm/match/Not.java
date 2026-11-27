@@ -1,11 +1,9 @@
 package net.buildtheearth.terracore.worldgen.dataset.osm.match;
 
-import java.io.IOException;
-import java.util.Map;
-
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.stream.JsonReader;
-
+import java.io.IOException;
+import java.util.Map;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.Geometry;
@@ -24,7 +22,11 @@ final class Not implements MatchCondition {
     protected final MatchCondition delegate;
 
     @Override
-    public boolean test(String id, @NonNull Map<String, String> tags, @NonNull Geometry originalGeometry, @NonNull Geometry projectedGeometry) {
+    public boolean test(
+            String id,
+            @NonNull Map<String, String> tags,
+            @NonNull Geometry originalGeometry,
+            @NonNull Geometry projectedGeometry) {
         return !this.delegate.test(id, tags, originalGeometry, projectedGeometry);
     }
 

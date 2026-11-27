@@ -3,16 +3,14 @@ package net.buildtheearth.terracore.worldgen.dataset.geojson.geometry;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
-import java.util.Iterator;
-
 import com.google.common.collect.Iterators;
-
+import java.util.Iterator;
 import lombok.Data;
 import lombok.NonNull;
-import net.buildtheearth.terracore.worldgen.dataset.geojson.Geometry;
+import net.buildtheearth.terracore.geo.bvh.Bounds2d;
 import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
 import net.buildtheearth.terracore.geo.projection.ProjectionFunction;
-import net.buildtheearth.terracore.geo.bvh.Bounds2d;
+import net.buildtheearth.terracore.worldgen.dataset.geojson.Geometry;
 
 /**
  * @author DaPorkchop_

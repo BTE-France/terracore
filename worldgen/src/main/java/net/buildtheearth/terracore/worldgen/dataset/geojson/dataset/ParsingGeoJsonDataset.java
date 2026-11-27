@@ -1,10 +1,9 @@
 package net.buildtheearth.terracore.worldgen.dataset.geojson.dataset;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import lombok.NonNull;
 import net.buildtheearth.terracore.worldgen.dataset.KeyedHttpDataset;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.GeoJson;
@@ -20,7 +19,8 @@ public class ParsingGeoJsonDataset extends KeyedHttpDataset<GeoJsonObject[]> {
 
     @Override
     protected GeoJsonObject[] decode(@NonNull String path, @NonNull ByteBuf data) throws Exception {
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new ByteBufInputStream(data)))) { //parse each line as a GeoJSON object
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(new ByteBufInputStream(data)))) { // parse each line as a GeoJSON object
             return reader.lines().map(GeoJson::parse).toArray(GeoJsonObject[]::new);
         }
     }

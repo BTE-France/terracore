@@ -3,9 +3,6 @@ package net.buildtheearth.terracore.worldgen.generator;
 import static java.util.Objects.*;
 import static net.daporkchop.lib.common.util.PValidation.checkState;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
@@ -19,6 +16,8 @@ import com.google.common.base.Strings;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import java.io.IOException;
+import java.io.InputStream;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
@@ -37,13 +36,15 @@ public class EarthGeneratorSettings {
     public static final int CONFIG_VERSION = 2;
     public static final String DEFAULT_SETTINGS;
     private static final LoadingCache<String, EarthGeneratorSettings> SETTINGS_PARSE_CACHE = CacheBuilder.newBuilder()
-            .weakKeys().weakValues()
+            .weakKeys()
+            .weakValues()
             .build(CacheLoader.from(EarthGeneratorSettings::parseUncached));
     public static final String BTE_DEFAULT_SETTINGS;
 
     static {
         try {
-            try (InputStream in = EarthGeneratorSettings.class.getResourceAsStream("default_generator_settings.json5")) {
+            try (InputStream in =
+                    EarthGeneratorSettings.class.getResourceAsStream("default_generator_settings.json5")) {
                 requireNonNull(in);
                 DEFAULT_SETTINGS = new String(StreamUtil.toByteArray(in));
             }
@@ -94,16 +95,19 @@ public class EarthGeneratorSettings {
     }
 
     @NonNull
-    @Getter(onMethod_ = { @JsonGetter })
+    @Getter(onMethod_ = {@JsonGetter})
     protected final GeographicProjection projection;
 
-    @Getter(onMethod_ = { @JsonGetter })
+    @Getter(onMethod_ = {@JsonGetter})
     protected final boolean useDefaultHeights;
-    @Getter(onMethod_ = { @JsonGetter })
+
+    @Getter(onMethod_ = {@JsonGetter})
     protected final boolean useDefaultTreeCover;
 
-    protected transient final Cached<EarthBiomeProvider> biomeProvider = Cached.global(() -> new EarthBiomeProvider(this), ReferenceStrength.SOFT);
-    protected transient final Cached<GeneratorDatasets> datasets = Cached.global(() -> new GeneratorDatasets(this), ReferenceStrength.SOFT);
+    protected final transient Cached<EarthBiomeProvider> biomeProvider =
+            Cached.global(() -> new EarthBiomeProvider(this), ReferenceStrength.SOFT);
+    protected final transient Cached<GeneratorDatasets> datasets =
+            Cached.global(() -> new GeneratorDatasets(this), ReferenceStrength.SOFT);
 
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
     public EarthGeneratorSettings(
@@ -140,5 +144,4 @@ public class EarthGeneratorSettings {
     public GeneratorDatasets datasets() {
         return this.datasets.get();
     }
-
 }

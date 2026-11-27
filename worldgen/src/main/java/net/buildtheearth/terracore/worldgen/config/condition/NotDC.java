@@ -11,7 +11,7 @@ import lombok.NonNull;
  * @author DaPorkchop_
  */
 @JsonDeserialize
-@Getter(onMethod_ = { @JsonGetter })
+@Getter(onMethod_ = {@JsonGetter})
 public class NotDC implements DoubleCondition {
     protected final DoubleCondition delegate;
 

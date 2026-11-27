@@ -4,14 +4,13 @@ import static java.lang.Math.max;
 
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
-
+import net.buildtheearth.terracore.geo.CornerBoundingBox2d;
+import net.buildtheearth.terracore.geo.bvh.Bounds2d;
+import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
 import net.buildtheearth.terracore.minecraft.ChunkPos;
 import net.buildtheearth.terracore.worldgen.generator.CachedChunkData;
 import net.buildtheearth.terracore.worldgen.generator.EarthGeneratorPipelines;
 import net.buildtheearth.terracore.worldgen.generator.GeneratorDatasets;
-import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
-import net.buildtheearth.terracore.geo.CornerBoundingBox2d;
-import net.buildtheearth.terracore.geo.bvh.Bounds2d;
 
 /**
  * Sets the surface height at null island to 1.
@@ -20,7 +19,9 @@ import net.buildtheearth.terracore.geo.bvh.Bounds2d;
  */
 public class NullIslandBaker implements IEarthDataBaker<Void> {
     @Override
-    public CompletableFuture<Void> requestData(ChunkPos pos, GeneratorDatasets datasets, Bounds2d bounds, CornerBoundingBox2d boundsGeo) throws OutOfProjectionBoundsException {
+    public CompletableFuture<Void> requestData(
+            ChunkPos pos, GeneratorDatasets datasets, Bounds2d bounds, CornerBoundingBox2d boundsGeo)
+            throws OutOfProjectionBoundsException {
         return null;
     }
 

@@ -5,13 +5,12 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 import io.netty.buffer.ByteBuf;
 import lombok.Getter;
 import lombok.NonNull;
+import net.buildtheearth.terracore.geo.projection.GeographicProjection;
 import net.buildtheearth.terracore.worldgen.config.scalarparse.d.DoubleScalarParser;
 import net.buildtheearth.terracore.worldgen.dataset.BlendMode;
-import net.buildtheearth.terracore.geo.projection.GeographicProjection;
 
 /**
  * Implementation of {@link DoubleTiledDataset} whose behavior is defined by JSON configuration.
@@ -20,7 +19,7 @@ import net.buildtheearth.terracore.geo.projection.GeographicProjection;
  */
 @JsonDeserialize
 @JsonSerialize
-@Getter(onMethod_ = { @JsonGetter })
+@Getter(onMethod_ = {@JsonGetter})
 public class ConfigurableDoubleTiledDataset extends DoubleTiledDataset {
     protected final String[] urls;
     protected final DoubleScalarParser parse;

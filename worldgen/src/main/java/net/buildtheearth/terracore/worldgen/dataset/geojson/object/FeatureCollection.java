@@ -1,12 +1,10 @@
 package net.buildtheearth.terracore.worldgen.dataset.geojson.object;
 
 import com.google.common.collect.Iterators;
-
+import java.util.Iterator;
 import lombok.Data;
 import lombok.NonNull;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.GeoJsonObject;
-
-import java.util.Iterator;
 
 /**
  * @author DaPorkchop_

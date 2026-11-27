@@ -2,7 +2,6 @@ package net.buildtheearth.terracore.worldgen.generator;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import net.buildtheearth.terracore.minecraft.Biome;
@@ -45,7 +44,6 @@ public class EarthGeneratorPipelines {
 
     public static BiomeOpts BIOME_OPTIONS = new BiomeOpts();
 
-
     public Map<String, Object> datasets(@NonNull EarthGeneratorSettings settings) {
         Map<String, Object> m = new HashMap<>();
 
@@ -53,7 +51,9 @@ public class EarthGeneratorPipelines {
 
         ParsingGeoJsonDataset rawOsm = new ParsingGeoJsonDataset(OSM_OPTIONS.servers);
         m.put(KEY_DATASET_OSM_RAW, new TiledGeoJsonDataset(new ReferenceResolvingGeoJsonDataset(rawOsm)));
-        m.put(KEY_DATASET_OSM_PARSED, new VectorTiledDataset(new GeoJsonToVectorDataset(rawOsm, OSMConfig.load(), settings.projection())));
+        m.put(
+                KEY_DATASET_OSM_PARSED,
+                new VectorTiledDataset(new GeoJsonToVectorDataset(rawOsm, OSMConfig.load(), settings.projection())));
 
         m.put(KEY_DATASET_TERRA121_PRECIPITATION, new Climate.Precipitation());
         m.put(KEY_DATASET_TERRA121_SOIL, new Soil());
@@ -64,7 +64,7 @@ public class EarthGeneratorPipelines {
     }
 
     public IEarthBiomeFilter<?>[] biomeFilters(@NonNull EarthGeneratorSettings settings) {
-        return new IEarthBiomeFilter<?>[] {new Terra121BiomeFilter() };
+        return new IEarthBiomeFilter<?>[] {new Terra121BiomeFilter()};
     }
 
     public IEarthDataBaker<?>[] dataBakers(@NonNull EarthGeneratorSettings settings) {
@@ -78,9 +78,7 @@ public class EarthGeneratorPipelines {
     }
 
     public static class OSMOpts {
-        public String[] servers = {
-                "https://cloud.daporkchop.net/gis/osm/0/"
-        };
+        public String[] servers = {"https://cloud.daporkchop.net/gis/osm/0/"};
     }
 
     public static class BiomeOpts {
@@ -90,5 +88,4 @@ public class EarthGeneratorPipelines {
         public Biome nullIslandInnerBiome = Biome.parse("forest");
         public Biome nullIslandOuterBiome = Biome.parse("plains");
     }
-
 }

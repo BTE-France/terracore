@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-
 import java.io.IOException;
 import java.util.Map;
 
@@ -40,6 +39,6 @@ public abstract class TypedSerializer<T> extends JsonSerializer<T> {
     protected abstract Map<Class<? extends T>, String> registry();
 
     @JsonSerialize
-    private class MixIn {} // Have this here to avoid a bug in forge gradle (https://forums.minecraftforge.net/topic/40670-build-terminates-at-extractrangemapreplacedmain/)
-
+    private class MixIn {} // Have this here to avoid a bug in forge gradle
+    // (https://forums.minecraftforge.net/topic/40670-build-terminates-at-extractrangemapreplacedmain/)
 }

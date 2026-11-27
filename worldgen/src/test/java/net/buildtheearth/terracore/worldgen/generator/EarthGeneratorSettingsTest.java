@@ -1,16 +1,17 @@
 package net.buildtheearth.terracore.worldgen.generator;
 
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 public class EarthGeneratorSettingsTest {
 
     @Test
     void testDefaults() {
-        final EarthGeneratorSettings defaultSettings = EarthGeneratorSettings.parse(EarthGeneratorSettings.DEFAULT_SETTINGS);
-        final EarthGeneratorSettings bteSettings = EarthGeneratorSettings.parse(EarthGeneratorSettings.BTE_DEFAULT_SETTINGS);
+        final EarthGeneratorSettings defaultSettings =
+                EarthGeneratorSettings.parse(EarthGeneratorSettings.DEFAULT_SETTINGS);
+        final EarthGeneratorSettings bteSettings =
+                EarthGeneratorSettings.parse(EarthGeneratorSettings.BTE_DEFAULT_SETTINGS);
         this.testNonNullFields(defaultSettings);
         this.testNonNullFields(bteSettings);
     }
@@ -20,5 +21,4 @@ public class EarthGeneratorSettingsTest {
         assertNotNull(settings.datasets());
         assertNotNull(settings.biomeProvider());
     }
-
 }

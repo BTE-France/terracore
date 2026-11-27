@@ -2,16 +2,14 @@ package net.buildtheearth.terracore.worldgen.dataset.osm;
 
 import static net.daporkchop.lib.common.util.PValidation.checkArg;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
-
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.daporkchop.lib.common.function.io.IOBiFunction;
@@ -23,7 +21,8 @@ import net.daporkchop.lib.common.function.io.IOFunction;
  * @author DaPorkchop_
  */
 public abstract class JsonParser<T> extends TypeAdapter<T> {
-    public static <T> List<T> readList(@NonNull JsonReader in, @NonNull IOFunction<JsonReader, T> elementParser) throws IOException {
+    public static <T> List<T> readList(@NonNull JsonReader in, @NonNull IOFunction<JsonReader, T> elementParser)
+            throws IOException {
         List<T> list = new ArrayList<>();
 
         in.beginArray();
@@ -47,7 +46,8 @@ public abstract class JsonParser<T> extends TypeAdapter<T> {
         return list;
     }
 
-    public static <T> List<T> readTypedList(@NonNull JsonReader in, @NonNull IOBiFunction<String, JsonReader, T> elementParser) throws IOException {
+    public static <T> List<T> readTypedList(
+            @NonNull JsonReader in, @NonNull IOBiFunction<String, JsonReader, T> elementParser) throws IOException {
         List<T> list = new ArrayList<>();
 
         in.beginObject();
@@ -70,9 +70,11 @@ public abstract class JsonParser<T> extends TypeAdapter<T> {
      * @author DaPorkchop_
      */
     @RequiredArgsConstructor
-    private static abstract class AbstractTyped<T, V> extends JsonParser<V> implements IOBiFunction<String, JsonReader, T> {
+    private abstract static class AbstractTyped<T, V> extends JsonParser<V>
+            implements IOBiFunction<String, JsonReader, T> {
         @NonNull
         protected final String name;
+
         @NonNull
         protected final Map<String, Class<? extends T>> types;
 
@@ -89,7 +91,7 @@ public abstract class JsonParser<T> extends TypeAdapter<T> {
      *
      * @author DaPorkchop_
      */
-    public static abstract class Typed<T> extends AbstractTyped<T, T> {
+    public abstract static class Typed<T> extends AbstractTyped<T, T> {
         public Typed(String name, Map<String, Class<? extends T>> types) {
             super(name, types);
         }

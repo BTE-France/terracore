@@ -5,17 +5,16 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.netty.buffer.ByteBuf;
+import java.io.IOException;
 import lombok.Getter;
 import lombok.NonNull;
 import net.buildtheearth.terracore.worldgen.config.scalarparse.i.IntScalarParser;
-
-import java.io.IOException;
 
 /**
  * @author DaPorkchop_
  */
 @JsonDeserialize
-@Getter(onMethod_ = { @JsonGetter })
+@Getter(onMethod_ = {@JsonGetter})
 public class FromIntDSP implements DoubleScalarParser {
     protected final IntScalarParser delegate;
 

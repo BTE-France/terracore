@@ -8,5 +8,5 @@ import net.buildtheearth.terracore.worldgen.util.ImmutableCompactArray;
 /**
  * @author DaPorkchop_
  */
-public interface IEarthBiomeFilter<D> extends IEarthAsyncPipelineStep<D, ImmutableCompactArray<Biome>, ChunkBiomesBuilder> {
-}
+public interface IEarthBiomeFilter<D>
+        extends IEarthAsyncPipelineStep<D, ImmutableCompactArray<Biome>, ChunkBiomesBuilder> {}

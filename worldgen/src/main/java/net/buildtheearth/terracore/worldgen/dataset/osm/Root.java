@@ -1,13 +1,11 @@
 package net.buildtheearth.terracore.worldgen.dataset.osm;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Map;
-
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
-
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Map;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
@@ -34,20 +32,26 @@ import net.daporkchop.lib.common.util.PorkUtil;
 final class Root implements OSMMapper<Geometry> {
     @NonNull
     protected final LineMapper line;
+
     @NonNull
     protected final PolygonMapper polygon;
 
     @Override
-    public Collection<VectorGeometry> apply(String id, @NonNull Map<String, String> tags, @NonNull Geometry originalGeometry, @NonNull Geometry projectedGeometry) {
-        if (projectedGeometry instanceof Point || projectedGeometry instanceof MultiPoint) { //points can't be generated
+    public Collection<VectorGeometry> apply(
+            String id,
+            @NonNull Map<String, String> tags,
+            @NonNull Geometry originalGeometry,
+            @NonNull Geometry projectedGeometry) {
+        if (projectedGeometry instanceof Point
+                || projectedGeometry instanceof MultiPoint) { // points can't be generated
             return null;
         }
 
-        //convert to multi type if not already
+        // convert to multi type if not already
         if (projectedGeometry instanceof LineString) {
-            projectedGeometry = new MultiLineString(new LineString[]{ (LineString) projectedGeometry });
+            projectedGeometry = new MultiLineString(new LineString[] {(LineString) projectedGeometry});
         } else if (projectedGeometry instanceof Polygon) {
-            projectedGeometry = new MultiPolygon(new Polygon[]{ (Polygon) projectedGeometry });
+            projectedGeometry = new MultiPolygon(new Polygon[] {(Polygon) projectedGeometry});
         }
 
         if (projectedGeometry instanceof MultiLineString) {

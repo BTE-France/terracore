@@ -1,14 +1,13 @@
 package net.buildtheearth.terracore.worldgen.dataset.vector.geometry;
 
-import net.buildtheearth.terracore.worldgen.dataset.geojson.geometry.LineString;
-import net.buildtheearth.terracore.worldgen.dataset.geojson.geometry.Point;
-import net.buildtheearth.terracore.worldgen.dataset.vector.draw.DrawFunction;
+import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-
-import java.util.List;
+import net.buildtheearth.terracore.worldgen.dataset.geojson.geometry.LineString;
+import net.buildtheearth.terracore.worldgen.dataset.geojson.geometry.Point;
+import net.buildtheearth.terracore.worldgen.dataset.vector.draw.DrawFunction;
 
 /**
  * @author DaPorkchop_
@@ -29,7 +28,9 @@ public abstract class AbstractVectorGeometry implements VectorGeometry {
 
     @NonNull
     protected final String id;
+
     protected final double layer;
+
     @NonNull
     protected final DrawFunction draw;
 }

@@ -1,12 +1,11 @@
 package net.buildtheearth.terracore.worldgen.util;
 
-import lombok.AllArgsConstructor;
-import lombok.NonNull;
-
-import java.util.Map;
-
 import static net.daporkchop.lib.common.util.PValidation.*;
 import static net.daporkchop.lib.common.util.PorkUtil.*;
+
+import java.util.Map;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
 
 /**
  * @author DaPorkchop_

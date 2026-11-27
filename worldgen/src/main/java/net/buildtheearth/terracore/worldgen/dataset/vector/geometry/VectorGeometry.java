@@ -1,8 +1,8 @@
 package net.buildtheearth.terracore.worldgen.dataset.vector.geometry;
 
 import lombok.NonNull;
-import net.buildtheearth.terracore.worldgen.generator.CachedChunkData;
 import net.buildtheearth.terracore.geo.bvh.Bounds2d;
+import net.buildtheearth.terracore.worldgen.generator.CachedChunkData;
 
 /**
  * A generate-able OpenStreetMap element.
@@ -33,7 +33,7 @@ public interface VectorGeometry extends Comparable<VectorGeometry>, Bounds2d {
     @Override
     default int compareTo(VectorGeometry o) {
         int d = Double.compare(this.layer(), o.layer());
-        if (d == 0) { //elements are on the same layer, compare IDs
+        if (d == 0) { // elements are on the same layer, compare IDs
             return this.id().compareTo(o.id());
         } else {
             return d;

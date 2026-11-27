@@ -1,13 +1,11 @@
 package net.buildtheearth.terracore.worldgen.dataset.osm.mapper;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Map;
-
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
-
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.Geometry;
@@ -29,19 +27,25 @@ import net.daporkchop.lib.common.util.GenericMatcher;
 abstract class Condition<G extends Geometry, M extends OSMMapper<G>> implements OSMMapper<G> {
     @NonNull
     protected final MatchCondition match;
+
     @NonNull
     protected final M emit;
 
     @Override
-    public Collection<VectorGeometry> apply(String id, @NonNull Map<String, String> tags, @NonNull Geometry originalGeometry, @NonNull G projectedGeometry) {
-        if (!this.match.test(id, tags, originalGeometry, projectedGeometry)) { //element doesn't match, emit nothing
+    public Collection<VectorGeometry> apply(
+            String id,
+            @NonNull Map<String, String> tags,
+            @NonNull Geometry originalGeometry,
+            @NonNull G projectedGeometry) {
+        if (!this.match.test(id, tags, originalGeometry, projectedGeometry)) { // element doesn't match, emit nothing
             return null;
         }
 
         return this.emit.apply(id, tags, originalGeometry, projectedGeometry);
     }
 
-    static abstract class Parser<G extends Geometry, M extends OSMMapper<G>, I extends Condition<?, ?>> extends JsonParser<I> {
+    abstract static class Parser<G extends Geometry, M extends OSMMapper<G>, I extends Condition<?, ?>>
+            extends JsonParser<I> {
         protected final Class<M> mapperClass = GenericMatcher.uncheckedFind(this.getClass(), Parser.class, "M");
 
         @Override

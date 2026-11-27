@@ -1,9 +1,8 @@
 package net.buildtheearth.terracore.worldgen.dataset.osm.mapper;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.buildtheearth.terracore.worldgen.dataset.osm.JsonParser;
-
 import java.util.Map;
+import net.buildtheearth.terracore.worldgen.dataset.osm.JsonParser;
 
 /**
  * @author DaPorkchop_

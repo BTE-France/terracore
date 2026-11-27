@@ -1,7 +1,6 @@
 package net.buildtheearth.terracore.worldgen.dataset.vector.draw;
 
 import com.google.gson.annotations.JsonAdapter;
-
 import lombok.NonNull;
 import net.buildtheearth.terracore.worldgen.generator.CachedChunkData;
 

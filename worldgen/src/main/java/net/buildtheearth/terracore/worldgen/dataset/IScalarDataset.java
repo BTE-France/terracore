@@ -1,13 +1,11 @@
 package net.buildtheearth.terracore.worldgen.dataset;
 
-import java.util.concurrent.CompletableFuture;
-
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
+import java.util.concurrent.CompletableFuture;
 import lombok.NonNull;
-import net.buildtheearth.terracore.worldgen.dataset.scalar.ConfigurableDoubleTiledDataset;
-import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
 import net.buildtheearth.terracore.geo.CornerBoundingBox2d;
+import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
+import net.buildtheearth.terracore.worldgen.dataset.scalar.ConfigurableDoubleTiledDataset;
 
 /**
  * A dataset consisting of floating-point scalar values.
@@ -40,5 +38,6 @@ public interface IScalarDataset {
      * @param sizeZ the number of samples to take along the Z axis
      * @return a {@link CompletableFuture} which will be completed with the values
      */
-    CompletableFuture<double[]> getAsync(@NonNull CornerBoundingBox2d bounds, int sizeX, int sizeZ) throws OutOfProjectionBoundsException;
+    CompletableFuture<double[]> getAsync(@NonNull CornerBoundingBox2d bounds, int sizeX, int sizeZ)
+            throws OutOfProjectionBoundsException;
 }

@@ -5,21 +5,20 @@ import static net.daporkchop.lib.common.math.PMath.clamp;
 
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
-
+import net.buildtheearth.terracore.geo.CornerBoundingBox2d;
+import net.buildtheearth.terracore.geo.bvh.Bounds2d;
+import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
 import net.buildtheearth.terracore.minecraft.ChunkPos;
 import net.buildtheearth.terracore.worldgen.dataset.IScalarDataset;
 import net.buildtheearth.terracore.worldgen.generator.CachedChunkData;
 import net.buildtheearth.terracore.worldgen.generator.EarthGeneratorPipelines;
 import net.buildtheearth.terracore.worldgen.generator.GeneratorDatasets;
-import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
-import net.buildtheearth.terracore.geo.CornerBoundingBox2d;
-import net.buildtheearth.terracore.geo.bvh.Bounds2d;
 
 /**
  * @author DaPorkchop_
  */
 public class TreeCoverBaker implements IEarthDataBaker<double[]> {
-    public static final double TREE_AREA = 2.0d * 2.0d; //the surface area covered by an average tree
+    public static final double TREE_AREA = 2.0d * 2.0d; // the surface area covered by an average tree
 
     public static final byte[] FALLBACK_TREE_DENSITY = new byte[16 * 16];
 
@@ -32,21 +31,24 @@ public class TreeCoverBaker implements IEarthDataBaker<double[]> {
             return 0;
         }
 
-        //value is in range [0-1]
+        // value is in range [0-1]
         value *= (1.0 / TREE_AREA);
 
-        //scale to byte range
+        // scale to byte range
         value *= 255.0d;
 
-        //increase by 50%
+        // increase by 50%
         value *= 1.50d;
 
         return (byte) clamp(ceilI(value), 0, 255);
     }
 
     @Override
-    public CompletableFuture<double[]> requestData(ChunkPos pos, GeneratorDatasets datasets, Bounds2d bounds, CornerBoundingBox2d boundsGeo) throws OutOfProjectionBoundsException {
-        return datasets.<IScalarDataset>getCustom(EarthGeneratorPipelines.KEY_DATASET_TREE_COVER).getAsync(boundsGeo, 16, 16);
+    public CompletableFuture<double[]> requestData(
+            ChunkPos pos, GeneratorDatasets datasets, Bounds2d bounds, CornerBoundingBox2d boundsGeo)
+            throws OutOfProjectionBoundsException {
+        return datasets.<IScalarDataset>getCustom(EarthGeneratorPipelines.KEY_DATASET_TREE_COVER)
+                .getAsync(boundsGeo, 16, 16);
     }
 
     @Override

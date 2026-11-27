@@ -7,5 +7,5 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
  */
 @JsonDeserialize
 public class ParseJpgISP extends ParsePngISP {
-    //we don't actually need to do anything different, since ImageIO does automatic type detection...
+    // we don't actually need to do anything different, since ImageIO does automatic type detection...
 }

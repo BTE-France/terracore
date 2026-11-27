@@ -1,9 +1,8 @@
 package net.buildtheearth.terracore.worldgen.dataset;
 
+import io.netty.buffer.ByteBuf;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
-
-import io.netty.buffer.ByteBuf;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

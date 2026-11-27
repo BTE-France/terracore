@@ -20,21 +20,20 @@
 
 package net.buildtheearth.terracore.worldgen.dataset.geojson;
 
+import static net.buildtheearth.terracore.worldgen.dataset.geojson.GeoJson.*;
+import static net.daporkchop.lib.common.util.PValidation.*;
+
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
-import lombok.Getter;
-import net.buildtheearth.terracore.worldgen.dataset.geojson.object.Feature;
-import net.buildtheearth.terracore.worldgen.dataset.geojson.object.FeatureCollection;
-import net.buildtheearth.terracore.worldgen.dataset.geojson.object.Reference;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static net.buildtheearth.terracore.worldgen.dataset.geojson.GeoJson.*;
-import static net.daporkchop.lib.common.util.PValidation.*;
+import lombok.Getter;
+import net.buildtheearth.terracore.worldgen.dataset.geojson.object.Feature;
+import net.buildtheearth.terracore.worldgen.dataset.geojson.object.FeatureCollection;
+import net.buildtheearth.terracore.worldgen.dataset.geojson.object.Reference;
 
 /**
  * @author DaPorkchop_

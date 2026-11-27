@@ -2,9 +2,11 @@ package net.buildtheearth.terracore.worldgen.generator.biome;
 
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
-
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import net.buildtheearth.terracore.geo.CornerBoundingBox2d;
+import net.buildtheearth.terracore.geo.bvh.Bounds2d;
+import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
 import net.buildtheearth.terracore.minecraft.Biome;
 import net.buildtheearth.terracore.minecraft.ChunkPos;
 import net.buildtheearth.terracore.worldgen.dataset.IScalarDataset;
@@ -12,9 +14,6 @@ import net.buildtheearth.terracore.worldgen.generator.ChunkBiomesBuilder;
 import net.buildtheearth.terracore.worldgen.generator.EarthBiomeProvider;
 import net.buildtheearth.terracore.worldgen.generator.EarthGeneratorPipelines;
 import net.buildtheearth.terracore.worldgen.generator.GeneratorDatasets;
-import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
-import net.buildtheearth.terracore.geo.CornerBoundingBox2d;
-import net.buildtheearth.terracore.geo.bvh.Bounds2d;
 
 /**
  * Implementation of {@link IEarthBiomeFilter} that emits the same Biome as legacy terra121.
@@ -24,8 +23,7 @@ import net.buildtheearth.terracore.geo.bvh.Bounds2d;
 public class Terra121BiomeFilter implements IEarthBiomeFilter<Terra121BiomeFilter.Data> {
 
     // Biomes used by this filter
-    private static final Biome
-            OCEAN = Biome.parse("ocean"),
+    private static final Biome OCEAN = Biome.parse("ocean"),
             PLAINS = Biome.parse("plains"),
             DESERT = Biome.parse("desert"),
             FOREST = Biome.parse("forest"),
@@ -39,10 +37,18 @@ public class Terra121BiomeFilter implements IEarthBiomeFilter<Terra121BiomeFilte
             BADLANDS = Biome.parse("badlands");
 
     @Override
-    public CompletableFuture<Terra121BiomeFilter.Data> requestData(ChunkPos pos, GeneratorDatasets datasets, Bounds2d bounds, CornerBoundingBox2d boundsGeo) throws OutOfProjectionBoundsException {
-        CompletableFuture<double[]> precipitationFuture = datasets.<IScalarDataset>getCustom(EarthGeneratorPipelines.KEY_DATASET_TERRA121_PRECIPITATION).getAsync(boundsGeo, 16, 16);
-        CompletableFuture<double[]> soilFuture = datasets.<IScalarDataset>getCustom(EarthGeneratorPipelines.KEY_DATASET_TERRA121_SOIL).getAsync(boundsGeo, 16, 16);
-        CompletableFuture<double[]> temperatureFuture = datasets.<IScalarDataset>getCustom(EarthGeneratorPipelines.KEY_DATASET_TERRA121_TEMPERATURE).getAsync(boundsGeo, 16, 16);
+    public CompletableFuture<Terra121BiomeFilter.Data> requestData(
+            ChunkPos pos, GeneratorDatasets datasets, Bounds2d bounds, CornerBoundingBox2d boundsGeo)
+            throws OutOfProjectionBoundsException {
+        CompletableFuture<double[]> precipitationFuture = datasets.<IScalarDataset>getCustom(
+                        EarthGeneratorPipelines.KEY_DATASET_TERRA121_PRECIPITATION)
+                .getAsync(boundsGeo, 16, 16);
+        CompletableFuture<double[]> soilFuture = datasets.<IScalarDataset>getCustom(
+                        EarthGeneratorPipelines.KEY_DATASET_TERRA121_SOIL)
+                .getAsync(boundsGeo, 16, 16);
+        CompletableFuture<double[]> temperatureFuture = datasets.<IScalarDataset>getCustom(
+                        EarthGeneratorPipelines.KEY_DATASET_TERRA121_TEMPERATURE)
+                .getAsync(boundsGeo, 16, 16);
 
         return CompletableFuture.allOf(precipitationFuture, soilFuture, temperatureFuture)
                 .thenApply(unused -> new Data(precipitationFuture.join(), soilFuture.join(), temperatureFuture.join()));
@@ -71,17 +77,17 @@ public class Terra121BiomeFilter implements IEarthBiomeFilter<Terra121BiomeFilte
      */
     protected Biome classify(double precipitation, double soil, double temperature) {
         switch ((int) soil) {
-            case 0: //Ocean
+            case 0: // Ocean
                 return OCEAN;
-            case 1: //Shifting Sand
+            case 1: // Shifting Sand
                 return DESERT;
-            case 2: //Rock
-                return DESERT; //cant find it (rock mountians)
-            case 3: //Ice
+            case 2: // Rock
+                return DESERT; // cant find it (rock mountians)
+            case 3: // Ice
                 return FROZEN_PEAKS;
             case 5:
             case 6:
-            case 7: //Permafrost
+            case 7: // Permafrost
                 return SNOWY_PLAINS;
             case 10:
                 return JUNGLE;
@@ -125,12 +131,12 @@ public class Terra121BiomeFilter implements IEarthBiomeFilter<Terra121BiomeFilte
                 return PLAINS;
             case 50:
                 return SNOWY_TAIGA;
-            case 51: //salt flats always desert
+            case 51: // salt flats always desert
                 return DESERT;
             case 52:
             case 53:
             case 55:
-            case 99: //hot and dry
+            case 99: // hot and dry
                 if (temperature < 2) {
                     return SNOWY_TAIGA;
                 } else if (temperature < 5) {
@@ -138,7 +144,7 @@ public class Terra121BiomeFilter implements IEarthBiomeFilter<Terra121BiomeFilte
                 } else if (precipitation < 5) {
                     return DESERT;
                 }
-                return BADLANDS; //TODO: this soil can also be desert i.e. saudi Arabia (base on percip?)
+                return BADLANDS; // TODO: this soil can also be desert i.e. saudi Arabia (base on percip?)
             case 54:
             case 56:
                 return SAVANNA;
@@ -193,8 +199,10 @@ public class Terra121BiomeFilter implements IEarthBiomeFilter<Terra121BiomeFilte
     protected static class Data {
         @NonNull
         protected final double[] precipitation;
+
         @NonNull
         protected final double[] soil;
+
         @NonNull
         protected final double[] temperature;
     }

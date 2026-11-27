@@ -3,13 +3,12 @@ package net.buildtheearth.terracore.worldgen.config.scalarparse.d;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.netty.buffer.ByteBuf;
+import java.io.IOException;
+import java.util.Map;
 import lombok.NonNull;
 import net.buildtheearth.terracore.worldgen.config.GlobalParseRegistries;
 import net.buildtheearth.terracore.worldgen.config.TypedDeserializer;
 import net.buildtheearth.terracore.worldgen.config.TypedSerializer;
-
-import java.io.IOException;
-import java.util.Map;
 
 /**
  * Parses a square grid of {@code double} values from a binary representation.

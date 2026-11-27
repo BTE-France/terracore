@@ -1,24 +1,22 @@
 package net.buildtheearth.terracore.worldgen.dataset.osm.mapper;
 
+import static net.daporkchop.lib.common.util.PValidation.*;
+
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.stream.JsonReader;
-
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.Geometry;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.geometry.MultiLineString;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.geometry.MultiPolygon;
 import net.buildtheearth.terracore.worldgen.dataset.osm.JsonParser;
 import net.buildtheearth.terracore.worldgen.dataset.osm.OSMMapper;
 import net.buildtheearth.terracore.worldgen.dataset.vector.geometry.VectorGeometry;
-import lombok.AllArgsConstructor;
-import lombok.NonNull;
 import net.daporkchop.lib.common.util.GenericMatcher;
-
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
-import static net.daporkchop.lib.common.util.PValidation.*;
 
 /**
  * Returns the result of the first of a number of mappers that returned a non-{@code null} value.
@@ -31,7 +29,11 @@ abstract class First<G extends Geometry, M extends OSMMapper<G>> implements OSMM
     protected final M[] children;
 
     @Override
-    public Collection<VectorGeometry> apply(String id, @NonNull Map<String, String> tags, @NonNull Geometry originalGeometry, @NonNull G projectedGeometry) {
+    public Collection<VectorGeometry> apply(
+            String id,
+            @NonNull Map<String, String> tags,
+            @NonNull Geometry originalGeometry,
+            @NonNull G projectedGeometry) {
         for (M child : this.children) {
             Collection<VectorGeometry> result = child.apply(id, tags, originalGeometry, projectedGeometry);
             if (result != null) {
@@ -39,10 +41,10 @@ abstract class First<G extends Geometry, M extends OSMMapper<G>> implements OSMM
             }
         }
 
-        return null; //none matched!
+        return null; // none matched!
     }
 
-    static abstract class Parser<G extends Geometry, M extends OSMMapper<G>> extends JsonParser<M> {
+    abstract static class Parser<G extends Geometry, M extends OSMMapper<G>> extends JsonParser<M> {
         protected final Class<M> mapperClass = GenericMatcher.uncheckedFind(this.getClass(), Parser.class, "M");
 
         @Override

@@ -1,7 +1,6 @@
 package net.buildtheearth.terracore.worldgen.dataset;
 
 import java.util.concurrent.CompletableFuture;
-
 import lombok.NonNull;
 
 /**

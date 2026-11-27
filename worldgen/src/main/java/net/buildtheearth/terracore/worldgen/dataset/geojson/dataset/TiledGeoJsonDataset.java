@@ -4,17 +4,16 @@ import static net.daporkchop.lib.common.util.PorkUtil.uncheckedCast;
 
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
-
 import lombok.NonNull;
+import net.buildtheearth.terracore.geo.CornerBoundingBox2d;
 import net.buildtheearth.terracore.geo.TileLocation;
+import net.buildtheearth.terracore.geo.bvh.Bounds2d;
+import net.buildtheearth.terracore.geo.projection.EquirectangularProjection;
+import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
 import net.buildtheearth.terracore.worldgen.dataset.IDataset;
 import net.buildtheearth.terracore.worldgen.dataset.IElementDataset;
 import net.buildtheearth.terracore.worldgen.dataset.TiledDataset;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.GeoJsonObject;
-import net.buildtheearth.terracore.geo.projection.EquirectangularProjection;
-import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
-import net.buildtheearth.terracore.geo.CornerBoundingBox2d;
-import net.buildtheearth.terracore.geo.bvh.Bounds2d;
 
 /**
  * @author DaPorkchop_
@@ -34,15 +33,15 @@ public class TiledGeoJsonDataset extends TiledDataset<GeoJsonObject[]> implement
     }
 
     @Override
-    public CompletableFuture<GeoJsonObject[][]> getAsync(@NonNull CornerBoundingBox2d bounds) throws OutOfProjectionBoundsException {
+    public CompletableFuture<GeoJsonObject[][]> getAsync(@NonNull CornerBoundingBox2d bounds)
+            throws OutOfProjectionBoundsException {
         Bounds2d localBounds = bounds.fromGeo(this.projection).axisAlign();
         CompletableFuture<GeoJsonObject[]>[] futures = uncheckedCast(Arrays.stream(localBounds.toTiles(this.tileSize))
                 .map(this::getAsync)
                 .toArray(CompletableFuture[]::new));
 
-        return CompletableFuture.allOf(futures).thenApply(unused ->
-                Arrays.stream(futures)
-                        .map(CompletableFuture::join)
-                        .toArray(GeoJsonObject[][]::new));
+        return CompletableFuture.allOf(futures)
+                .thenApply(unused ->
+                        Arrays.stream(futures).map(CompletableFuture::join).toArray(GeoJsonObject[][]::new));
     }
 }

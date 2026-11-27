@@ -2,13 +2,11 @@ package net.buildtheearth.terracore.worldgen.dataset.osm.match;
 
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.stream.JsonReader;
-
+import java.io.IOException;
+import java.util.Map;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.buildtheearth.terracore.worldgen.dataset.geojson.Geometry;
-
-import java.io.IOException;
-import java.util.Map;
 
 /**
  * Combines the results of multiple match conditions using a logical OR operation.
@@ -22,7 +20,11 @@ final class Or implements MatchCondition {
     protected final MatchCondition[] delegates;
 
     @Override
-    public boolean test(String id, @NonNull Map<String, String> tags, @NonNull Geometry originalGeometry, @NonNull Geometry projectedGeometry) {
+    public boolean test(
+            String id,
+            @NonNull Map<String, String> tags,
+            @NonNull Geometry originalGeometry,
+            @NonNull Geometry projectedGeometry) {
         for (MatchCondition delegate : this.delegates) {
             if (delegate.test(id, tags, originalGeometry, projectedGeometry)) {
                 return true;

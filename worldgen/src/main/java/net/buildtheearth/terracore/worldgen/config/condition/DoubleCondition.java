@@ -2,13 +2,11 @@ package net.buildtheearth.terracore.worldgen.config.condition;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
+import java.util.Map;
+import java.util.function.DoublePredicate;
 import net.buildtheearth.terracore.worldgen.config.GlobalParseRegistries;
 import net.buildtheearth.terracore.worldgen.config.TypedDeserializer;
 import net.buildtheearth.terracore.worldgen.config.TypedSerializer;
-
-import java.util.Map;
-import java.util.function.DoublePredicate;
 
 /**
  * A condition that accepts a {@code double} value and checks if it is applicable to a given argument.

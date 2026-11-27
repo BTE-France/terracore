@@ -1,10 +1,9 @@
 package net.buildtheearth.terracore.worldgen.dataset;
 
 import java.util.concurrent.CompletableFuture;
-
 import lombok.NonNull;
-import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
 import net.buildtheearth.terracore.geo.CornerBoundingBox2d;
+import net.buildtheearth.terracore.geo.projection.OutOfProjectionBoundsException;
 
 /**
  * A dataset consisting of arbitrary elements.

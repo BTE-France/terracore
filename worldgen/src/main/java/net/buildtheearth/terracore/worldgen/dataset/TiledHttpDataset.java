@@ -1,12 +1,10 @@
 package net.buildtheearth.terracore.worldgen.dataset;
 
+import com.google.common.collect.ImmutableMap;
+import io.netty.buffer.ByteBuf;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-
-import com.google.common.collect.ImmutableMap;
-
-import io.netty.buffer.ByteBuf;
 import lombok.NonNull;
 import net.buildtheearth.terracore.geo.TileLocation;
 import net.buildtheearth.terracore.geo.projection.GeographicProjection;
@@ -38,7 +36,7 @@ public abstract class TiledHttpDataset<T> extends TiledDataset<T> {
     public CompletableFuture<T> load(@NonNull TileLocation pos) throws Exception {
         String[] urls = this.urls(pos.x(), pos.y());
 
-        if (urls == null || urls.length == 0) { //no urls for tile
+        if (urls == null || urls.length == 0) { // no urls for tile
             return CompletableFuture.completedFuture(null);
         }
 
