@@ -18,6 +18,9 @@ import net.buildtheearth.terracore.worldgen.generator.GeneratorDatasets;
  * @author DaPorkchop_
  */
 public class TreeCoverBaker implements IEarthDataBaker<double[]> {
+    /**
+     * The surface area covered by an average tree, in meters squared.
+     */
     public static final double TREE_AREA = 2.0d * 2.0d; // the surface area covered by an average tree
 
     public static final byte[] FALLBACK_TREE_DENSITY = new byte[16 * 16];

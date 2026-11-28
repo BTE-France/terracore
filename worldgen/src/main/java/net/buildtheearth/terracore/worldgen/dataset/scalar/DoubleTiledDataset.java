@@ -60,8 +60,8 @@ public abstract class DoubleTiledDataset extends TiledHttpDataset<double[]> impl
             }
 
             @Override
-            public Double apply(
-                    Void unused) { // stage 2: actually compute the value now that the tiles have been fetched
+            public Double apply(Void unused) {
+                // stage 2: actually compute the value now that the tiles have been fetched
                 return DoubleTiledDataset.this.blend.get(this.localCoords[0], this.localCoords[1], this);
             }
         }
@@ -78,8 +78,8 @@ public abstract class DoubleTiledDataset extends TiledHttpDataset<double[]> impl
     @Override
     public CompletableFuture<double[]> getAsync(@NonNull CornerBoundingBox2d bounds, int sizeX, int sizeZ)
             throws OutOfProjectionBoundsException {
-        if (notNegative(sizeX, "sizeX") == 0
-                | notNegative(sizeZ, "sizeZ") == 0) { // no input points -> no output points, ez
+        if (notNegative(sizeX, "sizeX") == 0 | notNegative(sizeZ, "sizeZ") == 0) {
+            // no input points -> no output points, ez
             return CompletableFuture.completedFuture(new double[0]);
         }
 
@@ -93,8 +93,8 @@ public abstract class DoubleTiledDataset extends TiledHttpDataset<double[]> impl
             }
 
             @Override
-            public double[] apply(
-                    Void unused) { // stage 2: actually compute the values now that the tiles have been fetched
+            public double[] apply(Void unused) {
+                // stage 2: actually compute the values now that the tiles have been fetched
                 BlendMode blend = DoubleTiledDataset.this.blend;
 
                 double stepX = 1.0d / sizeX;
@@ -149,17 +149,15 @@ public abstract class DoubleTiledDataset extends TiledHttpDataset<double[]> impl
             TileLocation[] tilePositions = this.paddedLocalBounds.toTiles(DoubleTiledDataset.this.resolution);
 
             return CompletableFuture.allOf(Arrays.stream(tilePositions)
-                            .map(pos -> DoubleTiledDataset.this
-                                    .getAsync(pos)
-                                    .thenApply(
-                                            tile -> { // put tile directly into map when it's loaded
-                                                // synchronize because we can't be certain that all of the futures will
-                                                // be completed by the same thread
-                                                synchronized (this.loadedTiles) {
-                                                    this.loadedTiles.put(BinMath.packXY(pos.x(), pos.y()), tile);
-                                                }
-                                                return tile;
-                                            }))
+                            .map(pos -> DoubleTiledDataset.this.getAsync(pos).thenApply(tile -> {
+                                // put tile directly into map when it's loaded
+                                // synchronize because we can't be certain that all of the futures will
+                                // be completed by the same thread
+                                synchronized (this.loadedTiles) {
+                                    this.loadedTiles.put(BinMath.packXY(pos.x(), pos.y()), tile);
+                                }
+                                return tile;
+                            }))
                             .toArray(CompletableFuture[]::new))
                     .thenApplyAsync(this);
         }

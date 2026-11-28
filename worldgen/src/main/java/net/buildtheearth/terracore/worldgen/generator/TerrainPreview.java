@@ -341,14 +341,11 @@ public class TerrainPreview extends CacheLoader<TileLocation, CompletableFuture<
                                     b = lerpI(255, 64, clamp(waterHeight - groundHeight + 1, 0, 8) / 8.0f);
                                 }
 
-                                g = max(
-                                        g,
-                                        lerpI(
-                                                0,
-                                                80,
-                                                (treeCoverArr[cx * 16 + cz] & 0xFF)
-                                                        * TreeCoverBaker.TREE_AREA
-                                                        * (1.0d / 255.0d)));
+                                var treeDensity = treeCoverArr[cx * 16 + cz] & 0xFF;
+                                var treeColorIntensity =
+                                        lerpI(0, 80, treeDensity * TreeCoverBaker.TREE_AREA * (1.0d / 255.0d));
+                                g = max(g, treeColorIntensity);
+
                                 c = r << 16 | g << 8 | b;
                             }
 

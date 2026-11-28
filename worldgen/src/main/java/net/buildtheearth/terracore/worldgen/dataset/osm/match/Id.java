@@ -68,8 +68,8 @@ interface Id extends MatchCondition {
                         readList(in, reader -> reader.nextString().intern()));
                 if (expectedIds.isEmpty()) { // if no IDs are given, no ID can possibly match
                     return FALSE;
-                } else if (expectedIds.size()
-                        == 1) { // if only a single ID is given there's no need to compare against a set
+                } else if (expectedIds.size() == 1) {
+                    // if only a single ID is given there's no need to compare against a set
                     return new Exactly(expectedIds.iterator().next());
                 } else {
                     return new Any(expectedIds);

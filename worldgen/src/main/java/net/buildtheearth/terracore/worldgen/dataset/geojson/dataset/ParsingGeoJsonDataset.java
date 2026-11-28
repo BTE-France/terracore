@@ -19,8 +19,8 @@ public class ParsingGeoJsonDataset extends KeyedHttpDataset<GeoJsonObject[]> {
 
     @Override
     protected GeoJsonObject[] decode(@NonNull String path, @NonNull ByteBuf data) throws Exception {
-        try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(new ByteBufInputStream(data)))) { // parse each line as a GeoJSON object
+        try (var reader = new BufferedReader(new InputStreamReader(new ByteBufInputStream(data)))) {
+            // parse each line as a GeoJSON object
             return reader.lines().map(GeoJson::parse).toArray(GeoJsonObject[]::new);
         }
     }
