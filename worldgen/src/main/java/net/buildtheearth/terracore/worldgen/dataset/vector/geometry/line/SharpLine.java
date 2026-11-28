@@ -44,7 +44,9 @@ public class SharpLine extends AbstractLine {
             double absDz = abs(dz);
 
             if (absDx >= absDz) { // Calculate Z from X (line is more horizontal than vertical)
-                if (absDx < 0.01d) dx += copySign(0.01d, dx); // Avoid infinite slopes
+                if (absDx < 0.01d) {
+                    dx += copySign(0.01d, dx); // Avoid infinite slopes
+                }
                 double slope = dz / dx;
                 double offset = z0 - slope * x0;
 
@@ -63,7 +65,9 @@ public class SharpLine extends AbstractLine {
                     if (z >= 0 && z < 16) this.draw.drawOnto(builder, floorI(x), floorI(z), 1);
                 }
             } else { // Calculate X from Z (line is more vertical than horizontal)
-                if (absDz < 0.01d) dz += copySign(0.01d, dz); // Avoid infinite slopes
+                if (absDz < 0.01d) {
+                    dz += copySign(0.01d, dz); // Avoid infinite slopes
+                }
                 double slope = dx / dz;
                 double offset = x0 - slope * z0;
 

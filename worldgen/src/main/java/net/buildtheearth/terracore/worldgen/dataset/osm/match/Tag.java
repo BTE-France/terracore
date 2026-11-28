@@ -101,8 +101,8 @@ interface Tag extends MatchCondition {
                         readList(in, reader -> reader.nextString().intern()));
                 if (expectedValues.isEmpty()) { // if no values are given, no tag can possibly match
                     result = FALSE;
-                } else if (expectedValues.size()
-                        == 1) { // if only a single value is given there's no need to compare against a set
+                } else if (expectedValues.size() == 1) {
+                    // if only a single value is given there's no need to compare against a set
                     result = new Exactly(key, expectedValues.iterator().next());
                 } else {
                     result = new Any(key, expectedValues);

@@ -95,11 +95,11 @@ public class MultiScalarDataset implements IScalarDataset {
             public void accept(Double v, Throwable cause) {
                 if (cause != null) {
                     this.future.completeExceptionally(cause);
-                } else if (!Double.isNaN(v)
-                        && datasets[this.i].test(
-                                v)) { // if the value in the input array is accepted, use it as the output
+                } else if (!Double.isNaN(v) && datasets[this.i].test(v)) {
+                    // if the value in the input array is accepted, use it as the output
                     this.future.complete(v);
-                } else { // sample the next dataset
+                } else {
+                    // sample the next dataset
                     this.advance();
                 }
             }
@@ -150,8 +150,8 @@ public class MultiScalarDataset implements IScalarDataset {
             public void accept(double[] data, Throwable cause) {
                 if (cause != null) {
                     this.future.completeExceptionally(cause);
-                } else if (data
-                        != null) { // if the array is null, it's as if it were an array of NaNs - nothing would be set,
+                } else if (data != null) {
+                    // if the array is null, it's as if it were an array of NaNs - nothing would be set,
                     // we simply skip it
                     double[] out = this.out;
                     if (out == null) { // ensure the destination array is set
@@ -163,9 +163,8 @@ public class MultiScalarDataset implements IScalarDataset {
                     for (int i = 0; i < sizeX * sizeZ; i++) {
                         if (Double.isNaN(out[i])) { // if value in output array is NaN, consider replacing it
                             double v = data[i];
-                            if (!Double.isNaN(v)
-                                    && dataset.test(
-                                            v)) { // if the value in the input array is accepted, use it as the output
+                            if (!Double.isNaN(v) && dataset.test(v)) {
+                                // if the value in the input array is accepted, use it as the output
                                 out[i] = v;
                                 if (--this.remaining == 0) { // if no samples are left to process, we're done!
                                     this.future.complete(out);

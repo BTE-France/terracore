@@ -31,8 +31,8 @@ public abstract class AbstractBuiltinDataset implements IScalarDataset {
     @Override
     public CompletableFuture<double[]> getAsync(@NonNull CornerBoundingBox2d bounds, int sizeX, int sizeZ)
             throws OutOfProjectionBoundsException {
-        if (notNegative(sizeX, "sizeX") == 0
-                | notNegative(sizeZ, "sizeZ") == 0) { // no input points -> no output points, ez
+        if (notNegative(sizeX, "sizeX") == 0 | notNegative(sizeZ, "sizeZ") == 0) {
+            // no input points -> no output points, ez
             return CompletableFuture.completedFuture(new double[0]);
         }
 

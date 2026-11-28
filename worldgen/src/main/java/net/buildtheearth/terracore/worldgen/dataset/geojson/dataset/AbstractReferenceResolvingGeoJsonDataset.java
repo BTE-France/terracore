@@ -45,8 +45,8 @@ public abstract class AbstractReferenceResolvingGeoJsonDataset<V> extends Datase
     @Override
     public CompletableFuture<V> load(@NonNull String key) throws Exception {
         return this.delegate.getAsync(key).thenCompose(objects -> {
-            if (!areAnyObjectsReferences(
-                    objects)) { // none of the objects are references, so there's nothing to be resolved!
+            if (!areAnyObjectsReferences(objects)) {
+                // none of the objects are references, so there's nothing to be resolved!
                 return CompletableFuture.completedFuture(this.translate(Arrays.stream(objects)));
             }
 

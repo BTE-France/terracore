@@ -42,8 +42,8 @@ final class Root implements OSMMapper<Geometry> {
             @NonNull Map<String, String> tags,
             @NonNull Geometry originalGeometry,
             @NonNull Geometry projectedGeometry) {
-        if (projectedGeometry instanceof Point
-                || projectedGeometry instanceof MultiPoint) { // points can't be generated
+        if (projectedGeometry instanceof Point || projectedGeometry instanceof MultiPoint) {
+            // points can't be generated
             return null;
         }
 
