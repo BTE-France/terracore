@@ -1,0 +1,21 @@
+---
+title: Contributing code
+description: Help improve Terracore by contributing code
+---
+
+## Conventions and code style
+
+### Formatting
+
+A uniform code style is enforced through [Spotless](https://github.com/diffplug/spotless).
+The configured formatter is [Palentir Java Format](https://github.com/palantir/palantir-java-format).
+
+You can format Terracore's code automatically:
+```shell
+./gradlew spotlessApply
+```
+
+:::tip
+Consider configuring your IDE or [Git](https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks)
+to automatically format the code before commiting.
+:::
